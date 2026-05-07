@@ -1,24 +1,14 @@
-
----
-
-## 📄 `.gitignore`
-
-Create this file in your project root:
-
-```gitignore
 # Python
+venv/
+.venv/
 __pycache__/
 *.py[cod]
-*$py.class
+*.pyc
+*.pyo
+*.pyd
 *.so
-.Python
-env/
-venv/
-ENV/
-env.bak/
-venv.bak/
-*.egg-info/
 *.egg
+*.egg-info/
 dist/
 build/
 develop-eggs/
@@ -36,9 +26,8 @@ wheels/
 
 # PyInstaller
 *.spec
-*.manifest
 *.exe
-*.pdb
+*.manifest
 
 # Nuitka
 *.build
@@ -55,6 +44,7 @@ wheels/
 Thumbs.db
 
 # Project specific
+ml/
 logs/
 backups/
 *.bak
@@ -62,23 +52,11 @@ backups/
 *.log
 *.tmp
 
-# Assets (keep structure, ignore generated content)
-assets/generated/
-*.ico
-*.png
-*.webp
-!assets/logos/
-
 # Secrets
 .env
 *.key
 *.pem
 *.crt
-
-# Reports
-*.html
-*.pdf
-seo_report.html
 
 # Testing
 .pytest_cache/
@@ -88,7 +66,14 @@ htmlcov/
 # MyPy
 .mypy_cache/
 .dmypy.json
-dmypy.json
 
-# pyright
-pyrightconfig.json
+# README (keep but don't track if auto-generated)
+README.md
+
+# Setup scripts
+setup.bat
+hook-black.py
+.pylintrc
+
+# Assets (keep structure but ignore generated images)
+assets/generated/
