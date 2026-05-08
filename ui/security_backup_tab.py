@@ -21,8 +21,8 @@ class SecurityBackupTab(QWidget):
         self.security_tab = SecurityTab()
         self.backup_tab = BackupTab()
         
-        self.tabs.addTab(self.security_tab, "\f3ed Security")
-        self.tabs.addTab(self.backup_tab, "\f019 Backup & Restore")
+        self.tabs.addTab(self.security_tab, "\uf3ed Security")
+        self.tabs.addTab(self.backup_tab, "\uf019 Backup & Restore")
         
         layout.addWidget(self.tabs)
     
