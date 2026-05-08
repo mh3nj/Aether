@@ -1,0 +1,294 @@
+from pathlib import Path
+from PySide6.QtWidgets import (
+    QWidget, QVBoxLayout, QHBoxLayout, QPushButton, QFileDialog,
+    QLabel, QProgressBar, QApplication, QTreeWidget,
+    QTreeWidgetItem, QHeaderView, QGroupBox, QMessageBox
+)
+from PySide6.QtCore import Qt
+from bs4 import BeautifulSoup
+
+
+class SEOScoreTab(QWidget):
+    def __init__(self):
+        super().__init__()
+        self.project_folder = None
+        self.init_ui()
+
+    def init_ui(self):
+        layout = QVBoxLayout(self)
+
+        # Top controls
+        folder_row = QHBoxLayout()
+        self.folder_label = QLabel("No folder selected")
+        self.select_btn = QPushButton("Select Project Folder")
+        self.select_btn.clicked.connect(self.select_folder)
+        self.scan_btn = QPushButton("Analyze SEO Scores")
+        self.scan_btn.clicked.connect(self.analyze)
+        self.export_btn = QPushButton("📊 Export SEO Report")
+        self.export_btn.clicked.connect(self.export_report)
+        folder_row.addWidget(self.select_btn)
+        folder_row.addWidget(self.scan_btn)
+        folder_row.addWidget(self.folder_label)
+        folder_row.addStretch()
+        layout.addLayout(folder_row)
+
+        # Results tree
+        self.results_tree = QTreeWidget()
+        self.results_tree.setHeaderLabels(["Page", "Score", "Title", "Description", "Issues"])
+        self.results_tree.header().setSectionResizeMode(0, QHeaderView.Stretch)
+        self.results_tree.header().setSectionResizeMode(1, QHeaderView.ResizeToContents)
+        layout.addWidget(self.results_tree)
+
+        # Progress bar
+        self.progress = QProgressBar()
+        self.progress.setVisible(False)
+        layout.addWidget(self.progress)
+
+        # Tips section
+        tips_group = QGroupBox("📖 SEO Best Practices & Score Guide")
+        tips_layout = QVBoxLayout(tips_group)
+        tips_text = QLabel(
+            "📝 **Title Tag:** 50-60 characters – Include primary keyword near beginning\n\n"
+            "📄 **Meta Description:** 150-160 characters – Natural keywords + call-to-action\n\n"
+            "🏷️ **H1 Heading:** Exactly ONE per page – Describes the main topic\n\n"
+            "🖼️ **Image Alt Text:** Describes image for screen readers and SEO\n\n"
+            "📱 **Viewport:** Required for mobile-friendly ranking (Google mobile-first index)\n\n"
+            "⭐ **Score Guide:**\n"
+            "   • 80-100: ✅ Excellent – Optimized for search engines\n"
+            "   • 60-79:  ⚠️ Needs Improvement – Fix critical issues\n"
+            "   • 0-59:   ❌ Critical – Major SEO problems detected"
+        )
+        tips_text.setWordWrap(True)
+        tips_layout.addWidget(tips_text)
+        layout.addWidget(tips_group)
+
+        self.summary_label = QLabel("Ready - Select a folder and click Analyze")
+        layout.addWidget(self.summary_label)
+
+    def select_folder(self):
+        path = QFileDialog.getExistingDirectory(self, "Select Project Folder")
+        if path:
+            self.project_folder = path
+            self.folder_label.setText(path)
+
+    def export_report(self):
+        if not self.results_tree.topLevelItemCount():
+            QMessageBox.warning(self, "Warning", "No data to export. Run analysis first.")
+            return
+        
+        from PySide6.QtWidgets import QFileDialog
+        path, _ = QFileDialog.getSaveFileName(self, "Save Report", "seo_report.html", "HTML Files (*.html)")
+        if not path:
+            return
+        
+        # Collect data
+        page_data = {
+            'score': 0,
+            'title': '',
+            'description': '',
+            'issues': [],
+            'passed': []
+        }
+        
+        # Build HTML report
+        html = f"""<!DOCTYPE html>
+    <html>
+    <head><meta charset="UTF-8"><title>Aether SEO Report</title>
+    <style>
+    body {{ font-family: Arial; margin: 40px; background: #F8F9FA; }}
+    .container {{ max-width: 1200px; margin: 0 auto; background: white; padding: 30px; border-radius: 10px; }}
+    h1 {{ color: #1A1A2E; border-bottom: 3px solid #8095AB; }}
+    table {{ width: 100%; border-collapse: collapse; }}
+    th, td {{ padding: 10px; text-align: left; border-bottom: 1px solid #ddd; }}
+    th {{ background: #1A1A2E; color: white; }}
+    </style>
+    </head>
+    <body>
+    <div class="container">
+    <h1>📊 Aether SEO Report</h1>
+    <p>Generated: {__import__('datetime').datetime.now().strftime('%Y-%m-%d %H:%M:%S')}</p>
+    <h2>Page SEO Scores</h2>
+    <table>
+    <tr><th>Page</th><th>Score</th><th>Title</th><th>Issues</th></tr>
+    """
+        
+        for i in range(self.results_tree.topLevelItemCount()):
+            item = self.results_tree.topLevelItem(i)
+            html += f"<tr><td>{item.text(0)}</td><td>{item.text(1)}</td><td>{item.text(2)[:50]}</td><td>{item.text(4)}</td></tr>"
+        
+        html += """</table>
+    <p style="text-align:center; margin-top:30px;">Generated by Aether Web Dev Tools</p>
+    </div>
+    </body>
+    </html>"""
+        
+        with open(path, 'w', encoding='utf-8') as f:
+            f.write(html)
+        
+        QMessageBox.information(self, "Success", f"Report saved to:\n{path}")
+
+    def calculate_readability(self, text):
+        """Calculate Flesch Reading Ease score (0-100, higher = easier)"""
+        import re
+        if not text or len(text) < 100:
+            return 0, "Insufficient text"
+        
+        # Count sentences
+        sentences = re.split(r'[.!?]+', text)
+        sentences = [s for s in sentences if s.strip()]
+        sentence_count = len(sentences)
+        
+        # Count words
+        words = re.findall(r'\b\w+\b', text.lower())
+        word_count = len(words)
+        
+        # Count syllables (simplified)
+        syllable_count = 0
+        for word in words:
+            # Simple syllable detection
+            word_syllables = max(1, len(re.findall(r'[aeiouy]+', word)))
+            syllable_count += word_syllables
+        
+        if sentence_count == 0 or word_count == 0:
+            return 0, "N/A"
+        
+        # Flesch Reading Ease formula
+        score = 206.835 - 1.015 * (word_count / sentence_count) - 84.6 * (syllable_count / word_count)
+        score = max(0, min(100, score))
+        
+        # Interpret score
+        if score >= 90:
+            level = "Very Easy (5th grade)"
+        elif score >= 80:
+            level = "Easy (6th grade)"
+        elif score >= 70:
+            level = "Fairly Easy (7th grade)"
+        elif score >= 60:
+            level = "Standard (8th-9th grade)"
+        elif score >= 50:
+            level = "Fairly Difficult (10th-12th grade)"
+        elif score >= 30:
+            level = "Difficult (College)"
+        else:
+            level = "Very Difficult (College graduate)"
+        
+        return round(score, 1), level
+
+    def analyze(self):
+        if not self.project_folder:
+            return
+
+        html_files = list(Path(self.project_folder).rglob("*.html"))
+        if not html_files:
+            self.summary_label.setText("No HTML files found.")
+            return
+
+        self.scan_btn.setEnabled(False)
+        self.progress.setVisible(True)
+        self.progress.setMaximum(len(html_files))
+        self.results_tree.clear()
+
+        for idx, html_path in enumerate(html_files):
+            try:
+                with open(html_path, 'r', encoding='utf-8') as f:
+                    soup = BeautifulSoup(f, 'html.parser')
+                
+                score = 100
+                issues = []
+                title = ""
+                description = ""
+
+                # Title check (-30 max)
+                title_tag = soup.find('title')
+                if not title_tag or not title_tag.string:
+                    score -= 30
+                    issues.append("❌ Missing title tag")
+                    title = "(missing)"
+                else:
+                    title = title_tag.string.strip()
+                    length = len(title)
+                    if length < 30:
+                        score -= 15
+                        issues.append(f"Title too short ({length} chars - need 50-60)")
+                    elif length < 50:
+                        score -= 10
+                        issues.append(f"Title slightly short ({length} chars - aim for 50-60)")
+                    elif length > 60:
+                        score -= 10
+                        issues.append(f"Title too long ({length} chars - Google truncates after 60)")
+
+                # Meta description check (-30 max)
+                meta_desc = soup.find('meta', attrs={'name': 'description'})
+                if not meta_desc or not meta_desc.get('content'):
+                    score -= 30
+                    issues.append("❌ Missing meta description")
+                    description = "(missing)"
+                else:
+                    description = meta_desc['content']
+                    length = len(description)
+                    if length < 120:
+                        score -= 10
+                        issues.append(f"Description too short ({length} chars - need 150-160)")
+                    elif length > 160:
+                        score -= 10
+                        issues.append(f"Description too long ({length} chars - truncates on mobile)")
+
+                # H1 check (-20 max)
+                h1_tags = soup.find_all('h1')
+                h1_count = len(h1_tags)
+                if h1_count == 0:
+                    score -= 20
+                    issues.append("❌ No H1 tag - critical for structure")
+                elif h1_count > 1:
+                    score -= 10
+                    issues.append(f"⚠️ {h1_count} H1 tags - use only one")
+
+                # Image alt text (-15 max)
+                img_tags = soup.find_all('img')
+                missing_alt = sum(1 for img in img_tags if not img.get('alt'))
+                if missing_alt > 0:
+                    penalty = min(15, missing_alt * 2)
+                    score -= penalty
+                    issues.append(f"{missing_alt} images missing alt text (-{penalty})")
+
+                # Viewport check (-5)
+                if not soup.find('meta', attrs={'name': 'viewport'}):
+                    score -= 5
+                    issues.append("Missing viewport meta tag (not mobile-friendly)")
+
+                score = max(0, min(100, score))
+                
+                # Color code based on score
+                if score >= 80:
+                    color = Qt.green
+                elif score >= 60:
+                    color = Qt.yellow
+                else:
+                    color = Qt.red
+
+                item = QTreeWidgetItem([
+                    html_path.name,
+                    f"{score}%",
+                    title[:60],
+                    description[:80],
+                    ", ".join(issues[:3]) + ("..." if len(issues) > 3 else "")
+                ])
+                for col in range(5):
+                    item.setForeground(col, color)
+                self.results_tree.addTopLevelItem(item)
+
+            except Exception as e:
+                item = QTreeWidgetItem([html_path.name, "0%", "Error", "", str(e)[:50]])
+                for col in range(5):
+                    item.setForeground(col, Qt.red)
+                self.results_tree.addTopLevelItem(item)
+
+            self.progress.setValue(idx + 1)
+            QApplication.processEvents()
+
+        self.progress.setVisible(False)
+        self.scan_btn.setEnabled(True)
+        self.summary_label.setText(f"✅ Analyzed {len(html_files)} pages")
+
+    def update_theme(self, is_dark):
+        pass
