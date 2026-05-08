@@ -122,7 +122,7 @@ class SERPPreviewTab(QWidget):
                 {title}
             </div>
             <div style="font-size: 14px; color: #4D5156; line-height: 1.4;">{desc}</div>
-            <div style="font-size: 12px; color: #70757A; margin-top: 8px;">\f005 Google SERP Preview — Aether Tool</div>
+            <div style="font-size: 12px; color: #70757A; margin-top: 8px;">\uf005 Google SERP Preview — Aether Tool</div>
         </div>
         """
         
@@ -131,19 +131,19 @@ class SERPPreviewTab(QWidget):
         # Show character warnings
         warnings = []
         if len(self.title_edit.text()) > 60:
-            warnings.append(f"\f071 Title too long: {len(self.title_edit.text())} chars (max 60)")
+            warnings.append(f"\uf071 Title too long: {len(self.title_edit.text())} chars (max 60)")
         elif len(self.title_edit.text()) < 50:
-            warnings.append(f"\f071 Title too short: {len(self.title_edit.text())} chars (recommend 50-60)")
+            warnings.append(f"\uf071 Title too short: {len(self.title_edit.text())} chars (recommend 50-60)")
         
         if len(self.desc_edit.toPlainText()) > 160:
-            warnings.append(f"\f071 Description too long: {len(self.desc_edit.toPlainText())} chars (max 160)")
+            warnings.append(f"\uf071 Description too long: {len(self.desc_edit.toPlainText())} chars (max 160)")
         elif len(self.desc_edit.toPlainText()) < 120:
-            warnings.append(f"\f071 Description too short: {len(self.desc_edit.toPlainText())} chars (recommend 150-160)")
+            warnings.append(f"\uf071 Description too short: {len(self.desc_edit.toPlainText())} chars (recommend 150-160)")
         
         if warnings:
             self.status_label.setText(" | ".join(warnings))
         else:
-            self.status_label.setText("\f00c Perfect! Title and description are optimally sized")
+            self.status_label.setText("\uf00c Perfect! Title and description are optimally sized")
 
     def update_theme(self, is_dark):
         if is_dark:
