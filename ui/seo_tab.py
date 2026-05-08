@@ -1,6 +1,6 @@
 import os
 from pathlib import Path
-from PySide6.QtWidgets import (
+from PySide6.QtWidgets (
     QWidget, QHBoxLayout, QVBoxLayout, QFormLayout, QTreeView, QLineEdit,
     QTextEdit, QComboBox, QPushButton, QMessageBox, QLabel, QDialog,
     QFileDialog, QPlainTextEdit, QFileSystemModel, QApplication, QGroupBox,
@@ -18,6 +18,9 @@ class SEOTab(QWidget):
         self.init_ui()
 
     def init_ui(self):
+        # Set transparent background for theme inheritance
+        self.setStyleSheet("background-color: transparent;")
+        
         main_layout = QHBoxLayout(self)
 
         # Left: file tree
@@ -35,11 +38,25 @@ class SEOTab(QWidget):
         # Right: scrollable editor
         scroll = QScrollArea()
         scroll.setWidgetResizable(True)
+        scroll.setStyleSheet("QScrollArea { background-color: transparent; border: none; }")
         scroll_widget = QWidget()
+        scroll_widget.setStyleSheet("background-color: transparent;")
         right_layout = QVBoxLayout(scroll_widget)
+        right_layout.setSpacing(10)
 
         # ========== BASIC META TAGS ==========
         basic_group = QGroupBox("📋 Basic Meta Tags")
+        basic_group.setStyleSheet("""
+            QGroupBox {
+                font-weight: bold;
+                margin-top: 10px;
+            }
+            QGroupBox::title {
+                subcontrol-origin: margin;
+                left: 10px;
+                padding: 0 5px;
+            }
+        """)
         basic_layout = QFormLayout(basic_group)
 
         self.title_edit = QLineEdit()
@@ -70,6 +87,17 @@ class SEOTab(QWidget):
 
         # ========== OPEN GRAPH ==========
         og_group = QGroupBox("📱 Open Graph (Facebook/LinkedIn)")
+        og_group.setStyleSheet("""
+            QGroupBox {
+                font-weight: bold;
+                margin-top: 10px;
+            }
+            QGroupBox::title {
+                subcontrol-origin: margin;
+                left: 10px;
+                padding: 0 5px;
+            }
+        """)
         og_layout = QFormLayout(og_group)
 
         self.og_title = QLineEdit()
@@ -94,6 +122,17 @@ class SEOTab(QWidget):
 
         # ========== TWITTER CARD ==========
         tw_group = QGroupBox("🐦 Twitter Card")
+        tw_group.setStyleSheet("""
+            QGroupBox {
+                font-weight: bold;
+                margin-top: 10px;
+            }
+            QGroupBox::title {
+                subcontrol-origin: margin;
+                left: 10px;
+                padding: 0 5px;
+            }
+        """)
         tw_layout = QFormLayout(tw_group)
 
         self.tw_card = QComboBox()
@@ -117,6 +156,17 @@ class SEOTab(QWidget):
 
         # ========== PWA & MOBILE ==========
         pwa_group = QGroupBox("📱 PWA & Mobile Meta")
+        pwa_group.setStyleSheet("""
+            QGroupBox {
+                font-weight: bold;
+                margin-top: 10px;
+            }
+            QGroupBox::title {
+                subcontrol-origin: margin;
+                left: 10px;
+                padding: 0 5px;
+            }
+        """)
         pwa_layout = QFormLayout(pwa_group)
 
         self.theme_color = QLineEdit()
@@ -138,6 +188,17 @@ class SEOTab(QWidget):
 
         # ========== VERIFICATION ==========
         verify_group = QGroupBox("🔐 Search Console Verification")
+        verify_group.setStyleSheet("""
+            QGroupBox {
+                font-weight: bold;
+                margin-top: 10px;
+            }
+            QGroupBox::title {
+                subcontrol-origin: margin;
+                left: 10px;
+                padding: 0 5px;
+            }
+        """)
         verify_layout = QFormLayout(verify_group)
 
         self.google_verify = QLineEdit()
@@ -154,6 +215,17 @@ class SEOTab(QWidget):
 
         # ========== ADVANCED ==========
         adv_group = QGroupBox("⚙️ Advanced")
+        adv_group.setStyleSheet("""
+            QGroupBox {
+                font-weight: bold;
+                margin-top: 10px;
+            }
+            QGroupBox::title {
+                subcontrol-origin: margin;
+                left: 10px;
+                padding: 0 5px;
+            }
+        """)
         adv_layout = QFormLayout(adv_group)
 
         self.author_edit = QLineEdit()
@@ -185,7 +257,6 @@ class SEOTab(QWidget):
         scroll.setWidget(scroll_widget)
         main_layout.addWidget(scroll, 2)
 
-    # ========== CHARACTER COUNTERS ==========
     def update_title_counter(self):
         text = self.title_edit.text()
         length = len(text)
@@ -234,7 +305,6 @@ class SEOTab(QWidget):
             html = f.read()
         self.soup = BeautifulSoup(html, 'html.parser')
 
-        # Basic
         title_tag = self.soup.find("title")
         self.title_edit.setText(title_tag.string if title_tag else "")
         self.update_title_counter()
@@ -250,7 +320,6 @@ class SEOTab(QWidget):
         canonical = self.soup.find("link", attrs={"rel": "canonical"})
         self.canonical_edit.setText(canonical.get("href", "") if canonical else "")
 
-        # OG
         self.og_title.setText(self.get_meta_content("og:title") or "")
         self.og_desc.setPlainText(self.get_meta_content("og:description") or "")
         self.og_image.setText(self.get_meta_content("og:image") or "")
@@ -259,7 +328,6 @@ class SEOTab(QWidget):
         self.og_locale.setText(self.get_meta_content("og:locale") or "")
         self.og_site_name.setText(self.get_meta_content("og:site_name") or "")
 
-        # Twitter
         self.tw_card.setCurrentText(self.get_meta_content("twitter:card") or "summary_large_image")
         self.tw_title.setText(self.get_meta_content("twitter:title") or "")
         self.tw_desc.setPlainText(self.get_meta_content("twitter:description") or "")
@@ -267,7 +335,6 @@ class SEOTab(QWidget):
         self.tw_site.setText(self.get_meta_content("twitter:site") or "")
         self.tw_creator.setText(self.get_meta_content("twitter:creator") or "")
 
-        # PWA
         self.theme_color.setText(self.get_meta_content("theme-color") or "")
         color_scheme_meta = self.soup.find("meta", attrs={"name": "color-scheme"})
         if color_scheme_meta:
@@ -279,12 +346,10 @@ class SEOTab(QWidget):
         manifest = self.soup.find("link", attrs={"rel": "manifest"})
         self.manifest_url.setText(manifest.get("href", "") if manifest else "")
 
-        # Verification
         self.google_verify.setText(self.get_meta_content("google-site-verification") or "")
         self.bing_verify.setText(self.get_meta_content("msvalidate.01") or "")
         self.yandex_verify.setText(self.get_meta_content("yandex-verification") or "")
 
-        # Advanced
         self.author_edit.setText(self.get_meta_content("author") or "")
         content_lang = self.soup.find("meta", attrs={"http-equiv": "Content-Language"})
         self.content_language.setText(content_lang.get("content", "") if content_lang else "")
@@ -305,7 +370,6 @@ class SEOTab(QWidget):
             head = self.soup.new_tag("head")
             self.soup.html.insert(0, head)
 
-        # Helper to set or create meta tag
         def set_meta(attr_type, attr_value, content):
             if not content:
                 return
@@ -328,7 +392,6 @@ class SEOTab(QWidget):
                 tag = self.soup.new_tag("link", rel=rel, href=href)
                 head.append(tag)
 
-        # Basic
         title_tag = self.soup.find("title")
         if title_tag:
             title_tag.string = self.title_edit.text()
@@ -341,7 +404,6 @@ class SEOTab(QWidget):
         set_meta("name", "robots", self.robots_combo.currentText())
         set_link("canonical", self.canonical_edit.text())
 
-        # OG
         set_meta("property", "og:title", self.og_title.text())
         set_meta("property", "og:description", self.og_desc.toPlainText())
         set_meta("property", "og:image", self.og_image.text())
@@ -350,7 +412,6 @@ class SEOTab(QWidget):
         set_meta("property", "og:locale", self.og_locale.text())
         set_meta("property", "og:site_name", self.og_site_name.text())
 
-        # Twitter
         set_meta("name", "twitter:card", self.tw_card.currentText())
         set_meta("name", "twitter:title", self.tw_title.text())
         set_meta("name", "twitter:description", self.tw_desc.toPlainText())
@@ -358,19 +419,16 @@ class SEOTab(QWidget):
         set_meta("name", "twitter:site", self.tw_site.text())
         set_meta("name", "twitter:creator", self.tw_creator.text())
 
-        # PWA
         set_meta("name", "theme-color", self.theme_color.text())
         set_meta("name", "color-scheme", self.color_scheme.currentText())
         set_meta("name", "apple-mobile-web-app-capable", "yes" if self.app_capable.isChecked() else None)
         set_meta("name", "apple-mobile-web-app-status-bar-style", self.status_bar_style.currentText() if self.status_bar_style.currentText() != "default" else None)
         set_link("manifest", self.manifest_url.text())
 
-        # Verification
         set_meta("name", "google-site-verification", self.google_verify.text())
         set_meta("name", "msvalidate.01", self.bing_verify.text())
         set_meta("name", "yandex-verification", self.yandex_verify.text())
 
-        # Advanced
         set_meta("name", "author", self.author_edit.text())
         if self.content_language.text():
             existing = self.soup.find("meta", attrs={"http-equiv": "Content-Language"})
@@ -380,7 +438,6 @@ class SEOTab(QWidget):
                 tag = self.soup.new_tag("meta", **{"http-equiv": "Content-Language", "content": self.content_language.text()})
                 head.append(tag)
 
-        # Noscript fallback
         if self.noscript_check.isChecked() and not self.soup.find("noscript"):
             noscript = self.soup.new_tag("noscript")
             noscript.string = "Your browser does not support JavaScript or it is disabled. Please enable JavaScript for the best experience."
@@ -398,13 +455,16 @@ class SEOTab(QWidget):
         QMessageBox.information(self, "404 Preset", "Robots set to 'noindex, follow'.\nAdjust other tags as needed.")
 
     def open_hreflang_dialog(self):
-        # ... (same as before, keep your existing hreflang dialog code)
-        pass
+        # Simplified version - you can keep your existing hreflang dialog code here
+        QMessageBox.information(self, "Hreflang Generator", "This feature will generate hreflang tags for multi-language sites.\n\nSelect multiple HTML files with language variants.\nPattern: about-en.html, about-fa.html, etc.")
 
     def update_theme(self, is_dark):
         """Called from main window when theme changes."""
         if is_dark:
             self.setStyleSheet("""
+                QWidget {
+                    background-color: transparent;
+                }
                 QLineEdit, QTextEdit, QComboBox {
                     background-color: #2B2D31;
                     color: #E8E8E8;
@@ -416,6 +476,7 @@ class SEOTab(QWidget):
                     color: #E8E8E8;
                     border: 1px solid #3E4045;
                     margin-top: 10px;
+                    background-color: transparent;
                 }
                 QGroupBox::title {
                     color: #E8E8E8;
@@ -443,9 +504,16 @@ class SEOTab(QWidget):
                     color: #E8E8E8;
                     border: 1px solid #3E4045;
                 }
+                QScrollArea {
+                    background-color: transparent;
+                    border: none;
+                }
             """)
         else:
             self.setStyleSheet("""
+                QWidget {
+                    background-color: transparent;
+                }
                 QLineEdit, QTextEdit, QComboBox {
                     background-color: #FFFFFF;
                     color: #2C3E50;
@@ -457,6 +525,7 @@ class SEOTab(QWidget):
                     color: #2C3E50;
                     border: 1px solid #D0D7DE;
                     margin-top: 10px;
+                    background-color: transparent;
                 }
                 QGroupBox::title {
                     color: #2C3E50;
@@ -483,5 +552,9 @@ class SEOTab(QWidget):
                     background-color: #FFFFFF;
                     color: #2C3E50;
                     border: 1px solid #D0D7DE;
+                }
+                QScrollArea {
+                    background-color: transparent;
+                    border: none;
                 }
             """)
