@@ -6,6 +6,8 @@ Complete toolkit for web developers
 
 import sys
 import os
+import json
+from pathlib import Path
 from PySide6.QtWidgets import (
     QApplication,
     QMainWindow,
@@ -14,11 +16,13 @@ from PySide6.QtWidgets import (
     QMenu,
     QToolBar,
     QPushButton,
+    QMessageBox,
 )
 from PySide6.QtGui import QAction, QKeySequence, QIcon
 from PySide6.QtCore import QSettings
 
 # Import all tabs
+from ui.dashboard_tab import DashboardTab
 from ui.formatter_tab import FormatterTab
 from ui.seo_tab import SEOTab
 from ui.favicon_tab import FaviconTab
@@ -47,6 +51,7 @@ from ui.keyword_density_tab import KeywordDensityTab
 from ui.internal_links_tab import InternalLinksTab
 from ui.content_length_tab import ContentLengthTab
 from ui.batch_meta_updater import BatchMetaUpdaterTab
+from ui.project_setup_wizard import ProjectSetupWizard, ProjectConfig
 
 # Import About Dialog
 from ui.about_dialog import AboutDialog
@@ -61,11 +66,20 @@ class MainWindow(QMainWindow):
         # Store references to all tabs for theme updates
         self.all_tabs = []
 
+        # Project configuration
+        self.project_config = None
+
         # Create tab widget
         self.tabs = QTabWidget()
         self.setCentralWidget(self.tabs)
 
-        # Create all tabs
+        # Settings
+        self.settings = QSettings("WebDevTools", "Preferences")
+
+        # Create dashboard tab FIRST
+        self.dashboard_tab = DashboardTab(self, self)
+        
+        # Create all other tabs
         self.formatter_tab = FormatterTab(self)
         self.seo_tab = SEOTab()
         self.favicon_tab = FaviconTab()
@@ -97,6 +111,7 @@ class MainWindow(QMainWindow):
 
         # Add all tabs to the list for theme updates
         self.all_tabs = [
+            self.dashboard_tab,
             self.formatter_tab,
             self.seo_tab,
             self.favicon_tab,
@@ -127,7 +142,8 @@ class MainWindow(QMainWindow):
             self.batch_meta_tab
         ]
 
-        # Add tabs to the widget
+        # Add tabs to the widget (Dashboard FIRST)
+        self.tabs.addTab(self.dashboard_tab, "🏠 Dashboard")
         self.tabs.addTab(self.formatter_tab, "📝 Code Formatter")
         self.tabs.addTab(self.seo_tab, "🔍 SEO Optimizer")
         self.tabs.addTab(self.favicon_tab, "🎨 Favicon Generator")
@@ -159,34 +175,35 @@ class MainWindow(QMainWindow):
 
         # Tooltips
         tooltips = {
-            0: "Format Python, JS, HTML, CSS, TS, JSX files with diff view",
-            1: "Edit meta tags, generate hreflang, 404 presets",
-            2: "Generate all favicon sizes and inject into HTML",
-            3: "Auto-generate BreadcrumbList JSON-LD from URL",
-            4: "Create robots.txt and sitemap.xml",
-            5: "Convert images to WebP and update HTML",
-            6: "Bulk find/replace links across all files",
-            7: "Generate FAQ, Product, Article, Event, Recipe, HowTo schema",
-            8: "Smart lazy loading with blur-up WebP previews",
-            9: "Social media preview (Facebook, Twitter) with injection",
-            10: "Detect missing width/height, oversized images",
-            11: "Find broken internal and external links",
-            12: "Check alt text, lang, headings, labels",
-            13: "Bulk fix missing alt attributes",
-            14: "Generate print and speech CSS, semantic HTML",
-            15: "Create backups and restore previous versions",
-            16: "Analyze SEO score (0-100) for each page",
-            17: "Find duplicate titles, descriptions, H1 tags",
-            18: "CSP & SRI security headers",
-            19: "Preload scanner and injector",
-            20: "PageSpeed Insights & Core Web Vitals",
-            21: "Detect meta refresh redirects",
-            22: "Google SERP preview simulator",
-            23: "Spelling and grammar checker",
-            24: "Keyword density analyzer",
-            25: "Internal link suggestions",
-            26: "Content length analyzer",
-            27: "Batch meta tag updater",
+            0: "🏠 Dashboard – Overview and quick actions",
+            1: "Format Python, JS, HTML, CSS, TS, JSX files with diff view",
+            2: "Edit meta tags, generate hreflang, 404 presets",
+            3: "Generate all favicon sizes and inject into HTML",
+            4: "Auto-generate BreadcrumbList JSON-LD from URL",
+            5: "Create robots.txt and sitemap.xml",
+            6: "Convert images to WebP and update HTML",
+            7: "Bulk find/replace links across all files",
+            8: "Generate FAQ, Product, Article, Event, Recipe, HowTo schema",
+            9: "Smart lazy loading with blur-up WebP previews",
+            10: "Social media preview (Facebook, Twitter) with injection",
+            11: "Detect missing width/height, oversized images",
+            12: "Find broken internal and external links",
+            13: "Check alt text, lang, headings, labels",
+            14: "Bulk fix missing alt attributes",
+            15: "Generate print and speech CSS, semantic HTML",
+            16: "Create backups and restore previous versions",
+            17: "Analyze SEO score (0-100) for each page",
+            18: "Find duplicate titles, descriptions, H1 tags",
+            19: "CSP & SRI security headers",
+            20: "Preload scanner and injector",
+            21: "PageSpeed Insights & Core Web Vitals",
+            22: "Detect meta refresh redirects",
+            23: "Google SERP preview simulator",
+            24: "Spelling and grammar checker",
+            25: "Keyword density analyzer",
+            26: "Internal link suggestions",
+            27: "Content length analyzer",
+            28: "Batch meta tag updater",
         }
         for idx, tip in tooltips.items():
             if idx < self.tabs.count():
@@ -201,6 +218,12 @@ class MainWindow(QMainWindow):
         self.theme_action.triggered.connect(self.toggle_theme)
         view_menu.addAction(self.theme_action)
 
+        # Project menu
+        project_menu = menubar.addMenu("Project")
+        setup_project_action = QAction("⚙️ Project Setup Wizard", self)
+        setup_project_action.triggered.connect(self.run_project_setup)
+        project_menu.addAction(setup_project_action)
+
         # Help menu
         help_menu = menubar.addMenu("Help")
         about_action = QAction("About Aether", self)
@@ -210,17 +233,33 @@ class MainWindow(QMainWindow):
         # Create toolbar with theme toggle button
         toolbar = QToolBar("Main Toolbar")
         self.addToolBar(toolbar)
+        
+        # Project status button
+        self.project_status_btn = QPushButton("📁 No Project")
+        self.project_status_btn.clicked.connect(self.run_project_setup)
+        toolbar.addWidget(self.project_status_btn)
+        
+        toolbar.addSeparator()
+        
         self.theme_button = QPushButton("🌓 Toggle Theme")
         self.theme_button.setCheckable(True)
         self.theme_button.clicked.connect(self.on_theme_button_clicked)
         toolbar.addWidget(self.theme_button)
 
+        # Add Dashboard shortcut (Ctrl+1)
+        dashboard_action = QAction("Dashboard", self)
+        dashboard_action.setShortcut(QKeySequence("Ctrl+1"))
+        dashboard_action.triggered.connect(lambda: self.tabs.setCurrentIndex(0))
+        self.addAction(dashboard_action)
+
         # Load saved theme preference
-        self.settings = QSettings("WebDevTools", "Preferences")
         is_dark = self.settings.value("dark_mode", False, type=bool)
         self._set_theme_state(is_dark)
 
-        self.statusBar().showMessage("Ready - 28 powerful tools at your fingertips")
+        # Load project configuration
+        self.load_project_config()
+
+        self.statusBar().showMessage("Ready - 28 powerful tools at your fingertips | Ctrl+1 for Dashboard")
 
     def set_window_logo(self, is_dark):
         """Set the window icon based on theme"""
@@ -231,6 +270,34 @@ class MainWindow(QMainWindow):
         
         if os.path.exists(logo_path):
             self.setWindowIcon(QIcon(logo_path))
+
+    def load_project_config(self):
+        """Load existing project configuration"""
+        if self.project_config is None:
+            self.project_config = ProjectConfig()
+        
+        # Check for config file in last used project
+        last_project = self.settings.value("last_project", "")
+        if last_project and Path(last_project).exists():
+            config_path = Path(last_project) / ".aether-config.json"
+            if config_path.exists():
+                self.project_config.load(config_path)
+                self.project_status_btn.setText(f"📁 {Path(last_project).name}")
+                self.statusBar().showMessage(f"Project loaded: {last_project}")
+                return True
+        return False
+
+    def run_project_setup(self):
+        """Run the project setup wizard"""
+        wizard = ProjectSetupWizard(self)
+        if wizard.exec():
+            self.project_config = wizard.get_config()
+            self.settings.setValue("last_project", self.project_config.root_path)
+            project_name = Path(self.project_config.root_path).name
+            self.project_status_btn.setText(f"📁 {project_name}")
+            self.statusBar().showMessage(f"Project configured: {self.project_config.root_path}")
+            return True
+        return False
 
     def show_about(self):
         """Show about dialog"""
