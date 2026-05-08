@@ -20,6 +20,9 @@ class DashboardTab(QWidget):
         self.start_animations()
 
     def init_ui(self):
+        # IMPORTANT: Set transparent background for theme inheritance
+        self.setStyleSheet("background-color: transparent;")
+        
         main_layout = QVBoxLayout(self)
         main_layout.setSpacing(20)
         main_layout.setContentsMargins(20, 20, 20, 20)
@@ -89,6 +92,7 @@ class DashboardTab(QWidget):
         score_font.setBold(True)
         self.score_label.setFont(score_font)
         self.score_label.setAlignment(Qt.AlignCenter)
+        self.score_label.setStyleSheet("color: #8095AB;")
         health_layout.addWidget(self.score_label)
 
         self.score_status = QLabel("Select a project folder to begin")
