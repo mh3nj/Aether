@@ -36,6 +36,8 @@ class SidebarButton(QPushButton):
                 background-color: rgba(128, 149, 171, 0.3);
             }
         """)
+        self.icon = icon
+        self.text = text
 
 
 class Sidebar(QWidget):
@@ -90,8 +92,7 @@ class Sidebar(QWidget):
         
         # Navigation buttons
         self.nav_buttons = []
-        
-        nav_items = [
+        self.nav_items = [
             ("🏠", "Dashboard", "Ctrl+1", 0),
             ("📝", "Code Studio", "Ctrl+2", 1),
             ("🔍", "SEO Command", "Ctrl+3", 2),
@@ -106,7 +107,7 @@ class Sidebar(QWidget):
             ("📋", "Logs", "Ctrl+L", 11),
         ]
         
-        for icon, text, shortcut, tab_index in nav_items:
+        for icon, text, shortcut, tab_index in self.nav_items:
             btn = SidebarButton(icon, text, shortcut, self)
             btn.clicked.connect(lambda checked, idx=tab_index: self.go_to_tab(idx))
             scroll_layout.insertWidget(scroll_layout.count() - 1, btn)
@@ -187,6 +188,9 @@ class Sidebar(QWidget):
     def toggle_theme(self):
         """Toggle dark/light theme"""
         if self.main_window:
+            # Get current theme state and toggle
+            is_dark = self.main_window.theme_action.isChecked()
+            self.main_window.theme_action.setChecked(not is_dark)
             self.main_window.toggle_theme()
     
     def toggle_collapse(self):
@@ -206,7 +210,7 @@ class Sidebar(QWidget):
             
             # Hide text on buttons
             for btn in self.nav_buttons:
-                btn.setText("  " + btn.text()[0] + "  ")
+                btn.setText(f"  {btn.icon}  ")
             self.theme_btn.setText("  🌓  ")
             
         else:
@@ -221,23 +225,9 @@ class Sidebar(QWidget):
             self.toggle_btn.setText("◀ Collapse")
             
             # Restore text on buttons
-            original_texts = [
-                ("🏠", "Dashboard"),
-                ("📝", "Code Studio"),
-                ("🔍", "SEO Command"),
-                ("📊", "Schema & Social"),
-                ("🖼️", "Media Studio"),
-                ("🔗", "Link Studio"),
-                ("♿", "Accessibility Hub"),
-                ("⚡", "Performance Lab"),
-                ("🛡️", "Security & Backup"),
-                ("📈", "Analytics"),
-                ("⚙️", "Batch Ops"),
-                ("📋", "Logs"),
-            ]
             for i, btn in enumerate(self.nav_buttons):
-                if i < len(original_texts):
-                    icon, text = original_texts[i]
+                if i < len(self.nav_items):
+                    icon, text, shortcut, tab_index = self.nav_items[i]
                     btn.setText(f"  {icon}  {text}")
             self.theme_btn.setText("  🌓  Toggle Theme")
     
@@ -249,12 +239,18 @@ class Sidebar(QWidget):
                     background-color: #1E1F22;
                     border-right: 1px solid #3E4045;
                 }
+                QPushButton {
+                    color: #E8E8E8;
+                }
             """)
         else:
             self.setStyleSheet("""
                 QWidget {
                     background-color: #F8F9FA;
                     border-right: 1px solid #D0D7DE;
+                }
+                QPushButton {
+                    color: #2C3E50;
                 }
             """)
         # Refresh active button style
