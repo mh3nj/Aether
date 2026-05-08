@@ -25,10 +25,10 @@ class SEOCommandTab(QWidget):
         self.duplicate_tab = DuplicateDetectorTab()
         self.meta_refresh_tab = MetaRefreshTab()
         
-        self.tabs.addTab(self.seo_tab, "🔍 SEO Optimizer")
-        self.tabs.addTab(self.score_tab, "📈 SEO Score")
-        self.tabs.addTab(self.duplicate_tab, "🔄 Duplicate Detector")
-        self.tabs.addTab(self.meta_refresh_tab, "🔄 Meta Refresh")
+        self.tabs.addTab(self.seo_tab, "\e522 SEO Optimizer")
+        self.tabs.addTab(self.score_tab, "\f201 SEO Score")
+        self.tabs.addTab(self.duplicate_tab, "\f1b8 Duplicate Detector")
+        self.tabs.addTab(self.meta_refresh_tab, "\f1b8 Meta Refresh")
         
         layout.addWidget(self.tabs)
     
