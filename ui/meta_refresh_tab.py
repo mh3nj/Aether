@@ -76,7 +76,7 @@ class MetaRefreshTab(QWidget):
                         delay, url = content.split(';', 1)
                         delay = delay.strip()
                         url = url.replace('url=', '').strip()
-                        severity = "\f071 Warning" if int(delay) > 0 else "\58 Critical"
+                        severity = "\uf071 Warning" if int(delay) > 0 else "\58 Critical"
                         item = QTreeWidgetItem([rel_path, delay, url, severity])
                         self.results_tree.addTopLevelItem(item)
                         found += 1
@@ -88,6 +88,6 @@ class MetaRefreshTab(QWidget):
 
         self.progress.setVisible(False)
         if found > 0:
-            self.summary_label.setText(f"\f071 Found {found} pages with meta refresh redirects (bad for SEO)")
+            self.summary_label.setText(f"\uf071 Found {found} pages with meta refresh redirects (bad for SEO)")
         else:
-            self.summary_label.setText(f"\f00c No meta refresh redirects found across {len(html_files)} files")
+            self.summary_label.setText(f"\uf00c No meta refresh redirects found across {len(html_files)} files")
