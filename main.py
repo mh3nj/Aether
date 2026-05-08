@@ -52,6 +52,8 @@ from ui.internal_links_tab import InternalLinksTab
 from ui.content_length_tab import ContentLengthTab
 from ui.batch_meta_updater import BatchMetaUpdaterTab
 from ui.project_setup_wizard import ProjectSetupWizard, ProjectConfig
+from ui.undo_manager import UndoManager
+from ui.logs_tab import LogsTab
 
 # Import About Dialog
 from ui.about_dialog import AboutDialog
@@ -75,6 +77,9 @@ class MainWindow(QMainWindow):
 
         # Settings
         self.settings = QSettings("WebDevTools", "Preferences")
+
+        # Initialize Undo Manager
+        self.undo_manager = UndoManager(self)
 
         # Create dashboard tab FIRST
         self.dashboard_tab = DashboardTab(self, self)
@@ -108,6 +113,7 @@ class MainWindow(QMainWindow):
         self.internal_links_tab = InternalLinksTab()
         self.content_length_tab = ContentLengthTab()
         self.batch_meta_tab = BatchMetaUpdaterTab()
+        self.logs_tab = LogsTab(self, self.undo_manager)
 
         # Add all tabs to the list for theme updates
         self.all_tabs = [
@@ -139,7 +145,8 @@ class MainWindow(QMainWindow):
             self.keyword_density_tab,
             self.internal_links_tab,
             self.content_length_tab,
-            self.batch_meta_tab
+            self.batch_meta_tab,
+            self.logs_tab
         ]
 
         # Add tabs to the widget (Dashboard FIRST)
@@ -172,6 +179,10 @@ class MainWindow(QMainWindow):
         self.tabs.addTab(self.internal_links_tab, "🔗 Internal Links")
         self.tabs.addTab(self.content_length_tab, "📏 Content Length")
         self.tabs.addTab(self.batch_meta_tab, "⚡ Batch Meta")
+        self.tabs.addTab(self.logs_tab, "📋 Logs")
+
+        # Connect logs to dashboard
+        self.logs_tab.log_added.connect(self.dashboard_tab.add_log_entry)
 
         # Tooltips
         tooltips = {
@@ -204,6 +215,7 @@ class MainWindow(QMainWindow):
             26: "Internal link suggestions",
             27: "Content length analyzer",
             28: "Batch meta tag updater",
+            29: "Complete operation history"
         }
         for idx, tip in tooltips.items():
             if idx < self.tabs.count():
@@ -218,6 +230,23 @@ class MainWindow(QMainWindow):
         self.theme_action.triggered.connect(self.toggle_theme)
         view_menu.addAction(self.theme_action)
 
+        # Edit menu for Undo/Redo
+        edit_menu = menubar.addMenu("Edit")
+        
+        self.undo_action = QAction("Undo", self)
+        self.undo_action.setShortcut(QKeySequence("Ctrl+Z"))
+        self.undo_action.triggered.connect(self.undo)
+        self.undo_action.setEnabled(False)
+        edit_menu.addAction(self.undo_action)
+        
+        self.redo_action = QAction("Redo", self)
+        self.redo_action.setShortcut(QKeySequence("Ctrl+Y"))
+        self.redo_action.triggered.connect(self.redo)
+        self.redo_action.setEnabled(False)
+        edit_menu.addAction(self.redo_action)
+        
+        edit_menu.addSeparator()
+        
         # Project menu
         project_menu = menubar.addMenu("Project")
         setup_project_action = QAction("⚙️ Project Setup Wizard", self)
@@ -230,7 +259,7 @@ class MainWindow(QMainWindow):
         about_action.triggered.connect(self.show_about)
         help_menu.addAction(about_action)
 
-        # Create toolbar with theme toggle button
+        # Create toolbar
         toolbar = QToolBar("Main Toolbar")
         self.addToolBar(toolbar)
         
@@ -241,10 +270,27 @@ class MainWindow(QMainWindow):
         
         toolbar.addSeparator()
         
+        # Undo/Redo toolbar buttons
+        self.undo_btn = QPushButton("↩️ Undo")
+        self.undo_btn.clicked.connect(self.undo)
+        self.undo_btn.setEnabled(False)
+        toolbar.addWidget(self.undo_btn)
+        
+        self.redo_btn = QPushButton("↪️ Redo")
+        self.redo_btn.clicked.connect(self.redo)
+        self.redo_btn.setEnabled(False)
+        toolbar.addWidget(self.redo_btn)
+        
+        toolbar.addSeparator()
+        
         self.theme_button = QPushButton("🌓 Toggle Theme")
         self.theme_button.setCheckable(True)
         self.theme_button.clicked.connect(self.on_theme_button_clicked)
         toolbar.addWidget(self.theme_button)
+
+        # Connect undo manager signals
+        self.undo_manager.undo_available_changed.connect(self.update_undo_ui)
+        self.undo_manager.redo_available_changed.connect(self.update_redo_ui)
 
         # Add Dashboard shortcut (Ctrl+1)
         dashboard_action = QAction("Dashboard", self)
@@ -259,7 +305,7 @@ class MainWindow(QMainWindow):
         # Load project configuration
         self.load_project_config()
 
-        self.statusBar().showMessage("Ready - 28 powerful tools at your fingertips | Ctrl+1 for Dashboard")
+        self.statusBar().showMessage("Ready - 29 powerful tools at your fingertips | Ctrl+1 for Dashboard")
 
     def set_window_logo(self, is_dark):
         """Set the window icon based on theme"""
@@ -283,6 +329,8 @@ class MainWindow(QMainWindow):
             if config_path.exists():
                 self.project_config.load(config_path)
                 self.project_status_btn.setText(f"📁 {Path(last_project).name}")
+                # Set undo manager project root
+                self.undo_manager.set_project_root(last_project)
                 self.statusBar().showMessage(f"Project loaded: {last_project}")
                 return True
         return False
@@ -295,9 +343,54 @@ class MainWindow(QMainWindow):
             self.settings.setValue("last_project", self.project_config.root_path)
             project_name = Path(self.project_config.root_path).name
             self.project_status_btn.setText(f"📁 {project_name}")
+            # Set undo manager project root
+            self.undo_manager.set_project_root(self.project_config.root_path)
             self.statusBar().showMessage(f"Project configured: {self.project_config.root_path}")
             return True
         return False
+
+    def undo(self):
+        """Perform undo operation"""
+        if self.undo_manager.undo():
+            self.statusBar().showMessage("✓ Undo completed", 3000)
+            # Refresh current tab if it has refresh method
+            current_tab = self.tabs.currentWidget()
+            if hasattr(current_tab, 'refresh'):
+                current_tab.refresh()
+        else:
+            self.statusBar().showMessage("Nothing to undo", 2000)
+
+    def redo(self):
+        """Perform redo operation"""
+        if self.undo_manager.redo():
+            self.statusBar().showMessage("✓ Redo completed", 3000)
+            current_tab = self.tabs.currentWidget()
+            if hasattr(current_tab, 'refresh'):
+                current_tab.refresh()
+        else:
+            self.statusBar().showMessage("Nothing to redo", 2000)
+
+    def update_undo_ui(self, available):
+        """Update undo button state"""
+        self.undo_action.setEnabled(available)
+        self.undo_btn.setEnabled(available)
+        if available:
+            self.undo_action.setText(self.undo_manager.get_undo_text())
+            self.undo_btn.setToolTip(self.undo_manager.get_undo_text())
+        else:
+            self.undo_action.setText("Undo")
+            self.undo_btn.setToolTip("Undo")
+
+    def update_redo_ui(self, available):
+        """Update redo button state"""
+        self.redo_action.setEnabled(available)
+        self.redo_btn.setEnabled(available)
+        if available:
+            self.redo_action.setText(self.undo_manager.get_redo_text())
+            self.redo_btn.setToolTip(self.undo_manager.get_redo_text())
+        else:
+            self.redo_action.setText("Redo")
+            self.redo_btn.setToolTip("Redo")
 
     def show_about(self):
         """Show about dialog"""
