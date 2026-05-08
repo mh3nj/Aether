@@ -1,3 +1,9 @@
+# Aether – Complete Web Development Toolkit
+> Connectivity Note: Due to internet restrictions in Iran during development, compiled binaries (`.exe`) and screenshots are not included in this repository. **The full source code is provided** – clone, install dependencies, and run `python main.py` to use the application. All 28 tabs are fully functional. Media assets will be uploaded when connectivity permits.
+**Status:** Stable Release v1.1  
+**Build Date:** May 4, 2026
+---
+
 # Aether
 Web Development Toolkit: SEO, Formatting, Optimization.
 
