@@ -98,7 +98,7 @@ class Sidebar(QWidget):
             ("📊", "Schema & Social", "Ctrl+4", 3),
             ("🖼️", "Media Studio", "Ctrl+5", 4),
             ("🔗", "Link Studio", "Ctrl+6", 5),
-            ("♿", "Accessibility", "Ctrl+7", 6),
+            ("♿", "Accessibility Hub", "Ctrl+7", 6),
             ("⚡", "Performance Lab", "Ctrl+8", 7),
             ("🛡️", "Security & Backup", "Ctrl+9", 8),
             ("📈", "Analytics", "Ctrl+0", 9),
@@ -128,6 +128,10 @@ class Sidebar(QWidget):
     
     def update_active_button(self, active_index):
         """Highlight the active button"""
+        is_dark = False
+        if self.main_window and hasattr(self.main_window, 'theme_action'):
+            is_dark = self.main_window.theme_action.isChecked()
+        
         for i, btn in enumerate(self.nav_buttons):
             if i == active_index:
                 btn.setStyleSheet("""
@@ -147,7 +151,6 @@ class Sidebar(QWidget):
                     }
                 """)
             else:
-                is_dark = self.main_window.theme_action.isChecked() if self.main_window else False
                 if is_dark:
                     btn.setStyleSheet("""
                         QPushButton {
@@ -225,7 +228,7 @@ class Sidebar(QWidget):
                 ("📊", "Schema & Social"),
                 ("🖼️", "Media Studio"),
                 ("🔗", "Link Studio"),
-                ("♿", "Accessibility"),
+                ("♿", "Accessibility Hub"),
                 ("⚡", "Performance Lab"),
                 ("🛡️", "Security & Backup"),
                 ("📈", "Analytics"),
@@ -246,13 +249,6 @@ class Sidebar(QWidget):
                     background-color: #1E1F22;
                     border-right: 1px solid #3E4045;
                 }
-                QPushButton {
-                    color: #E8E8E8;
-                }
-                QPushButton:hover {
-                    background-color: rgba(128, 149, 171, 0.2);
-                    color: #FFFFFF;
-                }
             """)
         else:
             self.setStyleSheet("""
@@ -260,14 +256,7 @@ class Sidebar(QWidget):
                     background-color: #F8F9FA;
                     border-right: 1px solid #D0D7DE;
                 }
-                QPushButton {
-                    color: #2C3E50;
-                }
-                QPushButton:hover {
-                    background-color: rgba(128, 149, 171, 0.2);
-                    color: #1A1A2E;
-                }
             """)
-        
-    # Update active button style
-    self.update_active_button(self.main_window.tabs.currentIndex() if self.main_window else 0)
+        # Refresh active button style
+        if self.main_window:
+            self.update_active_button(self.main_window.tabs.currentIndex())
