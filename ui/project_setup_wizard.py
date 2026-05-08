@@ -442,7 +442,7 @@ class SummaryPage(QWizardPage):
         summary = f"""
 \uf00c Project Configuration Summary
 
-\e185 Project Root: {config.root_path}
+\ue185 Project Root: {config.root_path}
 
 \uf0ac Multi-language: {'Yes' if config.is_multilingual else 'No'}
 """
