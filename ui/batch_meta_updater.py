@@ -1,5 +1,5 @@
 """
-Aether Batch Meta Tag Updater - Update meta tags across multiple HTML files at once
+Aether Batch Meta Updater - Update meta tags across multiple HTML files at once
 """
 
 import re
@@ -8,7 +8,8 @@ from PySide6.QtWidgets import (
     QWidget, QVBoxLayout, QHBoxLayout, QPushButton, QFileDialog,
     QLabel, QProgressBar, QApplication, QTreeWidget,
     QTreeWidgetItem, QHeaderView, QMessageBox, QGroupBox,
-    QFormLayout, QLineEdit, QComboBox, QCheckBox, QTextEdit
+    QFormLayout, QLineEdit, QComboBox, QCheckBox, QTextEdit,
+    QInputDialog
 )
 from PySide6.QtCore import Qt
 from bs4 import BeautifulSoup
@@ -20,6 +21,7 @@ class BatchMetaUpdaterTab(QWidget):
         self.project_folder = None
         self.html_files = []
         self.preview_results = []
+        self.data_bridge = None
         self.init_ui()
 
     def init_ui(self):
@@ -28,9 +30,9 @@ class BatchMetaUpdaterTab(QWidget):
         # Folder selection
         folder_row = QHBoxLayout()
         self.folder_label = QLabel("No folder selected")
-        self.select_btn = QPushButton("Select Project Folder")
+        self.select_btn = QPushButton("📁 Select Project Folder")
         self.select_btn.clicked.connect(self.select_folder)
-        self.scan_btn = QPushButton("Scan for HTML Files")
+        self.scan_btn = QPushButton("🔍 Scan for HTML Files")
         self.scan_btn.clicked.connect(self.scan_files)
         folder_row.addWidget(self.select_btn)
         folder_row.addWidget(self.scan_btn)
@@ -46,7 +48,8 @@ class BatchMetaUpdaterTab(QWidget):
         self.meta_type.addItems([
             "title", "meta description", "meta robots", 
             "canonical URL", "author", "viewport", 
-            "og:title", "og:description", "og:image", "twitter:title", "twitter:description"
+            "og:title", "og:description", "og:image", 
+            "twitter:title", "twitter:description"
         ])
         self.meta_type.currentTextChanged.connect(self.on_meta_type_changed)
         meta_layout.addRow("Select Tag:", self.meta_type)
@@ -79,6 +82,7 @@ class BatchMetaUpdaterTab(QWidget):
         self.results_tree.header().setSectionResizeMode(1, QHeaderView.Stretch)
         self.results_tree.header().setSectionResizeMode(2, QHeaderView.Stretch)
         self.results_tree.header().setSectionResizeMode(3, QHeaderView.ResizeToContents)
+        self.results_tree.setAlternatingRowColors(True)
         layout.addWidget(self.results_tree)
 
         # Progress bar
@@ -107,6 +111,10 @@ class BatchMetaUpdaterTab(QWidget):
 
         self.summary_label = QLabel("Ready - Select a folder, choose a meta tag, enter new value, then Preview")
         layout.addWidget(self.summary_label)
+
+    def set_data_bridge(self, bridge):
+        """Set the data bridge for dashboard communication"""
+        self.data_bridge = bridge
 
     def select_folder(self):
         path = QFileDialog.getExistingDirectory(self, "Select Project Folder")
@@ -366,10 +374,16 @@ class BatchMetaUpdaterTab(QWidget):
         
         self.progress.setVisible(False)
         self.apply_btn.setEnabled(True)
+        
+        # Report to dashboard
+        if self.data_bridge and updated > 0:
+            self.data_bridge.report_fix("meta tags", updated)
+        
         self.summary_label.setText(f"✅ Updated {updated} files with new {tag_type}.")
         QMessageBox.information(self, "Update Complete", f"Successfully updated {updated} files.")
 
     def update_theme(self, is_dark):
+        """Called from main window when theme changes."""
         if is_dark:
             self.results_tree.setStyleSheet("""
                 QTreeWidget {
