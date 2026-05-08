@@ -165,7 +165,7 @@ class LazyLoadTab(QWidget):
         self.progress.setVisible(False)
         self.scan_btn.setEnabled(True)
         self.status_label.setText(f"Generated {len(self.generated_previews)} WebP preview images.")
-        self.log_msg(f"\n \f00c Done! Generated {len(self.generated_previews)} previews.")
+        self.log_msg(f"\n \uf00c Done! Generated {len(self.generated_previews)} previews.")
         QMessageBox.information(self, "Done", f"Generated {len(self.generated_previews)} WebP previews.\n\nNow click 'Update HTML Files'.")
 
     def update_html_files(self):
@@ -244,7 +244,7 @@ class LazyLoadTab(QWidget):
                     f.write(str(soup))
                 updated += 1
 
-        self.log_msg(f"\n \f00c Updated {updated} HTML files.")
+        self.log_msg(f"\n \uf00c Updated {updated} HTML files.")
         if updated > 0:
             self.status_label.setText(f"Updated {updated} HTML files. Click 'Inject Lazy Load Script' to finish.")
             QMessageBox.information(self, "HTML Updated", f"Updated {updated} HTML files.\n\nNow click 'Inject Lazy Load Script'.")
@@ -330,5 +330,5 @@ img.lazy-blur.loaded {
             injected += 1
             self.log_msg(f"  ✓ Injected: {html_path.name}")
 
-        self.log_msg(f"\n \f00c Injected lazy-load script into {injected} HTML files.")
+        self.log_msg(f"\n \uf00c Injected lazy-load script into {injected} HTML files.")
         QMessageBox.information(self, "Done", f"Lazy loading fully configured for {injected} files!")
