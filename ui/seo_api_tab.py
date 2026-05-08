@@ -30,7 +30,7 @@ class PageSpeedWorker(QThread):
             data = response.json()
             
             if 'lighthouseResult' in data:
-                result = f"\f080 PageSpeed Insights for: {self.url}\n"
+                result = f"\uf080 PageSpeed Insights for: {self.url}\n"
                 result += f"Strategy: {self.strategy.upper()}\n\n"
                 
                 scores = data['lighthouseResult']['categories']
@@ -76,7 +76,7 @@ class SEOAPITab(QWidget):
         self.url_input = QLineEdit()
         self.url_input.setPlaceholderText("https://example.com")
         self.url_input.setMinimumHeight(30)
-        self.test_btn = QPushButton("\f080 Run PageSpeed Test")
+        self.test_btn = QPushButton("\uf080 Run PageSpeed Test")
         self.test_btn.clicked.connect(self.run_pagespeed)
         url_layout.addWidget(self.url_input)
         url_layout.addWidget(self.test_btn)
@@ -144,11 +144,11 @@ class SEOAPITab(QWidget):
         self.test_btn.setEnabled(False)
         self.progress.setVisible(True)
         self.results.clear()
-        self.results.appendPlainText(f"\f002 Testing: {url}\n")
+        self.results.appendPlainText(f"\uf002 Testing: {url}\n")
         self.results.appendPlainText("=" * 60 + "\n")
         
         strategy = self.get_strategy()
-        self.results.appendPlainText(f"\f080 Fetching PageSpeed Insights ({strategy.upper()})...\n")
+        self.results.appendPlainText(f"\uf080 Fetching PageSpeed Insights ({strategy.upper()})...\n")
         
         self.worker = PageSpeedWorker(url, strategy)
         self.worker.finished.connect(self.on_pagespeed_result)
@@ -158,7 +158,7 @@ class SEOAPITab(QWidget):
     def on_pagespeed_result(self, result):
         self.results.appendPlainText(result)
         self.results.appendPlainText("\n" + "=" * 60)
-        self.results.appendPlainText("\n \f0eb For full report, visit: https://pagespeed.web.dev/")
+        self.results.appendPlainText("\n \uf0eb For full report, visit: https://pagespeed.web.dev/")
         self.progress.setVisible(False)
         self.test_btn.setEnabled(True)
         self.status_label.setText("PageSpeed test completed")
@@ -173,7 +173,7 @@ class SEOAPITab(QWidget):
 
     def on_pagespeed_error(self, error):
         self.results.appendPlainText(f"\58 Error: {error}")
-        self.results.appendPlainText("\n \f0eb This might be due to:\n")
+        self.results.appendPlainText("\n \uf0eb This might be due to:\n")
         self.results.appendPlainText("• Invalid URL (make sure it's reachable)\n")
         self.results.appendPlainText("• Rate limiting (try again in a minute)\n")
         self.results.appendPlainText("• The website might be blocking bots")
