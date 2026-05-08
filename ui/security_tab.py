@@ -98,7 +98,7 @@ class SecurityTab(QWidget):
         csp_layout.addLayout(preset_row)
 
         # Generate button and preview
-        self.generate_csp_btn = QPushButton("🔧 Generate CSP Meta Tag")
+        self.generate_csp_btn = QPushButton("\f0ad Generate CSP Meta Tag")
         self.generate_csp_btn.clicked.connect(self.generate_csp)
         csp_layout.addWidget(self.generate_csp_btn)
 
@@ -109,12 +109,12 @@ class SecurityTab(QWidget):
         csp_layout.addWidget(QLabel("Preview:"))
         csp_layout.addWidget(self.csp_preview)
 
-        self.inject_csp_btn = QPushButton("💉 Inject CSP into HTML")
+        self.inject_csp_btn = QPushButton("\f055 Inject CSP into HTML")
         self.inject_csp_btn.clicked.connect(self.inject_csp)
         self.inject_csp_btn.setEnabled(False)
         csp_layout.addWidget(self.inject_csp_btn)
 
-        self.tab_widget.addTab(csp_tab, "🛡️ CSP Generator")
+        self.tab_widget.addTab(csp_tab, "\f3ed CSP Generator")
 
         # ========== TAB 2: SRI GENERATOR ==========
         sri_tab = QWidget()
