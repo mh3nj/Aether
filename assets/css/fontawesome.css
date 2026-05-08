@@ -1,0 +1,71 @@
+/* Font Awesome 6 Solid Icons - Optimized for Aether */
+
+@font-face {
+  font-family: "Font Awesome 6 Free";
+  src: url("../fonts/fa-solid-900.ttf") format("truetype");
+  font-weight: 900;
+  font-style: normal;
+}
+
+.fas {
+  font-family: "Font Awesome 6 Free";
+  font-weight: 900;
+  font-style: normal;
+  font-size: 16px;
+  display: inline-block;
+  line-height: 1;
+}
+
+/* Theme-aware icon colors */
+:root {
+  --icon-color: #2c3e50;
+}
+
+.dark-mode .fas {
+  --icon-color: #e8e8e8;
+}
+
+/* Specific icon sizes for sidebar */
+.sidebar-icon {
+  width: 24px;
+  text-align: center;
+  margin-right: 12px;
+}
+
+/* Icon mapping for all Aether tools */
+.icon-dashboard:before {
+  content: "\f015";
+} /* fa-home */
+.icon-code:before {
+  content: "\f121";
+} /* fa-code */
+.icon-search:before {
+  content: "\f002";
+} /* fa-search */
+.icon-chart:before {
+  content: "\f080";
+} /* fa-chart-line */
+.icon-image:before {
+  content: "\f302";
+} /* fa-image */
+.icon-link:before {
+  content: "\f0c1";
+} /* fa-link */
+.icon-universal-access:before {
+  content: "\f29a";
+} /* fa-universal-access */
+.icon-gauge:before {
+  content: "\f3fd";
+} /* fa-gauge-high */
+.icon-shield:before {
+  content: "\f3ed";
+} /* fa-shield */
+.icon-chart-simple:before {
+  content: "\f473";
+} /* fa-chart-simple */
+.icon-gear:before {
+  content: "\f013";
+} /* fa-gear */
+.icon-clock:before {
+  content: "\f017";
+} /* fa-clock */
