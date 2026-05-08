@@ -228,8 +228,14 @@ class MainWindow(QMainWindow):
                 
     def setup_keyboard_shortcuts(self):
         """Setup keyboard shortcuts for tab navigation"""
-        # Dashboard is Ctrl+1 (already set in sidebar)
         
+        # Dashboard shortcut (Ctrl+1)
+        dashboard_action = QAction(self)
+        dashboard_action.setShortcut(QKeySequence("Ctrl+1"))
+        dashboard_action.triggered.connect(lambda: self.tabs.setCurrentIndex(0))
+        self.addAction(dashboard_action)
+        
+        # Other shortcuts
         shortcuts = [
             (Qt.Key_2, 1),   # Code Studio
             (Qt.Key_3, 2),   # SEO Command
