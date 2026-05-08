@@ -64,7 +64,7 @@ class LinkCheckerWorker(QThread):
                                 is_valid = self.check_external_link(link)
                                 if not is_valid:
                                     self.results.append({
-                                        "type": "🌐 Broken External Link",
+                                        "type": "\f0ac Broken External Link",
                                         "file": rel_path,
                                         "element": f"<{tag.name}>",
                                         "link": link,
@@ -72,7 +72,7 @@ class LinkCheckerWorker(QThread):
                                     })
             except Exception as e:
                 self.results.append({
-                    "type": "⚠️ Parse Error",
+                    "type": "\f071 Parse Error",
                     "file": str(html_path.name),
                     "element": "",
                     "link": "",
@@ -135,9 +135,9 @@ class LinkCheckerTab(QWidget):
         # Folder selection
         folder_row = QHBoxLayout()
         self.folder_label = QLabel("No project folder selected")
-        self.select_btn = QPushButton("📁 Select Project Folder")
+        self.select_btn = QPushButton("\f07c Select Project Folder")
         self.select_btn.clicked.connect(self.select_folder)
-        self.scan_btn = QPushButton("🔍 Scan for Broken Links")
+        self.scan_btn = QPushButton("\f002 Scan for Broken Links")
         self.scan_btn.clicked.connect(self.scan_links)
         folder_row.addWidget(self.select_btn)
         folder_row.addWidget(self.scan_btn)
@@ -148,7 +148,7 @@ class LinkCheckerTab(QWidget):
         # Options
         opts_group = QGroupBox("Scan Options")
         opts_layout = QHBoxLayout()
-        self.check_external = QCheckBox("🌐 Check external links (requires internet, slower)")
+        self.check_external = QCheckBox("\f0ac Check external links (requires internet, slower)")
         self.check_external.setChecked(False)
         opts_layout.addWidget(self.check_external)
         opts_group.setLayout(opts_layout)
@@ -200,7 +200,7 @@ class LinkCheckerTab(QWidget):
         self.worker.finished_signal.connect(self.scan_finished)
         self.worker.start()
 
-        self.summary_label.setText("🔍 Scanning for broken links...")
+        self.summary_label.setText("\f002 Scanning for broken links...")
 
     def update_progress(self, value):
         self.progress.setValue(value)
@@ -232,14 +232,14 @@ class LinkCheckerTab(QWidget):
             self.data_bridge.report_scan(len(html_files), total_broken, 0)
         
         if total_broken == 0:
-            self.summary_label.setText(f"✅ Scan complete! No broken links found across {len(html_files)} files.")
+            self.summary_label.setText(f"\f00c Scan complete! No broken links found across {len(html_files)} files.")
         else:
-            self.summary_label.setText(f"⚠️ Scan complete! Found {total_broken} broken links across {len(html_files)} files.")
+            self.summary_label.setText(f"\f071 Scan complete! Found {total_broken} broken links across {len(html_files)} files.")
         
         QMessageBox.information(self, "Scan Complete", 
                                 f"Found {total_broken} broken links.\n\n"
                                 f"Check the results panel for details.\n"
-                                f"💡 Use Link Manager to fix them!")
+                                f"\f0eb Use Link Manager to fix them!")
 
     def update_theme(self, is_dark):
         """Called from main window when theme changes."""
