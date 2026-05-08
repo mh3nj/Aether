@@ -1,5 +1,6 @@
 """
-Aether SEO API Tab - PageSpeed Insights & Core Web Vitals
+Aether SEO API Tab – PageSpeed Insights & Core Web Vitals
+Fetches real performance data from Google's API
 """
 
 import requests
@@ -7,7 +8,7 @@ from pathlib import Path
 from PySide6.QtWidgets import (
     QWidget, QVBoxLayout, QHBoxLayout, QPushButton,
     QLabel, QPlainTextEdit, QMessageBox, QGroupBox,
-    QLineEdit, QProgressBar
+    QLineEdit, QProgressBar, QComboBox
 )
 from PySide6.QtGui import QFont
 from PySide6.QtCore import Qt, QThread, Signal
@@ -42,12 +43,15 @@ class PageSpeedWorker(QThread):
                 if 'audits' in data['lighthouseResult']:
                     cls = data['lighthouseResult']['audits'].get('cumulative-layout-shift', {})
                     lcp = data['lighthouseResult']['audits'].get('largest-contentful-paint', {})
+                    fid = data['lighthouseResult']['audits'].get('max-potential-fid', {})
                     
                     result += "\n=== METRICS ===\n"
                     if cls.get('displayValue'):
                         result += f"CLS: {cls['displayValue']}\n"
                     if lcp.get('displayValue'):
                         result += f"LCP: {lcp['displayValue']}\n"
+                    if fid.get('displayValue'):
+                        result += f"FID: {fid['displayValue']}\n"
                 
                 self.finished.emit(result)
             else:
@@ -59,8 +63,9 @@ class PageSpeedWorker(QThread):
 class SEOAPITab(QWidget):
     def __init__(self):
         super().__init__()
+        self.pagespeed_score = 0
+        self.data_bridge = None
         self.init_ui()
-        self.pagespeed_worker = None
 
     def init_ui(self):
         layout = QVBoxLayout(self)
@@ -71,8 +76,8 @@ class SEOAPITab(QWidget):
         self.url_input = QLineEdit()
         self.url_input.setPlaceholderText("https://example.com")
         self.url_input.setMinimumHeight(30)
-        self.test_btn = QPushButton("Run PageSpeed Test")
-        self.test_btn.clicked.connect(self.run_tests)
+        self.test_btn = QPushButton("📊 Run PageSpeed Test")
+        self.test_btn.clicked.connect(self.run_pagespeed)
         url_layout.addWidget(self.url_input)
         url_layout.addWidget(self.test_btn)
         url_group.setLayout(url_layout)
@@ -96,22 +101,38 @@ class SEOAPITab(QWidget):
         self.progress.setVisible(False)
         layout.addWidget(self.progress)
 
-        # Results area - FIXED: using QFont instead of setFontFamily
+        # Results area
         self.results = QPlainTextEdit()
         self.results.setReadOnly(True)
         font = QFont("Courier New", 10)
         self.results.setFont(font)
         layout.addWidget(self.results)
 
+        # Explanation
+        info_label = QLabel(
+            "💡 PageSpeed Insights analyzes your website's performance and provides Core Web Vitals metrics.\n"
+            "• LCP (Largest Contentful Paint): Loading performance\n"
+            "• CLS (Cumulative Layout Shift): Visual stability\n"
+            "• FID (First Input Delay): Interactivity\n\n"
+            "Score ranges: 0-49 (Poor), 50-89 (Needs Improvement), 90-100 (Good)"
+        )
+        info_label.setWordWrap(True)
+        info_label.setStyleSheet("color: #8095AB; padding: 10px;")
+        layout.addWidget(info_label)
+
         self.status_label = QLabel("Ready - Enter a URL and click Run PageSpeed Test")
         layout.addWidget(self.status_label)
+
+    def set_data_bridge(self, bridge):
+        """Set the data bridge for dashboard communication"""
+        self.data_bridge = bridge
 
     def get_strategy(self):
         if self.mobile_btn.isChecked():
             return "mobile"
         return "desktop"
 
-    def run_tests(self):
+    def run_pagespeed(self):
         url = self.url_input.text().strip()
         if not url:
             QMessageBox.warning(self, "Warning", "Enter a URL first.")
@@ -129,10 +150,10 @@ class SEOAPITab(QWidget):
         strategy = self.get_strategy()
         self.results.appendPlainText(f"📊 Fetching PageSpeed Insights ({strategy.upper()})...\n")
         
-        self.pagespeed_worker = PageSpeedWorker(url, strategy)
-        self.pagespeed_worker.finished.connect(self.on_pagespeed_result)
-        self.pagespeed_worker.error.connect(self.on_pagespeed_error)
-        self.pagespeed_worker.start()
+        self.worker = PageSpeedWorker(url, strategy)
+        self.worker.finished.connect(self.on_pagespeed_result)
+        self.worker.error.connect(self.on_pagespeed_error)
+        self.worker.start()
 
     def on_pagespeed_result(self, result):
         self.results.appendPlainText(result)
@@ -140,13 +161,25 @@ class SEOAPITab(QWidget):
         self.results.appendPlainText("\n💡 For full report, visit: https://pagespeed.web.dev/")
         self.progress.setVisible(False)
         self.test_btn.setEnabled(True)
-        self.status_label.setText("Tests completed")
+        self.status_label.setText("PageSpeed test completed")
+        
+        # Extract score for dashboard
+        import re
+        match = re.search(r'Performance: (\d+)/100', result)
+        if match:
+            self.pagespeed_score = int(match.group(1))
+            if self.data_bridge:
+                self.data_bridge.report_scan(1, 0, self.pagespeed_score)
 
     def on_pagespeed_error(self, error):
         self.results.appendPlainText(f"❌ Error: {error}")
+        self.results.appendPlainText("\n💡 This might be due to:\n")
+        self.results.appendPlainText("• Invalid URL (make sure it's reachable)\n")
+        self.results.appendPlainText("• Rate limiting (try again in a minute)\n")
+        self.results.appendPlainText("• The website might be blocking bots")
         self.progress.setVisible(False)
         self.test_btn.setEnabled(True)
-        self.status_label.setText("Error occurred")
+        self.status_label.setText("Error occurred - check URL and try again")
 
     def update_theme(self, is_dark):
         """Called from main window when theme changes."""
