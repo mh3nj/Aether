@@ -27,7 +27,7 @@ class ContentLengthTab(QWidget):
         # Folder selection
         folder_row = QHBoxLayout()
         self.folder_label = QLabel("No folder selected")
-        self.select_btn = QPushButton("📁 Select Project Folder")
+        self.select_btn = QPushButton("\f07c Select Project Folder")
         self.select_btn.clicked.connect(self.select_folder)
         self.scan_btn = QPushButton("📏 Analyze Content Length")
         self.scan_btn.clicked.connect(self.analyze_content)
@@ -74,11 +74,11 @@ class ContentLengthTab(QWidget):
         # Length guidelines
         self.guidelines = QLabel(
             "📏 Content Length Guidelines:\n"
-            "• < 300 words: ⚠️ Very short - unlikely to rank\n"
-            "• 300-500 words: 🔸 Short - consider expanding\n"
-            "• 500-1000 words: ✅ Good - standard for many topics\n"
-            "• 1000-2000 words: 🌟 Great - comprehensive content\n"
-            "• > 2000 words: 🏆 Excellent - in-depth coverage"
+            "• < 300 words: \f071 Very short - unlikely to rank\n"
+            "• 300-500 words: \f219 Short - consider expanding\n"
+            "• 500-1000 words: \f00c Good - standard for many topics\n"
+            "• 1000-2000 words: \f005 Great - comprehensive content\n"
+            "• > 2000 words: \f091 Excellent - in-depth coverage"
         )
         self.guidelines.setWordWrap(True)
         self.guidelines.setStyleSheet("padding: 8px; border-radius: 4px; margin-top: 5px;")
@@ -165,21 +165,21 @@ class ContentLengthTab(QWidget):
                 
                 # Determine status based on word count
                 if word_count < 300:
-                    status = "⚠️ Very Short"
+                    status = "\f071 Very Short"
                     recommendation = "Add more detailed content (target: 500+ words)"
                     short_count += 1
                 elif word_count < 500:
-                    status = "🔸 Short"
+                    status = "\f219 Short"
                     recommendation = "Expand content to 500-1000 words for better ranking"
                     short_count += 1
                 elif word_count < 1000:
-                    status = "✅ Good"
+                    status = "\f00c Good"
                     recommendation = "Good length! Consider adding more depth if competitive topic"
                 elif word_count < 2000:
-                    status = "🌟 Great"
+                    status = "\f005 Great"
                     recommendation = "Excellent length! This page has strong potential"
                 else:
-                    status = "🏆 Excellent"
+                    status = "\f091 Excellent"
                     recommendation = "Outstanding! Very comprehensive content"
                 
                 # Create tree item
@@ -204,7 +204,7 @@ class ContentLengthTab(QWidget):
                 })
                 
             except Exception as e:
-                item = QTreeWidgetItem([str(html_path.name), "Error", "❌ Parse Error", str(e)[:50]])
+                item = QTreeWidgetItem([str(html_path.name), "Error", "\58 Parse Error", str(e)[:50]])
                 item.setForeground(2, Qt.GlobalColor(Qt.red))
                 self.results_tree.addTopLevelItem(item)
             
@@ -229,16 +229,16 @@ class ContentLengthTab(QWidget):
         self.results_tree.expandAll()
         
         self.summary_label.setText(
-            f"✅ Analysis complete! Found {len(html_files)} pages. "
+            f"\f00c Analysis complete! Found {len(html_files)} pages. "
             f"Average: {avg_words} words. {short_count} pages need improvement."
         )
         
         QMessageBox.information(self, "Analysis Complete", 
-            f"📊 Content Length Analysis\n\n"
+            f"\f201 Content Length Analysis\n\n"
             f"Total pages: {len(html_files)}\n"
             f"Average length: {avg_words} words\n"
             f"Pages needing improvement: {short_count}\n\n"
-            f"📋 Check the results table above for details on each page.")
+            f"\f15c Check the results table above for details on each page.")
 
     def update_theme(self, is_dark):
         """Called from main window when theme changes."""
