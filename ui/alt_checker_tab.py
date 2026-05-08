@@ -59,9 +59,9 @@ class AltCheckerTab(QWidget):
         # Folder selection
         folder_row = QHBoxLayout()
         self.folder_label = QLabel("No project folder selected")
-        self.select_btn = QPushButton("\f07c Select Project Folder")
+        self.select_btn = QPushButton("\uf07c Select Project Folder")
         self.select_btn.clicked.connect(self.select_folder)
-        self.scan_btn = QPushButton("\f002 Scan for Missing Alt Text")
+        self.scan_btn = QPushButton("\uf002 Scan for Missing Alt Text")
         self.scan_btn.clicked.connect(self.scan_images)
         folder_row.addWidget(self.select_btn)
         folder_row.addWidget(self.scan_btn)
@@ -87,10 +87,10 @@ class AltCheckerTab(QWidget):
 
         # Buttons
         btn_row = QHBoxLayout()
-        self.preview_btn = QPushButton("\f06e Preview Fixes")
+        self.preview_btn = QPushButton("\uf06e Preview Fixes")
         self.preview_btn.clicked.connect(self.preview_fixes)
         self.preview_btn.setEnabled(False)
-        self.fix_btn = QPushButton("\f0ad Bulk Fix Missing Alt Text")
+        self.fix_btn = QPushButton("\uf0ad Bulk Fix Missing Alt Text")
         self.fix_btn.clicked.connect(self.bulk_fix)
         self.fix_btn.setEnabled(False)
         btn_row.addWidget(self.preview_btn)
@@ -191,7 +191,7 @@ class AltCheckerTab(QWidget):
                             src[:50],
                             alt[:30],
                             "",
-                            "\f00c OK"
+                            "\uf00c OK"
                         ])
                         item.setForeground(4, Qt.darkGreen)
                         self.results_tree.addTopLevelItem(item)
@@ -212,7 +212,7 @@ class AltCheckerTab(QWidget):
         if missing_count > 0:
             self.preview_btn.setEnabled(True)
             self.fix_btn.setEnabled(True)
-            self.summary_label.setText(f"\f071 Found {missing_count} images with missing alt text out of {total_images} total images.")
+            self.summary_label.setText(f"\uf071 Found {missing_count} images with missing alt text out of {total_images} total images.")
             QMessageBox.warning(self, "Scan Complete", 
                                 f"Found {missing_count} images with missing or empty alt attributes.\n\n"
                                 f"Click 'Preview Fixes' to see what will be added.\n"
@@ -220,7 +220,7 @@ class AltCheckerTab(QWidget):
         else:
             self.preview_btn.setEnabled(False)
             self.fix_btn.setEnabled(False)
-            self.summary_label.setText(f"\f00c Great! No missing alt text found in {len(html_files)} files. All {total_images} images have alt attributes!")
+            self.summary_label.setText(f"\uf00c Great! No missing alt text found in {len(html_files)} files. All {total_images} images have alt attributes!")
 
     def preview_fixes(self):
         """Show a dialog with all suggested changes"""
@@ -230,9 +230,9 @@ class AltCheckerTab(QWidget):
         
         preview_text = "The following alt text will be added:\n\n"
         for img in self.missing_images[:50]:  # Show first 50
-            preview_text += f"\f07c {img['rel_path']}\n"
-            preview_text += f"   \f03e {img['src'][:60]}\n"
-            preview_text += f"   \f30b alt=\"{img['suggested']}\"\n\n"
+            preview_text += f"\uf07c {img['rel_path']}\n"
+            preview_text += f"   \uf03e {img['src'][:60]}\n"
+            preview_text += f"   \uf30b alt=\"{img['suggested']}\"\n\n"
         
         if len(self.missing_images) > 50:
             preview_text += f"\n... and {len(self.missing_images) - 50} more images."
@@ -337,7 +337,7 @@ class AltCheckerTab(QWidget):
         QMessageBox.information(self, "Bulk Fix Complete", 
                                 f"Fixed {fixed_count} images with missing alt text.\n"
                                 f"Modified {len(files_modified)} files.")
-        self.summary_label.setText(f"\f00c Fixed {fixed_count} images across {len(files_modified)} files")
+        self.summary_label.setText(f"\uf00c Fixed {fixed_count} images across {len(files_modified)} files")
         
         # Rescan to refresh display
         self.scan_images()
