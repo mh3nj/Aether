@@ -855,7 +855,7 @@ class SchemaTab(QWidget):
         
         scroll.setWidget(scroll_content)
         layout.addWidget(scroll)
-        self.schema_tabs.addTab(tab, "\e131 Video")
+        self.schema_tabs.addTab(tab, "\ue131 Video")
     
     def generate_video(self):
         name = self.video_name.text().strip()
