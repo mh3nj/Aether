@@ -66,7 +66,7 @@ class LinkManagerTab(QWidget):
         filter_row.addWidget(self.apply_single_btn)
         table_layout.addLayout(filter_row)
         
-        self.tabs.addTab(table_tab, "📋 All Links")
+        self.tabs.addTab(table_tab, "\f15b All Links")
 
         # === Tab 2: Bulk Replace ===
         replace_tab = QWidget()
@@ -98,7 +98,7 @@ class LinkManagerTab(QWidget):
         self.apply_replace_btn.clicked.connect(self.apply_replace)
         replace_layout.addWidget(self.apply_replace_btn)
 
-        self.tabs.addTab(replace_tab, "🔄 Bulk Replace")
+        self.tabs.addTab(replace_tab, "\f1b8 Bulk Replace")
 
         # Progress and status
         self.progress = QProgressBar()
@@ -277,7 +277,7 @@ class LinkManagerTab(QWidget):
                     f.write(new_content)
                 
                 self.links_table.item(current_row, 3).setText(new_link)
-                self.links_table.item(current_row, 4).setText("✅ Applied")
+                self.links_table.item(current_row, 4).setText("\f00c Applied")
                 link_data['original'] = new_link
                 self.status_label.setText(f"Link updated in {link_data['file']}")
                 
