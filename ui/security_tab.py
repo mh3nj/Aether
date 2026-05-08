@@ -30,7 +30,7 @@ class SecurityTab(QWidget):
         # File selection
         file_row = QHBoxLayout()
         self.file_label = QLabel("No HTML file selected")
-        self.select_btn = QPushButton("\f15c Select HTML File")
+        self.select_btn = QPushButton("\uf15c Select HTML File")
         self.select_btn.clicked.connect(self.select_file)
         file_row.addWidget(self.select_btn)
         file_row.addWidget(self.file_label)
@@ -46,7 +46,7 @@ class SecurityTab(QWidget):
         csp_layout = QVBoxLayout(csp_tab)
 
         csp_desc = QLabel(
-            "\f023 Content Security Policy (CSP) helps prevent XSS attacks by controlling which resources can be loaded.\n"
+            "\uf023 Content Security Policy (CSP) helps prevent XSS attacks by controlling which resources can be loaded.\n"
             "Configure your policy below, then inject into your HTML file."
         )
         csp_desc.setWordWrap(True)
@@ -98,7 +98,7 @@ class SecurityTab(QWidget):
         csp_layout.addLayout(preset_row)
 
         # Generate button and preview
-        self.generate_csp_btn = QPushButton("\f0ad Generate CSP Meta Tag")
+        self.generate_csp_btn = QPushButton("\uf0ad Generate CSP Meta Tag")
         self.generate_csp_btn.clicked.connect(self.generate_csp)
         csp_layout.addWidget(self.generate_csp_btn)
 
@@ -109,19 +109,19 @@ class SecurityTab(QWidget):
         csp_layout.addWidget(QLabel("Preview:"))
         csp_layout.addWidget(self.csp_preview)
 
-        self.inject_csp_btn = QPushButton("\f055 Inject CSP into HTML")
+        self.inject_csp_btn = QPushButton("\uf055 Inject CSP into HTML")
         self.inject_csp_btn.clicked.connect(self.inject_csp)
         self.inject_csp_btn.setEnabled(False)
         csp_layout.addWidget(self.inject_csp_btn)
 
-        self.tab_widget.addTab(csp_tab, "\f3ed CSP Generator")
+        self.tab_widget.addTab(csp_tab, "\uf3ed CSP Generator")
 
         # ========== TAB 2: SRI GENERATOR ==========
         sri_tab = QWidget()
         sri_layout = QVBoxLayout(sri_tab)
 
         sri_desc = QLabel(
-            "\f3c1 Subresource Integrity (SRI) ensures that resources loaded from CDNs haven't been tampered with.\n"
+            "\uf3c1 Subresource Integrity (SRI) ensures that resources loaded from CDNs haven't been tampered with.\n"
             "Enter a script or style URL to generate its integrity hash."
         )
         sri_desc.setWordWrap(True)
@@ -133,7 +133,7 @@ class SecurityTab(QWidget):
         self.sri_url.setPlaceholderText("https://cdn.example.com/script.js or style.css")
         self.sri_url.setMinimumHeight(30)
         url_row.addWidget(self.sri_url)
-        self.generate_sri_btn = QPushButton("\f3c1 Generate SRI Hash")
+        self.generate_sri_btn = QPushButton("\uf3c1 Generate SRI Hash")
         self.generate_sri_btn.clicked.connect(self.generate_sri)
         url_row.addWidget(self.generate_sri_btn)
         sri_layout.addLayout(url_row)
@@ -149,7 +149,7 @@ class SecurityTab(QWidget):
         self.inject_sri_btn.setEnabled(False)
         sri_layout.addWidget(self.inject_sri_btn)
 
-        self.tab_widget.addTab(sri_tab, "\f3c1 SRI Generator")
+        self.tab_widget.addTab(sri_tab, "\uf3c1 SRI Generator")
 
         # Status bar
         self.status_label = QLabel("Ready - Select an HTML file, then configure CSP or SRI")
@@ -272,7 +272,7 @@ class SecurityTab(QWidget):
             else:
                 tag_example = f'<script src="{url}" integrity="{integrity}" crossorigin="anonymous"></script>'
             
-            result_text = f"\f00c Integrity hash generated!\n\n"
+            result_text = f"\uf00c Integrity hash generated!\n\n"
             result_text += f"Hash: {integrity}\n\n"
             result_text += f"Example usage:\n{tag_example}"
             
