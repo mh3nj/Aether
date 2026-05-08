@@ -390,9 +390,69 @@ class MainWindow(QMainWindow):
     def apply_theme(self, dark):
         if dark:
             style = """
+            /* ========== DARK THEME ========== */
             QMainWindow, QDialog {
                 background-color: #1E1F22;
             }
+            
+            /* Main tab widget (sidebar tabs) */
+            QTabWidget::pane {
+                background-color: #1E1F22;
+                border: none;
+            }
+            
+            QTabBar::tab {
+                background-color: #2B2D31;
+                color: #E8E8E8;
+                padding: 8px 16px;
+                margin-right: 2px;
+            }
+            QTabBar::tab:selected {
+                background-color: #3E4045;
+                border-bottom: 2px solid #8095AB;
+            }
+            QTabBar::tab:hover {
+                background-color: #4B4E54;
+            }
+            
+            /* Nested tab widgets (inside merged tabs) - FIXED */
+            QTabWidget QTabWidget::pane {
+                background-color: #1E1F22;
+                border: 1px solid #3E4045;
+            }
+            
+            QTabWidget QTabBar::tab {
+                background-color: #2B2D31;
+                color: #E8E8E8;
+                padding: 6px 12px;
+                margin-right: 2px;
+            }
+            
+            QTabWidget QTabBar::tab:selected {
+                background-color: #3E4045;
+                border-bottom: 2px solid #8095AB;
+            }
+            
+            QTabWidget QTabBar::tab:hover {
+                background-color: #4B4E54;
+            }
+            
+            /* Deep nested (for Schema tab etc.) */
+            QTabWidget QTabWidget QTabWidget::pane {
+                background-color: #1E1F22;
+                border: 1px solid #3E4045;
+            }
+            
+            QTabWidget QTabWidget QTabBar::tab {
+                background-color: #2B2D31;
+                color: #E8E8E8;
+            }
+            
+            QTabWidget QTabWidget QTabBar::tab:selected {
+                background-color: #3E4045;
+            }
+            
+            /* All text editors and inputs */
             QPlainTextEdit, QTextEdit, QLineEdit, QComboBox, QTreeView, QTableWidget, QListWidget {
                 background-color: #2B2D31;
                 color: #E8E8E8;
@@ -400,58 +460,116 @@ class MainWindow(QMainWindow):
                 selection-background-color: #8095AB;
                 selection-color: #FFFFFF;
             }
+            
             QHeaderView::section {
                 background-color: #2B2D31;
                 color: #E8E8E8;
                 border: 1px solid #3E4045;
             }
+            
             QLabel, QStatusBar, QMenuBar, QMenu {
                 color: #E8E8E8;
                 background-color: #1E1F22;
             }
+            
             QPushButton, QToolButton {
                 background-color: #2B2D31;
                 color: #E8E8E8;
                 border: 1px solid #8095AB;
                 padding: 5px 10px;
                 border-radius: 4px;
-                font-family: 'Font Awesome 6 Free', 'Segoe UI', sans-serif;
             }
+            
             QPushButton:hover, QToolButton:hover {
                 background-color: #8095AB;
                 color: #1E1F22;
             }
+            
             QGroupBox {
                 color: #E8E8E8;
                 border: 1px solid #3E4045;
                 margin-top: 10px;
             }
+            
             QGroupBox::title {
                 subcontrol-origin: margin;
                 left: 10px;
                 padding: 0 5px;
             }
+            
             QScrollArea {
-                background-color: #2B2D31;
+                background-color: #1E1F22;
                 border: none;
             }
+            
             QProgressBar {
                 background-color: #2B2D31;
                 border: 1px solid #3E4045;
                 color: #E8E8E8;
             }
+            
             QProgressBar::chunk {
                 background-color: #8095AB;
             }
-            .fas, .far, .fab {
-                color: #E8E8E8;
+            
+            QScrollBar:vertical {
+                background-color: #2B2D31;
+                width: 12px;
+            }
+            
+            QScrollBar::handle:vertical {
+                background-color: #8095AB;
+                min-height: 20px;
+                border-radius: 6px;
+            }
+            
+            QScrollBar::add-line:vertical, QScrollBar::sub-line:vertical {
+                height: 0px;
             }
             """
         else:
             style = """
+            /* ========== LIGHT THEME ========== */
             QMainWindow, QDialog {
                 background-color: #F8F9FA;
             }
+            
+            QTabWidget::pane {
+                background-color: #F8F9FA;
+                border: none;
+            }
+            
+            QTabBar::tab {
+                background-color: #F1F3F5;
+                color: #2C3E50;
+                padding: 8px 16px;
+                margin-right: 2px;
+            }
+            QTabBar::tab:selected {
+                background-color: #FFFFFF;
+                border-bottom: 2px solid #8095AB;
+            }
+            QTabBar::tab:hover {
+                background-color: #8095AB;
+                color: white;
+            }
+            
+            /* Nested tab widgets */
+            QTabWidget QTabWidget::pane {
+                background-color: #FFFFFF;
+                border: 1px solid #D0D7DE;
+            }
+            
+            QTabWidget QTabBar::tab {
+                background-color: #F1F3F5;
+                color: #2C3E50;
+            }
+            
+            QTabWidget QTabBar::tab:selected {
+                background-color: #FFFFFF;
+                border-bottom: 2px solid #8095AB;
+            }
+            
             QPlainTextEdit, QTextEdit, QLineEdit, QComboBox, QTreeView, QTableWidget, QListWidget {
                 background-color: #FFFFFF;
                 color: #2C3E50;
@@ -459,51 +577,67 @@ class MainWindow(QMainWindow):
                 selection-background-color: #8095AB;
                 selection-color: white;
             }
+            
             QHeaderView::section {
                 background-color: #F1F3F5;
                 color: #2C3E50;
                 border: 1px solid #D0D7DE;
             }
+            
             QLabel, QStatusBar, QMenuBar, QMenu {
                 color: #2C3E50;
                 background-color: #F8F9FA;
             }
+            
             QPushButton, QToolButton {
                 background-color: #E9ECF1;
                 color: #2C3E50;
                 border: 1px solid #8095AB;
                 padding: 5px 10px;
                 border-radius: 4px;
-                font-family: 'Font Awesome 6 Free', 'Segoe UI', sans-serif;
             }
+            
             QPushButton:hover, QToolButton:hover {
                 background-color: #8095AB;
                 color: white;
             }
+            
             QGroupBox {
                 color: #2C3E50;
                 border: 1px solid #D0D7DE;
                 margin-top: 10px;
             }
+            
             QGroupBox::title {
                 subcontrol-origin: margin;
                 left: 10px;
                 padding: 0 5px;
             }
+            
             QScrollArea {
-                background-color: #FFFFFF;
+                background-color: #F8F9FA;
                 border: none;
             }
+            
             QProgressBar {
                 background-color: #FFFFFF;
                 border: 1px solid #D0D7DE;
                 color: #2C3E50;
             }
+            
             QProgressBar::chunk {
                 background-color: #8095AB;
             }
-            .fas, .far, .fab {
-                color: #2C3E50;
+            
+            QScrollBar:vertical {
+                background-color: #F1F3F5;
+                width: 12px;
+            }
+            
+            QScrollBar::handle:vertical {
+                background-color: #8095AB;
+                min-height: 20px;
+                border-radius: 6px;
             }
             """
         self.setStyleSheet(style)
