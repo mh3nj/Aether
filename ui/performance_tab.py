@@ -27,7 +27,7 @@ class PerformanceTab(QWidget):
         # Folder selection
         folder_row = QHBoxLayout()
         self.folder_label = QLabel("No folder selected")
-        self.select_btn = QPushButton("\e185 Select Project Folder")
+        self.select_btn = QPushButton("\ue185 Select Project Folder")
         self.select_btn.clicked.connect(self.select_folder)
         self.scan_btn = QPushButton("\uf002 Scan for Preload Opportunities")
         self.scan_btn.clicked.connect(self.scan)
