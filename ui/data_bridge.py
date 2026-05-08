@@ -25,8 +25,8 @@ class DataBridge(QObject):
     
     def report_scan(self, file_count, issue_count, score=0):
         """Report a scan completion from any tab"""
-        self.metrics["pages_analyzed"] += file_count
-        self.metrics["issues_found"] += issue_count
+        self.metrics["pages_analyzed"] = file_count
+        self.metrics["issues_found"] = issue_count
         self.metrics["seo_score"] = score if score > 0 else self.metrics["seo_score"]
         self.metrics["last_scan"] = __import__('datetime').datetime.now().isoformat()
         
