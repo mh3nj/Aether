@@ -122,7 +122,7 @@ class WelcomePage(QWizardPage):
         layout = QVBoxLayout()
         
         welcome_text = QLabel(
-            "\f121 Welcome to Aether Project Setup\n\n"
+            "\uf121 Welcome to Aether Project Setup\n\n"
             "This wizard will help you configure your project for optimal SEO and development tools.\n\n"
             "You'll be asked to:\n"
             "• Select your project folder\n"
@@ -152,7 +152,7 @@ class FolderSelectPage(QWizardPage):
         self.folder_label = QLabel("No folder selected")
         self.folder_label.setStyleSheet("padding: 10px; border: 1px solid #8095AB; border-radius: 5px;")
         
-        self.select_btn = QPushButton("\f07c Browse...")
+        self.select_btn = QPushButton("\uf07c Browse...")
         self.select_btn.clicked.connect(self.select_folder)
         
         btn_layout = QHBoxLayout()
@@ -440,28 +440,28 @@ class SummaryPage(QWizardPage):
     def initializePage(self):
         config = self.wizard.config
         summary = f"""
-\f00c Project Configuration Summary
+\uf00c Project Configuration Summary
 
 \e185 Project Root: {config.root_path}
 
-\f0ac Multi-language: {'Yes' if config.is_multilingual else 'No'}
+\uf0ac Multi-language: {'Yes' if config.is_multilingual else 'No'}
 """
         if config.is_multilingual:
             summary += f"   Language folders: {', '.join(config.language_folders)}\n"
 
         summary += f"""
-\f15c HTML Files: {len(config.html_files)} selected
+\uf15c HTML Files: {len(config.html_files)} selected
    Main: {config.main_html if config.main_html else 'None'}
 
-\f53f CSS Files: {len(config.css_files)} selected
+\uf53f CSS Files: {len(config.css_files)} selected
    Main: {config.main_css if config.main_css else 'None'}
 
-\f109 JS Files: {len(config.js_files)} selected
+\uf109 JS Files: {len(config.js_files)} selected
    Main: {config.main_js if config.main_js else 'None'}
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-\f0eb Your configuration will be saved to:
+\uf0eb Your configuration will be saved to:
    {config.root_path}/.aether-config.json
 
 You can always re-run this wizard from Project menu.
@@ -474,7 +474,7 @@ You can always re-run this wizard from Project menu.
         self.wizard.config.save(config_path)
         
         QMessageBox.information(self, "Setup Complete", 
-            "\f00c Project configuration saved successfully!\n\n"
+            "\uf00c Project configuration saved successfully!\n\n"
             "All Aether tools will now use this project structure.\n"
             "You can change settings anytime via Project → Project Setup Wizard.")
         
