@@ -34,7 +34,7 @@ class KeywordDensityTab(QWidget):
         # Folder selection
         folder_row = QHBoxLayout()
         self.folder_label = QLabel("No folder selected")
-        self.select_btn = QPushButton("\f07c Select Project Folder")
+        self.select_btn = QPushButton("\uf07c Select Project Folder")
         self.select_btn.clicked.connect(self.select_folder)
         folder_row.addWidget(self.select_btn)
         folder_row.addWidget(self.folder_label)
@@ -46,7 +46,7 @@ class KeywordDensityTab(QWidget):
         self.keyword_input = QLineEdit()
         self.keyword_input.setPlaceholderText("Enter keyword to analyze (e.g., 'web design')")
         self.keyword_input.setMinimumHeight(30)
-        self.analyze_btn = QPushButton("\f002 Analyze Keyword Density")
+        self.analyze_btn = QPushButton("\uf002 Analyze Keyword Density")
         self.analyze_btn.clicked.connect(self.analyze_keyword)
         keyword_row.addWidget(self.keyword_input)
         keyword_row.addWidget(self.analyze_btn)
@@ -78,9 +78,9 @@ class KeywordDensityTab(QWidget):
 
         # Density guidelines
         guidelines = QLabel(
-            "\f201 Keyword Density Guidelines:\n"
-            "• < 0.5%: \f071 Under-optimized - add more keyword variations\n"
-            "• 0.5% - 3.0%: \f00c Optimal range\n"
+            "\uf201 Keyword Density Guidelines:\n"
+            "• < 0.5%: \uf071 Under-optimized - add more keyword variations\n"
+            "• 0.5% - 3.0%: \uf00c Optimal range\n"
             "• > 3.0%: \58 Keyword stuffing - reduce usage to avoid penalties"
         )
         guidelines.setWordWrap(True)
@@ -183,7 +183,7 @@ class KeywordDensityTab(QWidget):
                 
                 # Determine status
                 if density < 0.5:
-                    status = "\f071 Under-optimized"
+                    status = "\uf071 Under-optimized"
                     status_color = "orange"
                     issue_count += 1
                 elif density > 3.0:
@@ -191,7 +191,7 @@ class KeywordDensityTab(QWidget):
                     status_color = "red"
                     issue_count += 1
                 else:
-                    status = "\f00c Good"
+                    status = "\uf00c Good"
                     status_color = "green"
                 
                 rel_path = str(html_path.relative_to(self.project_folder))
@@ -240,30 +240,30 @@ class KeywordDensityTab(QWidget):
         overall_density = (total_keyword_count / total_words) * 100 if total_words > 0 else 0
         
         if overall_density < 0.5:
-            recommendation = "\f071 Overall keyword density is LOW. Consider adding more keyword variations naturally."
+            recommendation = "\uf071 Overall keyword density is LOW. Consider adding more keyword variations naturally."
             rec_color = "orange"
         elif overall_density > 3.0:
             recommendation = "\58 Overall keyword density is HIGH. Reduce keyword usage to avoid penalties."
             rec_color = "red"
         else:
-            recommendation = "\f00c Overall keyword density is GOOD (0.5-3.0%). Keep up the natural writing!"
+            recommendation = "\uf00c Overall keyword density is GOOD (0.5-3.0%). Keep up the natural writing!"
             rec_color = "green"
         
         stats_text = f"""
-\f201 Overall Statistics:
+\uf201 Overall Statistics:
 • Total words analyzed: {total_words:,}
 • Total keyword mentions: {total_keyword_count}
 • Overall density: {overall_density:.2f}%
 
-\f140 Recommendation:
+\uf140 Recommendation:
 <span style='color:{rec_color}'>{recommendation}</span>
 
-\f0eb Ideal keyword density: 0.5% - 3.0%
+\uf0eb Ideal keyword density: 0.5% - 3.0%
 • Below 0.5%: Too low, may not rank
 • Above 3.0%: Risk of keyword stuffing penalty
 """
         self.stats_label.setText(stats_text)
-        self.summary_label.setText(f"\f00c Analyzed {len(html_files)} files for keyword '{keyword}'")
+        self.summary_label.setText(f"\uf00c Analyzed {len(html_files)} files for keyword '{keyword}'")
 
     def update_theme(self, is_dark):
         """Called from main window when theme changes."""
