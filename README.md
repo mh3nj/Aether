@@ -225,9 +225,9 @@ Aether/
 **Mohsen Jafari** – Creator, Developer, Designer
 
 - Email: parsegan@proton.me
-- Websites: parsegan.com, dahgan.com
-- GitHub: @parsegan / @mh3nj
-- LinkedIn: linkedin.com/in/parsegan
+- Websites: [parsegan.com](https://parsegan.com), [dahgan.com](https://dahgan.com)
+- GitHub: [@parsegan](https://github.com/parsegan) | [@mh3nj](https://github.com/mh3nj)
+- LinkedIn: linkedin.com/in/parsegan [linkedin.com/in/parsegan](https://linkedin.com/in/parsegan)
 
 > Special thanks to the AI coding companion that co-wrote the code and helped debug every feature across all 12 merged tools.
 
