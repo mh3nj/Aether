@@ -26,9 +26,9 @@ class DuplicateDetectorTab(QWidget):
         # Folder selection
         folder_row = QHBoxLayout()
         self.folder_label = QLabel("No folder selected")
-        self.select_btn = QPushButton("\f07c Select Project Folder")
+        self.select_btn = QPushButton("\uf07c Select Project Folder")
         self.select_btn.clicked.connect(self.select_folder)
-        self.scan_btn = QPushButton("\f1b8 Scan Duplicates")
+        self.scan_btn = QPushButton("\uf1b8 Scan Duplicates")
         self.scan_btn.clicked.connect(self.scan)
         folder_row.addWidget(self.select_btn)
         folder_row.addWidget(self.scan_btn)
@@ -120,21 +120,21 @@ class DuplicateDetectorTab(QWidget):
         # Add duplicate titles to tree
         for title, files in titles.items():
             if len(files) > 1:
-                item = QTreeWidgetItem(["\f31c Duplicate Title", title[:100], ", ".join(files)])
+                item = QTreeWidgetItem(["\uf31c Duplicate Title", title[:100], ", ".join(files)])
                 self.results_tree.addTopLevelItem(item)
                 duplicate_count += 1
 
         # Add duplicate descriptions to tree
         for desc, files in descriptions.items():
             if len(files) > 1:
-                item = QTreeWidgetItem(["\f15c Duplicate Description", desc[:100], ", ".join(files)])
+                item = QTreeWidgetItem(["\uf15c Duplicate Description", desc[:100], ", ".join(files)])
                 self.results_tree.addTopLevelItem(item)
                 duplicate_count += 1
 
         # Add duplicate H1s to tree
         for h1, files in h1s.items():
             if len(files) > 1:
-                item = QTreeWidgetItem(["\f02b Duplicate H1", h1[:100], ", ".join(files)])
+                item = QTreeWidgetItem(["\uf02b Duplicate H1", h1[:100], ", ".join(files)])
                 self.results_tree.addTopLevelItem(item)
                 duplicate_count += 1
 
@@ -148,9 +148,9 @@ class DuplicateDetectorTab(QWidget):
         self.results_tree.expandAll()
         
         if duplicate_count == 0:
-            self.summary_label.setText(f"\f00c Great! No duplicate issues found across {len(html_files)} files")
+            self.summary_label.setText(f"\uf00c Great! No duplicate issues found across {len(html_files)} files")
         else:
-            self.summary_label.setText(f"\f071 Found {duplicate_count} duplicate issues across {len(html_files)} files")
+            self.summary_label.setText(f"\uf071 Found {duplicate_count} duplicate issues across {len(html_files)} files")
             
             QMessageBox.warning(self, "Duplicate Content Found", 
                 f"Found {duplicate_count} duplicate content issues!\n\n"
