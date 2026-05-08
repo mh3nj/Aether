@@ -143,6 +143,10 @@ class MainWindow(QMainWindow):
         # Connect logs to dashboard
         self.logs_tab.log_added.connect(self.dashboard_tab.add_log_entry)
 
+        # ========== FIXED: Connect data bridge to dashboard HERE ==========
+        self.data_bridge.scan_completed.connect(self.dashboard_tab.on_scan_completed)
+        self.data_bridge.issue_fixed.connect(self.dashboard_tab.on_issue_fixed)
+
         # Create menu bar
         menubar = self.menuBar()
         
