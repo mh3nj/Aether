@@ -1,5 +1,5 @@
 """
-Aether Sidebar Navigation – Collapsible sidebar for quick access
+Aether Sidebar Navigation – Collapsible sidebar with FontAwesome icons
 """
 
 from PySide6.QtWidgets import (
@@ -11,11 +11,14 @@ from PySide6.QtGui import QFont, QIcon
 
 
 class SidebarButton(QPushButton):
-    """Custom sidebar button with icon and text"""
+    """Custom sidebar button with FontAwesome icon and text"""
     
-    def __init__(self, icon, text, shortcut="", parent=None):
+    def __init__(self, icon_code, text, shortcut="", parent=None):
         super().__init__(parent)
-        self.setText(f"  {icon}  {text}")
+        self.icon_code = icon_code
+        self.text = text
+        # Use FontAwesome icon instead of emoji
+        self.setText(f"  {icon_code}  {text}")
         if shortcut:
             self.setToolTip(f"{text} ({shortcut})")
         self.setFixedHeight(40)
@@ -28,6 +31,7 @@ class SidebarButton(QPushButton):
                 border-radius: 6px;
                 margin: 2px 8px;
                 font-size: 13px;
+                font-family: 'Font Awesome 6 Free', 'Segoe UI', sans-serif;
             }
             QPushButton:hover {
                 background-color: rgba(128, 149, 171, 0.2);
@@ -36,8 +40,6 @@ class SidebarButton(QPushButton):
                 background-color: rgba(128, 149, 171, 0.3);
             }
         """)
-        self.icon = icon
-        self.text = text
 
 
 class Sidebar(QWidget):
@@ -59,7 +61,7 @@ class Sidebar(QWidget):
         layout.setSpacing(2)
         
         # Collapse/Expand button
-        self.toggle_btn = QPushButton("◀ Collapse")
+        self.toggle_btn = QPushButton("\uf053  Collapse")  # fa-chevron-left
         self.toggle_btn.setFixedHeight(35)
         self.toggle_btn.setCursor(Qt.PointingHandCursor)
         self.toggle_btn.clicked.connect(self.toggle_collapse)
@@ -70,6 +72,7 @@ class Sidebar(QWidget):
                 border-radius: 6px;
                 margin: 5px 8px;
                 font-weight: bold;
+                font-family: 'Font Awesome 6 Free', 'Segoe UI', sans-serif;
             }
             QPushButton:hover {
                 background-color: rgba(128, 149, 171, 0.2);
@@ -90,9 +93,9 @@ class Sidebar(QWidget):
         scroll_layout.setContentsMargins(0, 0, 0, 0)
         scroll_layout.addStretch()
         
-        # Navigation buttons
+        # Navigation buttons with FontAwesome icons
         self.nav_buttons = []
-        nav_items = [
+        self.nav_items = [
             ("\uf015", "Dashboard", "Ctrl+1", 0),      # fa-home
             ("\uf121", "Code Studio", "Ctrl+2", 1),    # fa-code
             ("\uf002", "SEO Command", "Ctrl+3", 2),    # fa-search
@@ -107,8 +110,8 @@ class Sidebar(QWidget):
             ("\uf017", "Logs", "Ctrl+L", 11),          # fa-clock
         ]
         
-        for icon, text, shortcut, tab_index in self.nav_items:
-            btn = SidebarButton(icon, text, shortcut, self)
+        for icon_code, text, shortcut, tab_index in self.nav_items:
+            btn = SidebarButton(icon_code, text, shortcut, self)
             btn.clicked.connect(lambda checked, idx=tab_index: self.go_to_tab(idx))
             scroll_layout.insertWidget(scroll_layout.count() - 1, btn)
             self.nav_buttons.append(btn)
@@ -117,7 +120,7 @@ class Sidebar(QWidget):
         layout.addWidget(scroll)
         
         # Theme toggle at bottom
-        self.theme_btn = SidebarButton("🌓", "Toggle Theme", "Ctrl+Shift+T")
+        self.theme_btn = SidebarButton("\uf186", "Toggle Theme", "Ctrl+Shift+T")  # fa-moon
         self.theme_btn.clicked.connect(self.toggle_theme)
         layout.addWidget(self.theme_btn)
     
@@ -145,6 +148,7 @@ class Sidebar(QWidget):
                         background-color: #8095AB;
                         color: white;
                         font-weight: bold;
+                        font-family: 'Font Awesome 6 Free', 'Segoe UI', sans-serif;
                     }
                     QPushButton:hover {
                         background-color: #8095AB;
@@ -162,6 +166,7 @@ class Sidebar(QWidget):
                             margin: 2px 8px;
                             font-size: 13px;
                             color: #E8E8E8;
+                            font-family: 'Font Awesome 6 Free', 'Segoe UI', sans-serif;
                         }
                         QPushButton:hover {
                             background-color: rgba(128, 149, 171, 0.2);
@@ -178,6 +183,7 @@ class Sidebar(QWidget):
                             margin: 2px 8px;
                             font-size: 13px;
                             color: #2C3E50;
+                            font-family: 'Font Awesome 6 Free', 'Segoe UI', sans-serif;
                         }
                         QPushButton:hover {
                             background-color: rgba(128, 149, 171, 0.2);
@@ -188,7 +194,6 @@ class Sidebar(QWidget):
     def toggle_theme(self):
         """Toggle dark/light theme"""
         if self.main_window:
-            # Get current theme state and toggle
             is_dark = self.main_window.theme_action.isChecked()
             self.main_window.theme_action.setChecked(not is_dark)
             self.main_window.toggle_theme()
@@ -206,12 +211,12 @@ class Sidebar(QWidget):
             self.animation.setEasingCurve(QEasingCurve.OutCubic)
             self.animation.start()
             
-            self.toggle_btn.setText("▶")
+            self.toggle_btn.setText("\uf054")  # fa-chevron-right
             
             # Hide text on buttons
             for btn in self.nav_buttons:
-                btn.setText(f"  {btn.icon}  ")
-            self.theme_btn.setText("  🌓  ")
+                btn.setText(f"  {btn.icon_code}  ")
+            self.theme_btn.setText("  \uf186  ")
             
         else:
             # Expand
@@ -222,14 +227,14 @@ class Sidebar(QWidget):
             self.animation.setEasingCurve(QEasingCurve.OutCubic)
             self.animation.start()
             
-            self.toggle_btn.setText("◀ Collapse")
+            self.toggle_btn.setText("\uf053  Collapse")  # fa-chevron-left
             
             # Restore text on buttons
             for i, btn in enumerate(self.nav_buttons):
                 if i < len(self.nav_items):
-                    icon, text, shortcut, tab_index = self.nav_items[i]
-                    btn.setText(f"  {icon}  {text}")
-            self.theme_btn.setText("  🌓  Toggle Theme")
+                    icon_code, text, shortcut, tab_index = self.nav_items[i]
+                    btn.setText(f"  {icon_code}  {text}")
+            self.theme_btn.setText("  \uf186  Toggle Theme")
     
     def update_theme(self, is_dark):
         """Update sidebar theme"""
