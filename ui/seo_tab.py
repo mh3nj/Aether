@@ -242,7 +242,7 @@ class SEOTab(QWidget):
         btn_layout = QHBoxLayout()
         self.apply_btn = QPushButton("\uf00c Apply Meta Tags")
         self.apply_btn.clicked.connect(self.apply_meta)
-        self.preset_404_btn = QPushButton("\e4eb Set as 404 Page (noindex)")
+        self.preset_404_btn = QPushButton("\ue4eb Set as 404 Page (noindex)")
         self.preset_404_btn.clicked.connect(self.apply_404_preset)
         self.hreflang_btn = QPushButton("\uf0ac Generate Hreflang Tags")
         self.hreflang_btn.clicked.connect(self.open_hreflang_dialog)
