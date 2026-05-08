@@ -30,9 +30,9 @@ class BatchMetaUpdaterTab(QWidget):
         # Folder selection
         folder_row = QHBoxLayout()
         self.folder_label = QLabel("No folder selected")
-        self.select_btn = QPushButton("\f07c Select Project Folder")
+        self.select_btn = QPushButton("\uf07c Select Project Folder")
         self.select_btn.clicked.connect(self.select_folder)
-        self.scan_btn = QPushButton("\f002 Scan for HTML Files")
+        self.scan_btn = QPushButton("\uf002 Scan for HTML Files")
         self.scan_btn.clicked.connect(self.scan_files)
         folder_row.addWidget(self.select_btn)
         folder_row.addWidget(self.scan_btn)
@@ -70,7 +70,7 @@ class BatchMetaUpdaterTab(QWidget):
         layout.addWidget(meta_group)
 
         # Preview button and results
-        self.preview_btn = QPushButton("\f06e Preview Changes")
+        self.preview_btn = QPushButton("\uf06e Preview Changes")
         self.preview_btn.clicked.connect(self.preview_changes)
         self.preview_btn.setEnabled(False)
         layout.addWidget(self.preview_btn)
@@ -91,7 +91,7 @@ class BatchMetaUpdaterTab(QWidget):
         layout.addWidget(self.progress)
 
         # Apply button
-        self.apply_btn = QPushButton("\f135 Apply Changes to All Files")
+        self.apply_btn = QPushButton("\uf135 Apply Changes to All Files")
         self.apply_btn.clicked.connect(self.apply_changes)
         self.apply_btn.setEnabled(False)
         self.apply_btn.setStyleSheet("""
@@ -298,10 +298,10 @@ class BatchMetaUpdaterTab(QWidget):
                 item = QTreeWidgetItem([rel_path, current_value[:80], new_display[:80], "Pending"])
                 if not current_value:
                     item.setForeground(3, Qt.GlobalColor(Qt.darkYellow))
-                    item.setText(3, "\f071 Will create")
+                    item.setText(3, "\uf071 Will create")
                 else:
                     item.setForeground(3, Qt.GlobalColor(Qt.blue))
-                    item.setText(3, "\f31c Will update")
+                    item.setText(3, "\uf31c Will update")
                 
                 self.results_tree.addTopLevelItem(item)
                 self.preview_results.append({
@@ -362,7 +362,7 @@ class BatchMetaUpdaterTab(QWidget):
                 for i in range(self.results_tree.topLevelItemCount()):
                     item = self.results_tree.topLevelItem(i)
                     if item.text(0) == str(result['path'].relative_to(self.project_folder)):
-                        item.setText(3, "\f00c Updated")
+                        item.setText(3, "\uf00c Updated")
                         item.setForeground(3, Qt.GlobalColor(Qt.darkGreen))
                         break
                 
@@ -379,7 +379,7 @@ class BatchMetaUpdaterTab(QWidget):
         if self.data_bridge and updated > 0:
             self.data_bridge.report_fix("meta tags", updated)
         
-        self.summary_label.setText(f"\f00c Updated {updated} files with new {tag_type}.")
+        self.summary_label.setText(f"\uf00c Updated {updated} files with new {tag_type}.")
         QMessageBox.information(self, "Update Complete", f"Successfully updated {updated} files.")
 
     def update_theme(self, is_dark):
