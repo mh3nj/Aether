@@ -391,13 +391,22 @@ class DashboardTab(QWidget):
             self.score_status.setText("Good! Keep optimizing.")
 
     def update_theme(self, is_dark):
-        """Update colors when theme changes - FIXED"""
+        """Update colors when theme changes"""
         if is_dark:
-            # Dark theme
             self.setStyleSheet("""
-                QLabel { color: #E8E8E8; }
-                QProgressBar::chunk { background-color: #8095AB; }
-                QFrame { background-color: rgba(128, 149, 171, 0.1); border-color: #3E4045; }
+                QLabel { 
+                    color: #E8E8E8; 
+                }
+                QProgressBar::chunk { 
+                    background-color: #8095AB; 
+                }
+                QFrame { 
+                    background-color: rgba(128, 149, 171, 0.1);
+                    border-radius: 12px;
+                    padding: 15px;
+                    margin: 5px;
+                    border: 1px solid #3E4045;
+                }
                 QPushButton {
                     background-color: #2B2D31;
                     color: #E8E8E8;
@@ -409,14 +418,40 @@ class DashboardTab(QWidget):
                     background-color: #8095AB;
                     color: #1E1F22;
                 }
-                QScrollArea { background-color: #1E1F22; border: none; }
+                QScrollArea {
+                    background-color: #1E1F22;
+                    border: none;
+                }
+                QWidget {
+                    background-color: #1E1F22;
+                }
             """)
+            # Update card backgrounds
+            for card in self.findChildren(QFrame):
+                card.setStyleSheet("""
+                    QFrame {
+                        background-color: rgba(128, 149, 171, 0.1);
+                        border-radius: 12px;
+                        padding: 15px;
+                        margin: 5px;
+                        border: 1px solid #3E4045;
+                    }
+                """)
         else:
-            # Light theme
             self.setStyleSheet("""
-                QLabel { color: #2C3E50; }
-                QProgressBar::chunk { background-color: #8095AB; }
-                QFrame { background-color: rgba(128, 149, 171, 0.05); border-color: #D0D7DE; }
+                QLabel { 
+                    color: #2C3E50; 
+                }
+                QProgressBar::chunk { 
+                    background-color: #8095AB; 
+                }
+                QFrame { 
+                    background-color: rgba(128, 149, 171, 0.05);
+                    border-radius: 12px;
+                    padding: 15px;
+                    margin: 5px;
+                    border: 1px solid #D0D7DE;
+                }
                 QPushButton {
                     background-color: #E9ECF1;
                     color: #2C3E50;
@@ -428,8 +463,24 @@ class DashboardTab(QWidget):
                     background-color: #8095AB;
                     color: white;
                 }
-                QScrollArea { background-color: #F8F9FA; border: none; }
+                QScrollArea {
+                    background-color: #F8F9FA;
+                    border: none;
+                }
+                QWidget {
+                    background-color: #F8F9FA;
+                }
             """)
+            for card in self.findChildren(QFrame):
+                card.setStyleSheet("""
+                    QFrame {
+                        background-color: rgba(128, 149, 171, 0.05);
+                        border-radius: 12px;
+                        padding: 15px;
+                        margin: 5px;
+                        border: 1px solid #D0D7DE;
+                    }
+                """)
 
     # Navigation methods
     def go_to_formatter(self):
