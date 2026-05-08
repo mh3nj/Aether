@@ -215,18 +215,35 @@ class Sidebar(QWidget):
             self.theme_btn.setText("  🌓  Toggle Theme")
     
     def update_theme(self, is_dark):
-        """Update sidebar theme"""
-        if is_dark:
-            self.setStyleSheet("""
-                QWidget {
-                    background-color: #1E1F22;
-                    border-right: 1px solid #3E4045;
-                }
-            """)
-        else:
-            self.setStyleSheet("""
-                QWidget {
-                    background-color: #F8F9FA;
-                    border-right: 1px solid #D0D7DE;
-                }
-            """)
+    """Update sidebar theme"""
+    if is_dark:
+        self.setStyleSheet("""
+            QWidget {
+                background-color: #1E1F22;
+                border-right: 1px solid #3E4045;
+            }
+            QPushButton {
+                color: #E8E8E8;
+            }
+            QPushButton:hover {
+                background-color: rgba(128, 149, 171, 0.2);
+                color: #FFFFFF;
+            }
+        """)
+    else:
+        self.setStyleSheet("""
+            QWidget {
+                background-color: #F8F9FA;
+                border-right: 1px solid #D0D7DE;
+            }
+            QPushButton {
+                color: #2C3E50;
+            }
+            QPushButton:hover {
+                background-color: rgba(128, 149, 171, 0.2);
+                color: #1A1A2E;
+            }
+        """)
+    
+    # Update active button style
+    self.update_active_button(self.main_window.tabs.currentIndex() if self.main_window else 0)
