@@ -42,10 +42,10 @@ class BackupTab(QWidget):
 
         # Buttons
         btn_row = QHBoxLayout()
-        self.create_btn = QPushButton("\f790 Create Backup Now")
+        self.create_btn = QPushButton("\uf790 Create Backup Now")
         self.create_btn.clicked.connect(self.create_backup)
         self.create_btn.setEnabled(False)
-        self.restore_btn = QPushButton("\f1b8 Restore from Backup")
+        self.restore_btn = QPushButton("\uf1b8 Restore from Backup")
         self.restore_btn.clicked.connect(self.restore_backup)
         self.restore_btn.setEnabled(False)
         btn_row.addWidget(self.create_btn)
@@ -164,7 +164,7 @@ class BackupTab(QWidget):
         self.load_backup_history()
         self.progress.setVisible(False)
         self.create_btn.setEnabled(True)
-        self.status_label.setText(f"\f00c Backup complete! {len(files_to_backup)} files backed up.")
+        self.status_label.setText(f"\uf00c Backup complete! {len(files_to_backup)} files backed up.")
         QMessageBox.information(self, "Backup Complete", 
                                 f"Backed up {len(files_to_backup)} files ({size_kb} KB)\n"
                                 f"Location: {backup_subfolder}")
@@ -215,7 +215,7 @@ class BackupTab(QWidget):
 
         self.progress.setVisible(False)
         self.restore_btn.setEnabled(True)
-        self.status_label.setText(f"\f00c Restored {restored} files from backup.")
+        self.status_label.setText(f"\uf00c Restored {restored} files from backup.")
         QMessageBox.information(self, "Restore Complete", 
                                 f"Restored {restored} files.\nYour project has been reverted.")
 
