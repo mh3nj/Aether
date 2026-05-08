@@ -16,7 +16,8 @@ class LinkManagerTab(QWidget):
     def __init__(self):
         super().__init__()
         self.project_folder = None
-        self.links_data = []  # list of dicts: file, tag, attr, original_link
+        self.links_data = []
+        self.data_bridge = None  # Initialize data bridge
         self.init_ui()
 
     def init_ui(self):
@@ -107,7 +108,7 @@ class LinkManagerTab(QWidget):
         self.status_label = QLabel("Ready – select a folder and click Scan")
         layout.addWidget(self.status_label)
 
-        self.all_links = []  # unfiltered
+        self.all_links = []
         self.filtered_links = []
 
     def select_folder(self):
@@ -116,6 +117,10 @@ class LinkManagerTab(QWidget):
             self.project_folder = path
             self.folder_label.setText(path)
             self.status_label.setText(f"Project: {path}")
+
+    def set_data_bridge(self, bridge):
+        """Set the data bridge for dashboard communication"""
+        self.data_bridge = bridge
 
     def scan_links(self):
         if not self.project_folder:
@@ -137,7 +142,6 @@ class LinkManagerTab(QWidget):
                     soup = BeautifulSoup(f, 'html.parser')
                 rel_path = html_path.relative_to(self.project_folder)
 
-                # Find all tags with href or src
                 for tag in soup.find_all(['a', 'link', 'script', 'img']):
                     for attr in ['href', 'src']:
                         if tag.has_attr(attr):
@@ -149,7 +153,7 @@ class LinkManagerTab(QWidget):
                                     'attr': attr,
                                     'original': link,
                                     'full_path': str(html_path),
-                                    'new_preview': link,  # Initialize with original
+                                    'new_preview': link,
                                 })
             except Exception as e:
                 pass
@@ -170,7 +174,6 @@ class LinkManagerTab(QWidget):
             self.links_table.setItem(row, 2, QTableWidgetItem(link['attr']))
             self.links_table.setItem(row, 3, QTableWidgetItem(link['original']))
             
-            # Editable preview column
             preview_value = link.get('new_preview', link['original'])
             preview_item = QTableWidgetItem(preview_value)
             preview_item.setFlags(preview_item.flags() | Qt.ItemIsEditable)
@@ -194,7 +197,7 @@ class LinkManagerTab(QWidget):
         use_regex = self.regex_check.isChecked()
         preview_lines = []
         count = 0
-        for link in self.all_links[:50]:  # preview first 50
+        for link in self.all_links[:50]:
             old = link['original']
             if use_regex:
                 try:
@@ -217,17 +220,14 @@ class LinkManagerTab(QWidget):
         self.status_label.setText(f"Preview: {count} matches found.")
 
     def on_cell_double_clicked(self, item):
-        """Allow editing the New Link Preview column"""
         row = item.row()
         column = item.column()
         
-        if column == 4:  # New Link Preview column
+        if column == 4:
             current_text = self.links_table.item(row, column).text()
-            # Create an inline editor
             from PySide6.QtWidgets import QLineEdit
             editor = QLineEdit(current_text)
             
-            # Apply theme-aware style
             is_dark = hasattr(self, 'parent') and self.parent() and hasattr(self.parent(), 'theme_action')
             if is_dark and self.parent().theme_action.isChecked():
                 editor.setStyleSheet("background-color: #2B2D31; color: #E8E8E8; border: 1px solid #8095AB;")
@@ -238,7 +238,6 @@ class LinkManagerTab(QWidget):
                 new_value = editor.text()
                 if new_value != current_text:
                     self.links_table.item(row, column).setText(new_value)
-                    # Update the stored link data
                     if row < len(self.filtered_links):
                         self.filtered_links[row]['new_preview'] = new_value
                     self.status_label.setText(f"Updated preview: {new_value}")
@@ -252,7 +251,6 @@ class LinkManagerTab(QWidget):
             editor.selectAll()
 
     def apply_single_fix(self):
-        """Apply the edited link preview to the actual HTML file for selected row"""
         current_row = self.links_table.currentRow()
         if current_row < 0:
             QMessageBox.warning(self, "Warning", "Select a link first.")
@@ -262,29 +260,30 @@ class LinkManagerTab(QWidget):
             return
             
         link_data = self.filtered_links[current_row]
-        new_link = self.links_table.item(current_row, 4).text()  # New Link Preview column
+        new_link = self.links_table.item(current_row, 4).text()
         
         if not new_link or new_link == link_data['original']:
             self.status_label.setText("No change to apply.")
             return
         
-        # Apply to file
         try:
             with open(link_data['full_path'], 'r', encoding='utf-8') as f:
                 content = f.read()
             
-            # Replace only this specific occurrence
             if link_data['original'] in content:
                 new_content = content.replace(link_data['original'], new_link, 1)
                 
                 with open(link_data['full_path'], 'w', encoding='utf-8') as f:
                     f.write(new_content)
                 
-                # Update the display
                 self.links_table.item(current_row, 3).setText(new_link)
                 self.links_table.item(current_row, 4).setText("✅ Applied")
-                link_data['original'] = new_link  # Update stored value
+                link_data['original'] = new_link
                 self.status_label.setText(f"Link updated in {link_data['file']}")
+                
+                # Report to dashboard
+                if self.data_bridge:
+                    self.data_bridge.report_fix("link", 1)
             else:
                 self.status_label.setText("Original link not found in file - already changed?")
             
@@ -318,11 +317,9 @@ class LinkManagerTab(QWidget):
             else:
                 new = old.replace(find, replace)
             if new != old:
-                # Update the actual HTML file
                 file_path = link['full_path']
                 with open(file_path, 'r', encoding='utf-8') as f:
                     content = f.read()
-                # Replace in content (simple string replace)
                 if use_regex:
                     new_content = re.sub(find, replace, content)
                 else:
@@ -334,11 +331,14 @@ class LinkManagerTab(QWidget):
 
         self.status_label.setText(f"Applied {total_replacements} replacements in {len(files_modified)} files.")
         QMessageBox.information(self, "Done", f"Replaced {total_replacements} links in {len(files_modified)} files.")
-        # Rescan to refresh table
+        
+        # Report to dashboard
+        if self.data_bridge and total_replacements > 0:
+            self.data_bridge.report_fix("link", total_replacements)
+        
         self.scan_links()
 
     def update_theme(self, is_dark):
-        """Called from main window when theme changes."""
         if is_dark:
             self.links_table.setStyleSheet("""
                 QTableWidget {
