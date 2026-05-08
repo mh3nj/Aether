@@ -18,6 +18,7 @@ class PerformanceTab(QWidget):
         super().__init__()
         self.project_folder = None
         self.preloads = []
+        self.data_bridge = None
         self.init_ui()
 
     def init_ui(self):
@@ -71,24 +72,15 @@ class PerformanceTab(QWidget):
         self.inject_btn = QPushButton("🚀 Inject Preload Links into HTML")
         self.inject_btn.clicked.connect(self.inject_preloads)
         self.inject_btn.setEnabled(False)
-        self.inject_btn.setStyleSheet("""
-            QPushButton {
-                background-color: #2B2D31;
-                color: #E8E8E8;
-                border: 1px solid #8095AB;
-                padding: 8px;
-                font-weight: bold;
-            }
-            QPushButton:hover {
-                background-color: #8095AB;
-                color: #1E1F22;
-            }
-        """)
         layout.addWidget(self.inject_btn)
 
         # Summary
         self.summary_label = QLabel("Ready - Select a folder and click Scan")
         layout.addWidget(self.summary_label)
+
+    def set_data_bridge(self, bridge):
+        """Set the data bridge for dashboard communication"""
+        self.data_bridge = bridge
 
     def select_folder(self):
         path = QFileDialog.getExistingDirectory(self, "Select Project Folder")
@@ -183,7 +175,7 @@ class PerformanceTab(QWidget):
                             item = QTreeWidgetItem([rel_path, href, 'Web Font', '⚡ Preload as font'])
                             self.results_tree.addTopLevelItem(item)
 
-            except Exception as e:
+            except Exception:
                 pass
 
             self.progress.setValue(idx + 1)
@@ -192,13 +184,16 @@ class PerformanceTab(QWidget):
         self.progress.setVisible(False)
         self.scan_btn.setEnabled(True)
 
+        # Report to dashboard
+        if self.data_bridge:
+            self.data_bridge.report_scan(len(html_files), len(self.preloads), 0)
+
         if self.preloads:
             self.inject_btn.setEnabled(True)
             self.summary_label.setText(f"✅ Found {len(self.preloads)} preload opportunities across {len(html_files)} files")
             QMessageBox.information(self, "Scan Complete", 
                 f"Found {len(self.preloads)} assets that can be preloaded.\n\n"
-                f"Click 'Inject Preload Links' to add them to your HTML files.\n\n"
-                f"This will improve your Largest Contentful Paint (LCP) score.")
+                f"Click 'Inject Preload Links' to add them to your HTML files.")
         else:
             self.inject_btn.setEnabled(False)
             self.summary_label.setText(f"✅ No preload opportunities found. Your site is already optimized!")
@@ -210,11 +205,6 @@ class PerformanceTab(QWidget):
 
         reply = QMessageBox.question(self, "Confirm Injection",
                                      f"Inject {len(self.preloads)} preload links into your HTML files?\n\n"
-                                     f"This will add:\n"
-                                     f"• <link rel='preload' as='style' href='...'> for CSS\n"
-                                     f"• <link rel='preload' as='script' href='...'> for JS\n"
-                                     f"• <link rel='preload' as='image' href='...'> for images\n"
-                                     f"• <link rel='preload' as='font' href='...' crossorigin> for fonts\n\n"
                                      f"Proceed?",
                                      QMessageBox.Yes | QMessageBox.No)
         if reply != QMessageBox.Yes:
@@ -235,7 +225,6 @@ class PerformanceTab(QWidget):
                     head = soup.new_tag('head')
                     soup.html.insert(0, head)
 
-                # Check if already preloaded (avoid duplicates)
                 existing = head.find('link', rel='preload', href=preload['asset'])
                 if not existing:
                     preload_tag = soup.new_tag('link', 
@@ -250,7 +239,7 @@ class PerformanceTab(QWidget):
                 with open(preload['full_path'], 'w', encoding='utf-8') as f:
                     f.write(str(soup))
 
-            except Exception as e:
+            except Exception:
                 pass
 
             self.progress.setValue(idx + 1)
@@ -259,9 +248,12 @@ class PerformanceTab(QWidget):
         self.progress.setVisible(False)
         self.inject_btn.setEnabled(True)
         
+        # Report to dashboard
+        if self.data_bridge and injected > 0:
+            self.data_bridge.report_fix("preload", injected)
+        
         QMessageBox.information(self, "Injection Complete", 
-            f"Injected {injected} preload links into HTML files.\n\n"
-            f"💡 Tip: Run Lighthouse in Chrome DevTools to see the improvement!")
+            f"Injected {injected} preload links into HTML files.")
         self.summary_label.setText(f"✅ Injected {injected} preload links")
 
     def update_theme(self, is_dark):
