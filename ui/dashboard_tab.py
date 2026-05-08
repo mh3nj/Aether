@@ -7,16 +7,17 @@ import os
 from pathlib import Path
 from PySide6.QtWidgets import (
     QWidget, QVBoxLayout, QHBoxLayout, QPushButton, QLabel,
-    QFrame, QGridLayout, QScrollArea, QProgressBar, QMessageBox
+    QFrame, QGridLayout, QScrollArea, QProgressBar
 )
-from PySide6.QtCore import Qt, QPropertyAnimation, QEasingCurve, QTimer
-from PySide6.QtGui import QFont, QPalette, QColor
+from PySide6.QtCore import Qt, QPropertyAnimation, QEasingCurve, QTimer, Property
+from PySide6.QtGui import QFont
 
 
 class DashboardTab(QWidget):
     def __init__(self, parent=None, main_window=None):
         super().__init__(parent)
         self.main_window = main_window
+        self._anim_value = 0  # Store animation value
         self.init_ui()
         self.start_animations()
 
@@ -93,12 +94,12 @@ class DashboardTab(QWidget):
         quick_actions = [
             ("📝 Format Code", "Ctrl+2", self.go_to_formatter),
             ("🔍 SEO Check", "Ctrl+3", self.go_to_seo),
-            ("🖼️ Optimize Images", "Ctrl+5", self.go_to_media),
-            ("🔗 Fix Broken Links", "Ctrl+6", self.go_to_links),
-            ("♿ Accessibility", "Ctrl+7", self.go_to_accessibility),
-            ("💾 Backup Project", "Ctrl+9", self.go_to_backup),
-            ("⚡ Performance", "Ctrl+8", self.go_to_performance),
-            ("📊 Schema", "Ctrl+4", self.go_to_schema),
+            ("🖼️ Optimize Images", "Ctrl+6", self.go_to_media),
+            ("🔗 Fix Broken Links", "Ctrl+7", self.go_to_links),
+            ("♿ Accessibility", "Ctrl+13", self.go_to_accessibility),
+            ("💾 Backup Project", "Ctrl+16", self.go_to_backup),
+            ("⚡ Performance", "Ctrl+20", self.go_to_performance),
+            ("📊 Schema", "Ctrl+8", self.go_to_schema),
         ]
 
         for i, (name, shortcut, callback) in enumerate(quick_actions):
@@ -228,8 +229,7 @@ class DashboardTab(QWidget):
 
     def start_animations(self):
         # Animate the health score counting up
-        self.anim_value = 0
-        self.animation = QPropertyAnimation(self, b"anim_value")
+        self.animation = QPropertyAnimation(self, b"animValue")
         self.animation.setDuration(1000)
         self.animation.setStartValue(0)
         self.animation.setEndValue(78)
@@ -238,13 +238,13 @@ class DashboardTab(QWidget):
         QTimer.singleShot(500, self.animation.start)
 
     def get_anim_value(self):
-        return self.anim_value
+        return self._anim_value
 
     def set_anim_value(self, value):
-        self.anim_value = value
+        self._anim_value = value
         self.score_label.setText(f"{int(value)}%")
 
-    anim_value = property(get_anim_value, set_anim_value)
+    animValue = Property(int, get_anim_value, set_anim_value)
 
     def update_score_display(self, value):
         self.score_label.setText(f"{int(value)}%")
@@ -261,52 +261,51 @@ class DashboardTab(QWidget):
     # Navigation methods
     def go_to_formatter(self):
         if self.main_window:
-            self.main_window.tabs.setCurrentIndex(0)
+            self.main_window.tabs.setCurrentIndex(1)
 
     def go_to_seo(self):
         if self.main_window:
-            self.main_window.tabs.setCurrentIndex(1)
+            self.main_window.tabs.setCurrentIndex(2)
 
     def go_to_media(self):
         if self.main_window:
-            self.main_window.tabs.setCurrentIndex(5)
+            self.main_window.tabs.setCurrentIndex(6)
 
     def go_to_links(self):
         if self.main_window:
-            self.main_window.tabs.setCurrentIndex(6)
+            self.main_window.tabs.setCurrentIndex(7)
 
     def go_to_accessibility(self):
         if self.main_window:
-            self.main_window.tabs.setCurrentIndex(12)
+            self.main_window.tabs.setCurrentIndex(13)
 
     def go_to_backup(self):
         if self.main_window:
-            self.main_window.tabs.setCurrentIndex(15)
+            self.main_window.tabs.setCurrentIndex(16)
 
     def go_to_performance(self):
         if self.main_window:
-            self.main_window.tabs.setCurrentIndex(19)
+            self.main_window.tabs.setCurrentIndex(20)
 
     def go_to_schema(self):
         if self.main_window:
-            self.main_window.tabs.setCurrentIndex(7)
+            self.main_window.tabs.setCurrentIndex(8)
 
     def go_to_tab_by_name(self, name):
         if not self.main_window:
             return
-        tab_names = {
-            "🔍 SEO": 1,
-            "🔗 Links": 6,
-            "🖼️ Images": 5,
-            "💾 Backup": 15,
-            "📊 Schema": 7,
+        tab_indexes = {
+            "🔍 SEO": 2,
+            "🔗 Links": 7,
+            "🖼️ Images": 6,
+            "💾 Backup": 16,
+            "📊 Schema": 8,
         }
-        if name in tab_names:
-            self.main_window.tabs.setCurrentIndex(tab_names[name])
+        if name in tab_indexes:
+            self.main_window.tabs.setCurrentIndex(tab_indexes[name])
 
     def update_metrics(self, scan_data=None):
         """Update dashboard with real data from scans"""
-        # This will be populated as other tabs send data
         pass
 
     def update_theme(self, is_dark):
