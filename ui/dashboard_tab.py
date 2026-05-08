@@ -1,6 +1,5 @@
 """
 Aether Dashboard – Command Center for All Tools
-Quick stats, health score, and one-click access to everything
 """
 
 import os
@@ -10,7 +9,7 @@ from PySide6.QtWidgets import (
     QFrame, QGridLayout, QScrollArea, QProgressBar
 )
 from PySide6.QtCore import Qt, QPropertyAnimation, QEasingCurve, QTimer, Property
-from PySide6.QtGui import QFont
+from PySide6.QtGui import QFont, QPalette, QColor
 from ui.data_bridge import DataBridge
 
 
@@ -32,6 +31,7 @@ class DashboardTab(QWidget):
         # Main layout
         main_layout = QVBoxLayout(self)
         main_layout.setSpacing(20)
+        main_layout.setContentsMargins(20, 20, 20, 20)
 
         # Scroll area for dashboard
         scroll = QScrollArea()
@@ -57,7 +57,16 @@ class DashboardTab(QWidget):
         scroll_layout.addWidget(stats_line)
 
         # ========== PROJECT STATUS CARD ==========
-        self.project_card = self.create_card()
+        self.project_card = QFrame()
+        self.project_card.setFrameShape(QFrame.StyledPanel)
+        self.project_card.setStyleSheet("""
+            QFrame {
+                background-color: rgba(128, 149, 171, 0.1);
+                border-radius: 12px;
+                padding: 15px;
+                margin: 5px;
+            }
+        """)
         project_layout = QVBoxLayout(self.project_card)
         self.project_status = QLabel("📁 No Project Loaded")
         self.project_status.setFont(QFont("", 12, QFont.Bold))
@@ -70,21 +79,27 @@ class DashboardTab(QWidget):
         scroll_layout.addWidget(self.project_card)
 
         # ========== HEALTH SCORE CARD ==========
-        health_card = self.create_card()
+        health_card = QFrame()
+        health_card.setStyleSheet("""
+            QFrame {
+                background-color: rgba(128, 149, 171, 0.1);
+                border-radius: 12px;
+                padding: 15px;
+                margin: 5px;
+            }
+        """)
         health_layout = QVBoxLayout(health_card)
 
         health_title = QLabel("📊 OVERALL SEO HEALTH")
         health_title.setFont(QFont("", 14, QFont.Bold))
         health_layout.addWidget(health_title)
 
-        # Score circle
         self.score_label = QLabel("--")
         score_font = QFont()
         score_font.setPointSize(48)
         score_font.setBold(True)
         self.score_label.setFont(score_font)
         self.score_label.setAlignment(Qt.AlignCenter)
-        self.score_label.setStyleSheet("color: #8095AB;")
         health_layout.addWidget(self.score_label)
 
         self.score_status = QLabel("Select a project folder to begin")
@@ -100,7 +115,15 @@ class DashboardTab(QWidget):
         scroll_layout.addWidget(health_card)
 
         # ========== QUICK ACTIONS GRID ==========
-        actions_card = self.create_card()
+        actions_card = QFrame()
+        actions_card.setStyleSheet("""
+            QFrame {
+                background-color: rgba(128, 149, 171, 0.1);
+                border-radius: 12px;
+                padding: 15px;
+                margin: 5px;
+            }
+        """)
         actions_layout = QVBoxLayout(actions_card)
 
         actions_title = QLabel("🎯 QUICK ACTIONS")
@@ -125,25 +148,21 @@ class DashboardTab(QWidget):
             btn = QPushButton(f"{name}\n{shortcut}")
             btn.setMinimumHeight(70)
             btn.clicked.connect(callback)
-            btn.setStyleSheet("""
-                QPushButton {
-                    text-align: center;
-                    padding: 10px;
-                    border: 1px solid #8095AB;
-                    border-radius: 8px;
-                }
-                QPushButton:hover {
-                    background-color: #8095AB;
-                    color: white;
-                }
-            """)
             actions_grid.addWidget(btn, i // 2, i % 2)
 
         actions_layout.addLayout(actions_grid)
         scroll_layout.addWidget(actions_card)
 
         # ========== KEY METRICS ==========
-        metrics_card = self.create_card()
+        metrics_card = QFrame()
+        metrics_card.setStyleSheet("""
+            QFrame {
+                background-color: rgba(128, 149, 171, 0.1);
+                border-radius: 12px;
+                padding: 15px;
+                margin: 5px;
+            }
+        """)
         metrics_layout = QGridLayout(metrics_card)
 
         metrics_title = QLabel("📈 KEY METRICS")
@@ -160,13 +179,7 @@ class DashboardTab(QWidget):
 
         for i, (key, label, value, icon) in enumerate(metrics_data):
             card = QFrame()
-            card.setStyleSheet("""
-                QFrame {
-                    background-color: rgba(128, 149, 171, 0.1);
-                    border-radius: 8px;
-                    padding: 10px;
-                }
-            """)
+            card.setStyleSheet("background-color: rgba(128, 149, 171, 0.15); border-radius: 8px; padding: 10px;")
             card_layout = QVBoxLayout(card)
             val_label = QLabel(f"{icon} {value}")
             val_label.setFont(QFont("", 18, QFont.Bold))
@@ -184,8 +197,15 @@ class DashboardTab(QWidget):
         issues_fixes_layout = QHBoxLayout()
         issues_fixes_layout.setSpacing(20)
 
-        # Top Issues
-        issues_card = self.create_card()
+        issues_card = QFrame()
+        issues_card.setStyleSheet("""
+            QFrame {
+                background-color: rgba(128, 149, 171, 0.1);
+                border-radius: 12px;
+                padding: 15px;
+                margin: 5px;
+            }
+        """)
         issues_layout = QVBoxLayout(issues_card)
         issues_title = QLabel("⚠️ TOP ISSUES")
         issues_title.setFont(QFont("", 12, QFont.Bold))
@@ -195,8 +215,15 @@ class DashboardTab(QWidget):
         self.issues_list.setWordWrap(True)
         issues_layout.addWidget(self.issues_list)
 
-        # Recent Fixes
-        fixes_card = self.create_card()
+        fixes_card = QFrame()
+        fixes_card.setStyleSheet("""
+            QFrame {
+                background-color: rgba(128, 149, 171, 0.1);
+                border-radius: 12px;
+                padding: 15px;
+                margin: 5px;
+            }
+        """)
         fixes_layout = QVBoxLayout(fixes_card)
         fixes_title = QLabel("✅ RECENT FIXES")
         fixes_title.setFont(QFont("", 12, QFont.Bold))
@@ -211,7 +238,15 @@ class DashboardTab(QWidget):
         scroll_layout.addLayout(issues_fixes_layout)
 
         # ========== QUICK LAUNCH TABS ==========
-        tabs_card = self.create_card()
+        tabs_card = QFrame()
+        tabs_card.setStyleSheet("""
+            QFrame {
+                background-color: rgba(128, 149, 171, 0.1);
+                border-radius: 12px;
+                padding: 15px;
+                margin: 5px;
+            }
+        """)
         tabs_layout = QVBoxLayout(tabs_card)
         tabs_title = QLabel("🚀 RECENT TABS")
         tabs_title.setFont(QFont("", 12, QFont.Bold))
@@ -228,7 +263,15 @@ class DashboardTab(QWidget):
         scroll_layout.addWidget(tabs_card)
 
         # ========== MINI LOGS VIEWER ==========
-        logs_card = self.create_card()
+        logs_card = QFrame()
+        logs_card.setStyleSheet("""
+            QFrame {
+                background-color: rgba(128, 149, 171, 0.1);
+                border-radius: 12px;
+                padding: 15px;
+                margin: 5px;
+            }
+        """)
         logs_layout = QVBoxLayout(logs_card)
         logs_title = QLabel("📋 RECENT ACTIVITY")
         logs_title.setFont(QFont("", 12, QFont.Bold))
@@ -254,19 +297,6 @@ class DashboardTab(QWidget):
         footer.setStyleSheet("color: #8095AB; padding: 10px;")
         main_layout.addWidget(footer)
 
-    def create_card(self):
-        card = QFrame()
-        card.setStyleSheet("""
-            QFrame {
-                background-color: rgba(128, 149, 171, 0.05);
-                border-radius: 12px;
-                padding: 15px;
-                margin: 5px;
-                border: 1px solid transparent;
-            }
-        """)
-        return card
-
     def on_scan_completed(self, data):
         """Handle scan completion from any tab"""
         self.has_project = True
@@ -281,7 +311,7 @@ class DashboardTab(QWidget):
             self.animation.start()
         
         self.issues_list.setText(f"• Found {data.get('issues', 0)} issues to fix")
-    
+
     def on_issue_fixed(self, fix_type, count):
         """Handle issue fixes from any tab"""
         current_text = self.metric_widgets['fixes_count'].text()
@@ -355,54 +385,36 @@ class DashboardTab(QWidget):
         """Update colors when theme changes"""
         if is_dark:
             self.setStyleSheet("""
-                QLabel { color: #E8E8E8; }
+                QLabel, QPushButton { color: #E8E8E8; }
                 QProgressBar::chunk { background-color: #8095AB; }
-                QFrame { border-color: #3E4045; }
+                QFrame { background-color: rgba(128, 149, 171, 0.1); }
                 QPushButton {
                     background-color: #2B2D31;
-                    color: #E8E8E8;
                     border: 1px solid #8095AB;
+                    border-radius: 8px;
+                    padding: 5px;
                 }
                 QPushButton:hover {
                     background-color: #8095AB;
                     color: #1E1F22;
                 }
             """)
-            for card in self.findChildren(QFrame):
-                card.setStyleSheet("""
-                    QFrame {
-                        background-color: rgba(128, 149, 171, 0.1);
-                        border-radius: 12px;
-                        padding: 15px;
-                        margin: 5px;
-                        border: 1px solid #3E4045;
-                    }
-                """)
         else:
             self.setStyleSheet("""
-                QLabel { color: #2C3E50; }
+                QLabel, QPushButton { color: #2C3E50; }
                 QProgressBar::chunk { background-color: #8095AB; }
-                QFrame { border-color: #D0D7DE; }
+                QFrame { background-color: rgba(128, 149, 171, 0.05); }
                 QPushButton {
                     background-color: #E9ECF1;
-                    color: #2C3E50;
                     border: 1px solid #8095AB;
+                    border-radius: 8px;
+                    padding: 5px;
                 }
                 QPushButton:hover {
                     background-color: #8095AB;
                     color: white;
                 }
             """)
-            for card in self.findChildren(QFrame):
-                card.setStyleSheet("""
-                    QFrame {
-                        background-color: rgba(128, 149, 171, 0.05);
-                        border-radius: 12px;
-                        padding: 15px;
-                        margin: 5px;
-                        border: 1px solid #D0D7DE;
-                    }
-                """)
 
     # Navigation methods
     def go_to_formatter(self):
