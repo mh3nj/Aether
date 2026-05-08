@@ -1,5 +1,6 @@
 """
 Aether Content Length Checker - Ensure pages have enough content for SEO
+Scans HTML files and reports word count statistics to dashboard
 """
 
 import re
@@ -17,6 +18,7 @@ class ContentLengthTab(QWidget):
     def __init__(self):
         super().__init__()
         self.project_folder = None
+        self.data_bridge = None
         self.init_ui()
 
     def init_ui(self):
@@ -25,9 +27,9 @@ class ContentLengthTab(QWidget):
         # Folder selection
         folder_row = QHBoxLayout()
         self.folder_label = QLabel("No folder selected")
-        self.select_btn = QPushButton("Select Project Folder")
+        self.select_btn = QPushButton("📁 Select Project Folder")
         self.select_btn.clicked.connect(self.select_folder)
-        self.scan_btn = QPushButton("Analyze Content Length")
+        self.scan_btn = QPushButton("📏 Analyze Content Length")
         self.scan_btn.clicked.connect(self.analyze_content)
         folder_row.addWidget(self.select_btn)
         folder_row.addWidget(self.scan_btn)
@@ -55,7 +57,7 @@ class ContentLengthTab(QWidget):
         stats_row.addStretch()
         layout.addLayout(stats_row)
 
-        # Results tree - FIXED: This is where individual pages should appear
+        # Results tree
         self.results_tree = QTreeWidget()
         self.results_tree.setHeaderLabels(["Page", "Word Count", "Status", "Recommendation"])
         self.results_tree.header().setSectionResizeMode(0, QHeaderView.Stretch)
@@ -69,7 +71,7 @@ class ContentLengthTab(QWidget):
         self.progress.setVisible(False)
         layout.addWidget(self.progress)
 
-        # Length guidelines - FIXED: dynamic styling for dark mode
+        # Length guidelines
         self.guidelines = QLabel(
             "📏 Content Length Guidelines:\n"
             "• < 300 words: ⚠️ Very short - unlikely to rank\n"
@@ -85,8 +87,11 @@ class ContentLengthTab(QWidget):
         self.summary_label = QLabel("Ready - Select a folder and click Analyze")
         layout.addWidget(self.summary_label)
 
-        # Store results for later use
         self.analysis_results = []
+
+    def set_data_bridge(self, bridge):
+        """Set the data bridge for dashboard communication"""
+        self.data_bridge = bridge
 
     def select_folder(self):
         path = QFileDialog.getExistingDirectory(self, "Select Project Folder")
@@ -110,23 +115,18 @@ class ContentLengthTab(QWidget):
             if main_content:
                 text = main_content.get_text()
             else:
-                # Fallback to body
                 text = soup.body.get_text() if soup.body else ""
         elif mode == "Body Text Only":
-            # Only body text, exclude headers/footers
             body = soup.body
             if body:
-                # Remove common non-content elements
                 for tag in body.find_all(['nav', 'header', 'footer', 'aside']):
                     tag.decompose()
                 text = body.get_text()
             else:
                 text = ""
         else:
-            # All text
             text = soup.get_text()
         
-        # Clean text - split into words
         text = re.sub(r'\s+', ' ', text)
         return text.strip()
 
@@ -149,6 +149,7 @@ class ContentLengthTab(QWidget):
         mode = self.content_type.currentText()
         total_words = 0
         short_count = 0
+        results = []
 
         for idx, html_path in enumerate(html_files):
             try:
@@ -181,7 +182,7 @@ class ContentLengthTab(QWidget):
                     status = "🏆 Excellent"
                     recommendation = "Outstanding! Very comprehensive content"
                 
-                # Create tree item for each page
+                # Create tree item
                 item = QTreeWidgetItem([rel_path, str(word_count), status, recommendation])
                 
                 # Color-code the status column
@@ -196,14 +197,13 @@ class ContentLengthTab(QWidget):
                 
                 self.results_tree.addTopLevelItem(item)
                 
-                self.analysis_results.append({
+                results.append({
                     'file': rel_path,
                     'words': word_count,
                     'status': status
                 })
                 
             except Exception as e:
-                # Add error item
                 item = QTreeWidgetItem([str(html_path.name), "Error", "❌ Parse Error", str(e)[:50]])
                 item.setForeground(2, Qt.GlobalColor(Qt.red))
                 self.results_tree.addTopLevelItem(item)
@@ -221,18 +221,12 @@ class ContentLengthTab(QWidget):
         self.progress.setVisible(False)
         self.scan_btn.setEnabled(True)
         
+        # Report to dashboard
+        if self.data_bridge:
+            self.data_bridge.report_scan(len(html_files), short_count, 0)
+        
         # Expand all items so user can see them
         self.results_tree.expandAll()
-        
-        # Color-code stats based on average
-        if avg_words < 300:
-            avg_color = "red"
-        elif avg_words < 500:
-            avg_color = "orange"
-        elif avg_words < 1000:
-            avg_color = "green"
-        else:
-            avg_color = "blue"
         
         self.summary_label.setText(
             f"✅ Analysis complete! Found {len(html_files)} pages. "
@@ -249,7 +243,6 @@ class ContentLengthTab(QWidget):
     def update_theme(self, is_dark):
         """Called from main window when theme changes."""
         if is_dark:
-            # Dark theme styles
             self.results_tree.setStyleSheet("""
                 QTreeWidget {
                     background-color: #2B2D31;
@@ -271,7 +264,6 @@ class ContentLengthTab(QWidget):
                 border: 1px solid #3E4045;
             """)
         else:
-            # Light theme styles
             self.results_tree.setStyleSheet("""
                 QTreeWidget {
                     background-color: #FFFFFF;
