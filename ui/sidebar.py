@@ -237,7 +237,7 @@ class Sidebar(QWidget):
             self.theme_btn.setText("  \uf186  Toggle Theme")
     
     def update_theme(self, is_dark):
-        """Update sidebar theme"""
+        """Update sidebar theme - called on initialization and theme change"""
         if is_dark:
             self.setStyleSheet("""
                 QWidget {
@@ -258,6 +258,6 @@ class Sidebar(QWidget):
                     color: #2C3E50;
                 }
             """)
-        # Refresh active button style
+        # Refresh active button style to apply new text colors
         if self.main_window:
             self.update_active_button(self.main_window.tabs.currentIndex())
