@@ -21,11 +21,11 @@ class OGPreviewTab(QWidget):
 
         # Mode selection
         mode_row = QHBoxLayout()
-        self.single_mode_btn = QPushButton("\f15c Single File Mode")
+        self.single_mode_btn = QPushButton("\uf15c Single File Mode")
         self.single_mode_btn.setCheckable(True)
         self.single_mode_btn.setChecked(True)
         self.single_mode_btn.clicked.connect(lambda: self.set_mode("single"))
-        self.bulk_mode_btn = QPushButton("\f07c Bulk Mode (Folder)")
+        self.bulk_mode_btn = QPushButton("\uf07c Bulk Mode (Folder)")
         self.bulk_mode_btn.setCheckable(True)
         self.bulk_mode_btn.clicked.connect(lambda: self.set_mode("bulk"))
         mode_row.addWidget(self.single_mode_btn)
@@ -99,11 +99,11 @@ class OGPreviewTab(QWidget):
 
         # Preview and injection buttons
         btn_row = QHBoxLayout()
-        self.preview_btn = QPushButton("\f06e Generate Preview")
+        self.preview_btn = QPushButton("\uf06e Generate Preview")
         self.preview_btn.clicked.connect(self.generate_preview)
-        self.inject_btn = QPushButton("\f055 Inject Tags into HTML")
+        self.inject_btn = QPushButton("\uf055 Inject Tags into HTML")
         self.inject_btn.clicked.connect(self.inject_tags)
-        self.bulk_inject_btn = QPushButton("\f187 Bulk Inject into All HTML Files")
+        self.bulk_inject_btn = QPushButton("\uf187 Bulk Inject into All HTML Files")
         self.bulk_inject_btn.clicked.connect(self.bulk_inject_tags)
         btn_row.addWidget(self.preview_btn)
         btn_row.addWidget(self.inject_btn)
@@ -122,13 +122,13 @@ class OGPreviewTab(QWidget):
         self.fb_preview = QLabel()
         self.fb_preview.setWordWrap(True)
         self.fb_preview.setAlignment(Qt.AlignTop)
-        preview_layout.addWidget(QLabel("\f02d Facebook / LinkedIn / WhatsApp:"))
+        preview_layout.addWidget(QLabel("\uf02d Facebook / LinkedIn / WhatsApp:"))
         preview_layout.addWidget(self.fb_preview)
         
         self.tw_preview = QLabel()
         self.tw_preview.setWordWrap(True)
         self.tw_preview.setAlignment(Qt.AlignTop)
-        preview_layout.addWidget(QLabel("\f099 Twitter / X:"))
+        preview_layout.addWidget(QLabel("\uf099 Twitter / X:"))
         preview_layout.addWidget(self.tw_preview)
         
         layout.addWidget(preview_group)
@@ -243,7 +243,7 @@ class OGPreviewTab(QWidget):
                 <div style="padding: 12px;">
                     <div style="font-size: 15px; font-weight: 700; color: #0F1419; margin-bottom: 4px;">{twitter_title[:100]}</div>
                     <div style="font-size: 14px; color: #536471; line-height: 1.4;">{twitter_desc[:200]}</div>
-                    <div style="font-size: 13px; color: #536471; margin-top: 8px;">\f140 {twitter_card}</div>
+                    <div style="font-size: 13px; color: #536471; margin-top: 8px;">\uf140 {twitter_card}</div>
                 </div>
             </div>
         </div>
