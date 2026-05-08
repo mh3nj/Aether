@@ -26,9 +26,9 @@ class AccessibilityHubTab(QWidget):
         self.content_length_tab = ContentLengthTab()
         
         self.tabs.addTab(self.accessibility_tab, "\e2ce Accessibility")
-        self.tabs.addTab(self.alt_tab, "\f02b Alt Checker")
-        self.tabs.addTab(self.spell_tab, "\f31c Spell Checker")
-        self.tabs.addTab(self.content_length_tab, "\f545 Content Length")
+        self.tabs.addTab(self.alt_tab, "\uf02b Alt Checker")
+        self.tabs.addTab(self.spell_tab, "\uf31c Spell Checker")
+        self.tabs.addTab(self.content_length_tab, "\uf545 Content Length")
         
         layout.addWidget(self.tabs)
     
