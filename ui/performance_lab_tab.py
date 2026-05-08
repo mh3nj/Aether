@@ -35,7 +35,7 @@ class PageSpeedWorker(QThread):
             data = response.json()
             
             if 'lighthouseResult' in data:
-                result = f"📊 PageSpeed Insights for: {self.url}\n"
+                result = f"\f201 PageSpeed Insights for: {self.url}\n"
                 result += f"Strategy: {self.strategy.upper()}\n\n"
                 
                 scores = data['lighthouseResult']['categories']
@@ -86,7 +86,7 @@ class PerformanceLabTab(QWidget):
         self.performance_tab = PerformanceTab()
         preload_layout.addWidget(self.performance_tab)
         
-        self.perf_tabs.addTab(preload_tab, "⚡ Preload Scanner")
+        self.perf_tabs.addTab(preload_tab, "\f0e7 Preload Scanner")
         
         # ========== TAB 2: PAGESPEED INSIGHTS ==========
         pagespeed_tab = QWidget()
@@ -96,7 +96,7 @@ class PerformanceLabTab(QWidget):
         self.seo_api_tab = SEOAPITab()
         pagespeed_layout.addWidget(self.seo_api_tab)
         
-        self.perf_tabs.addTab(pagespeed_tab, "📊 PageSpeed Insights")
+        self.perf_tabs.addTab(pagespeed_tab, "\f201 PageSpeed Insights")
         
         # Status
         self.status_label = QLabel("Ready - Select a folder or enter a URL")
