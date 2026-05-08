@@ -9,8 +9,7 @@ from pathlib import Path
 from PySide6.QtWidgets import (
     QWizard, QWizardPage, QVBoxLayout, QHBoxLayout, QLabel,
     QPushButton, QFileDialog, QListWidget, QListWidgetItem,
-    QCheckBox, QGroupBox, QRadioButton, QMessageBox, QLineEdit,
-    QProgressBar
+    QCheckBox, QGroupBox, QMessageBox, QLineEdit, QProgressBar
 )
 from PySide6.QtCore import Qt, QThread, Signal
 from PySide6.QtGui import QFont
@@ -113,41 +112,6 @@ class ProjectConfig:
         self.main_css = data.get("main_css", "")
         self.main_js = data.get("main_js", "")
         return True
-
-
-class ProjectSetupWizard(QWizard):
-    """Main setup wizard"""
-    
-    def __init__(self, parent=None):
-        super().__init__(parent)
-        self.setWindowTitle("Aether - Project Setup Wizard")
-        self.setWizardStyle(QWizard.ModernStyle)
-        self.setMinimumSize(700, 500)
-        
-        self.config = ProjectConfig()
-        self.scanner = None
-        
-        # Add pages
-        self.addPage(WelcomePage())
-        self.addPage(FolderSelectPage(self))
-        self.addPage(ScanProgressPage(self))
-        self.addPage(LanguagePage(self))
-        self.addPage(FileSelectionPage(self, "html", "HTML Files", "Select main HTML file(s)"))
-        self.addPage(FileSelectionPage(self, "css", "CSS Files", "Select main CSS file(s)"))
-        self.addPage(FileSelectionPage(self, "js", "JavaScript Files", "Select main JS file(s)"))
-        self.addPage(SummaryPage(self))
-        
-        self.setButtonText(QWizard.NextButton, "Next")
-        self.setButtonText(QWizard.BackButton, "Back")
-        self.setButtonText(QWizard.FinishButton, "Complete Setup")
-        
-        # Store config reference in each page
-        for page in self.pages():
-            if hasattr(page, 'set_config'):
-                page.set_config(self.config)
-    
-    def get_config(self):
-        return self.config
 
 
 class WelcomePage(QWizardPage):
@@ -366,7 +330,13 @@ class FileSelectionPage(QWizardPage):
         layout = QVBoxLayout()
         
         self.file_list = QListWidget()
-        self.file_list.setSelectionMode(QListWidget.SingleSelection if file_type != "html" else QListWidget.ExtendedSelection)
+        # For HTML: allow multiple selection, for CSS/JS: single selection
+        if file_type == "html":
+            self.file_list.setSelectionMode(QListWidget.MultiSelection)
+        else:
+            self.file_list.setSelectionMode(QListWidget.SingleSelection)
+        
+        self.file_list.itemSelectionChanged.connect(self.completeChanged)
         layout.addWidget(self.file_list)
         
         self.add_btn = QPushButton("+ Add Custom File")
@@ -386,26 +356,36 @@ class FileSelectionPage(QWizardPage):
         else:
             files = self.wizard.config.js_files
         
-        for f in files[:50]:  # Limit display
+        for f in files[:100]:  # Show more files
             item = QListWidgetItem(f)
             item.setData(Qt.UserRole, f)
             self.file_list.addItem(item)
+            # Auto-select first item for CSS/JS if single selection mode
+            if self.file_type != "html" and len(files) == 1:
+                item.setSelected(True)
     
     def add_custom_file(self):
         from PySide6.QtWidgets import QInputDialog
         file_path, ok = QInputDialog.getText(self, "Add File", f"Enter path to {self.file_type.upper()} file (relative to project root):")
         if ok and file_path:
-            item = QListWidgetItem(file_path)
-            item.setData(Qt.UserRole, file_path)
-            self.file_list.addItem(item)
-            self.file_list.item(self.file_list.count()-1).setSelected(True)
-            # Also add to config list
-            if self.file_type == "html":
-                self.wizard.config.html_files.append(file_path)
-            elif self.file_type == "css":
-                self.wizard.config.css_files.append(file_path)
-            else:
-                self.wizard.config.js_files.append(file_path)
+            # Check if already exists
+            existing = False
+            for i in range(self.file_list.count()):
+                if self.file_list.item(i).text() == file_path:
+                    existing = True
+                    break
+            if not existing:
+                item = QListWidgetItem(file_path)
+                item.setData(Qt.UserRole, file_path)
+                self.file_list.addItem(item)
+                item.setSelected(True)
+                # Also add to config list
+                if self.file_type == "html":
+                    self.wizard.config.html_files.append(file_path)
+                elif self.file_type == "css":
+                    self.wizard.config.css_files.append(file_path)
+                else:
+                    self.wizard.config.js_files.append(file_path)
     
     def validatePage(self):
         selected = []
@@ -414,9 +394,11 @@ class FileSelectionPage(QWizardPage):
             if item.isSelected():
                 selected.append(item.data(Qt.UserRole))
         
+        if not selected:
+            return False
+        
         if self.file_type == "html":
             self.wizard.config.html_files = selected
-            # Set main HTML as first selected
             if selected:
                 self.wizard.config.main_html = selected[0]
         elif self.file_type == "css":
@@ -431,7 +413,7 @@ class FileSelectionPage(QWizardPage):
         return True
     
     def isComplete(self):
-        # At least one file selected
+        # Check if at least one item is selected
         for i in range(self.file_list.count()):
             if self.file_list.item(i).isSelected():
                 return True
@@ -482,18 +464,48 @@ class SummaryPage(QWizardPage):
 💡 Your configuration will be saved to:
    {config.root_path}/.aether-config.json
 
-You can always re-run this wizard from Settings menu.
+You can always re-run this wizard from Project menu.
 """
         self.summary_text.setText(summary)
     
     def validatePage(self):
-        # Save configuration
+        # Save configuration even if some files weren't selected
         config_path = Path(self.wizard.config.root_path) / ".aether-config.json"
         self.wizard.config.save(config_path)
         
         QMessageBox.information(self, "Setup Complete", 
             "✅ Project configuration saved successfully!\n\n"
             "All Aether tools will now use this project structure.\n"
-            "You can change settings anytime via Settings → Project Settings.")
+            "You can change settings anytime via Project → Project Setup Wizard.")
         
         return True
+
+
+class ProjectSetupWizard(QWizard):
+    """Main setup wizard"""
+    
+    def __init__(self, parent=None):
+        super().__init__(parent)
+        self.setWindowTitle("Aether - Project Setup Wizard")
+        self.setWizardStyle(QWizard.ModernStyle)
+        self.setMinimumSize(700, 500)
+        
+        self.config = ProjectConfig()
+        self.scanner = None
+        
+        # Add pages (no need to loop through .pages())
+        self.addPage(WelcomePage())
+        self.addPage(FolderSelectPage(self))
+        self.addPage(ScanProgressPage(self))
+        self.addPage(LanguagePage(self))
+        self.addPage(FileSelectionPage(self, "html", "HTML Files", "Select main HTML file(s)"))
+        self.addPage(FileSelectionPage(self, "css", "CSS Files", "Select main CSS file(s)"))
+        self.addPage(FileSelectionPage(self, "js", "JavaScript Files", "Select main JS file(s)"))
+        self.addPage(SummaryPage(self))
+        
+        self.setButtonText(QWizard.NextButton, "Next")
+        self.setButtonText(QWizard.BackButton, "Back")
+        self.setButtonText(QWizard.FinishButton, "Complete Setup")
+    
+    def get_config(self):
+        return self.config
