@@ -34,7 +34,7 @@ class SpellCheckerTab(QWidget):
 
         # Warning if spellchecker not installed
         if not HAS_SPELLCHECKER:
-            warning = QLabel("\f071 pyspellchecker not installed. Run: pip install pyspellchecker")
+            warning = QLabel("\uf071 pyspellchecker not installed. Run: pip install pyspellchecker")
             warning.setStyleSheet("color: red; padding: 10px;")
             layout.addWidget(warning)
 
@@ -167,9 +167,9 @@ class SpellCheckerTab(QWidget):
         self.scan_btn.setEnabled(True)
         
         if error_count == 0:
-            self.summary_label.setText(f"\f00c No spelling errors found across {len(html_files)} files!")
+            self.summary_label.setText(f"\uf00c No spelling errors found across {len(html_files)} files!")
         else:
-            self.summary_label.setText(f"\f071 Found {error_count} potential spelling errors across {len(html_files)} files")
+            self.summary_label.setText(f"\uf071 Found {error_count} potential spelling errors across {len(html_files)} files")
 
     def update_theme(self, is_dark):
         if is_dark:
