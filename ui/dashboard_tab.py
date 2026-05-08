@@ -131,7 +131,7 @@ class DashboardTab(QWidget):
             ("\uf002 SEO Check", "Ctrl+3", self.go_to_seo),
             ("\uf03e Optimize Images", "Ctrl+5", self.go_to_media),
             ("\uf0c1 Fix Broken Links", "Ctrl+6", self.go_to_links),
-            ("\e2ce Accessibility", "Ctrl+7", self.go_to_accessibility),
+            ("\ue2ce Accessibility", "Ctrl+7", self.go_to_accessibility),
             ("\uf019 Backup Project", "Ctrl+9", self.go_to_backup),
             ("\uf0e7 Performance", "Ctrl+8", self.go_to_performance),
             ("\uf201 Schema", "Ctrl+4", self.go_to_schema),
