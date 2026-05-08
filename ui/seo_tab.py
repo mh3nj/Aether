@@ -45,7 +45,7 @@ class SEOTab(QWidget):
         right_layout.setSpacing(10)
 
         # ========== BASIC META TAGS ==========
-        basic_group = QGroupBox("📋 Basic Meta Tags")
+        basic_group = QGroupBox("\f31c Basic Meta Tags")
         basic_group.setStyleSheet("""
             QGroupBox {
                 font-weight: bold;
@@ -121,7 +121,7 @@ class SEOTab(QWidget):
         right_layout.addWidget(og_group)
 
         # ========== TWITTER CARD ==========
-        tw_group = QGroupBox("🐦 Twitter Card")
+        tw_group = QGroupBox("\f099 Twitter Card")
         tw_group.setStyleSheet("""
             QGroupBox {
                 font-weight: bold;
@@ -187,7 +187,7 @@ class SEOTab(QWidget):
         right_layout.addWidget(pwa_group)
 
         # ========== VERIFICATION ==========
-        verify_group = QGroupBox("🔐 Search Console Verification")
+        verify_group = QGroupBox("\f023 Search Console Verification")
         verify_group.setStyleSheet("""
             QGroupBox {
                 font-weight: bold;
@@ -214,7 +214,7 @@ class SEOTab(QWidget):
         right_layout.addWidget(verify_group)
 
         # ========== ADVANCED ==========
-        adv_group = QGroupBox("⚙️ Advanced")
+        adv_group = QGroupBox("\f013 Advanced")
         adv_group.setStyleSheet("""
             QGroupBox {
                 font-weight: bold;
@@ -240,11 +240,11 @@ class SEOTab(QWidget):
 
         # ========== BUTTONS ==========
         btn_layout = QHBoxLayout()
-        self.apply_btn = QPushButton("✅ Apply Meta Tags")
+        self.apply_btn = QPushButton("\f00c Apply Meta Tags")
         self.apply_btn.clicked.connect(self.apply_meta)
-        self.preset_404_btn = QPushButton("📄 Set as 404 Page (noindex)")
+        self.preset_404_btn = QPushButton("\e4eb Set as 404 Page (noindex)")
         self.preset_404_btn.clicked.connect(self.apply_404_preset)
-        self.hreflang_btn = QPushButton("🌐 Generate Hreflang Tags")
+        self.hreflang_btn = QPushButton("\f0ac Generate Hreflang Tags")
         self.hreflang_btn.clicked.connect(self.open_hreflang_dialog)
         btn_layout.addWidget(self.apply_btn)
         btn_layout.addWidget(self.preset_404_btn)
@@ -262,16 +262,16 @@ class SEOTab(QWidget):
         length = len(text)
         if length < 50:
             color = "orange"
-            tip = "⚠️ Too short (50-60 chars recommended)"
+            tip = "\f071 Too short (50-60 chars recommended)"
         elif 50 <= length <= 60:
             color = "green"
-            tip = "✅ Perfect! (50-60 chars)"
+            tip = "\f00c Perfect! (50-60 chars)"
         elif 61 <= length <= 70:
             color = "orange"
-            tip = "⚠️ Slightly long (50-60 chars is better)"
+            tip = "\f071 Slightly long (50-60 chars is better)"
         else:
             color = "red"
-            tip = "❌ Too long! Google may truncate after 60 chars"
+            tip = "\58 Too long! Google may truncate after 60 chars"
         self.title_counter.setText(f"{length} chars - {tip}")
         self.title_counter.setStyleSheet(f"color: {color}; font-size: 10px;")
 
@@ -280,16 +280,16 @@ class SEOTab(QWidget):
         length = len(text)
         if length < 120:
             color = "orange"
-            tip = "⚠️ Too short (150-160 chars recommended)"
+            tip = "\f071 Too short (150-160 chars recommended)"
         elif 120 <= length <= 160:
             color = "green"
-            tip = "✅ Good range (120-160 chars works well)"
+            tip = "\f00c Good range (120-160 chars works well)"
         elif 161 <= length <= 200:
             color = "orange"
-            tip = "⚠️ Slightly long (160 chars is ideal for desktop)"
+            tip = "\f071 Slightly long (160 chars is ideal for desktop)"
         else:
             color = "red"
-            tip = "❌ Too long! Mobile search truncates after ~160 chars"
+            tip = "\58 Too long! Mobile search truncates after ~160 chars"
         self.desc_counter.setText(f"{length} chars - {tip}")
         self.desc_counter.setStyleSheet(f"color: {color}; font-size: 10px;")
 
