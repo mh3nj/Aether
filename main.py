@@ -80,7 +80,7 @@ class MainWindow(QMainWindow):
 
         # Create tab widget (with hidden tab bar)
         self.tabs = QTabWidget()
-        self.tabs.setStyleSheet("QTabBar { height: 0px; visibility: hidden; }")
+        self.tabs.tabBar().setHidden(True)
         main_layout.addWidget(self.tabs)
 
         # Create dashboard tab FIRST
