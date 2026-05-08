@@ -58,9 +58,9 @@ class SEOScoreTab(QWidget):
             "🖼️ **Image Alt Text:** Describes image for screen readers and SEO\n\n"
             "📱 **Viewport:** Required for mobile-friendly ranking (Google mobile-first index)\n\n"
             "⭐ **Score Guide:**\n"
-            "   • 80-100: ✅ Excellent – Optimized for search engines\n"
-            "   • 60-79:  ⚠️ Needs Improvement – Fix critical issues\n"
-            "   • 0-59:   ❌ Critical – Major SEO problems detected"
+            "   • 80-100: \f00c Excellent – Optimized for search engines\n"
+            "   • 60-79:  \f071 Needs Improvement – Fix critical issues\n"
+            "   • 0-59:   \58 Critical – Major SEO problems detected"
         )
         tips_text.setWordWrap(True)
         tips_layout.addWidget(tips_text)
@@ -114,7 +114,7 @@ class SEOScoreTab(QWidget):
                 title_tag = soup.find('title')
                 if not title_tag or not title_tag.string:
                     score -= 30
-                    issues.append("❌ Missing title tag")
+                    issues.append("\58 Missing title tag")
                     title = "(missing)"
                 else:
                     title = title_tag.string.strip()
@@ -133,7 +133,7 @@ class SEOScoreTab(QWidget):
                 meta_desc = soup.find('meta', attrs={'name': 'description'})
                 if not meta_desc or not meta_desc.get('content'):
                     score -= 30
-                    issues.append("❌ Missing meta description")
+                    issues.append("\58 Missing meta description")
                     description = "(missing)"
                 else:
                     description = meta_desc['content']
@@ -150,10 +150,10 @@ class SEOScoreTab(QWidget):
                 h1_count = len(h1_tags)
                 if h1_count == 0:
                     score -= 20
-                    issues.append("❌ No H1 tag - critical for structure")
+                    issues.append("\58 No H1 tag - critical for structure")
                 elif h1_count > 1:
                     score -= 10
-                    issues.append(f"⚠️ {h1_count} H1 tags - use only one")
+                    issues.append(f"\f071 {h1_count} H1 tags - use only one")
 
                 # Image alt text (-15 max)
                 img_tags = soup.find_all('img')
@@ -214,7 +214,7 @@ class SEOScoreTab(QWidget):
         if self.data_bridge:
             self.data_bridge.report_scan(len(html_files), total_issues, avg_score)
         
-        self.summary_label.setText(f"✅ Analyzed {len(html_files)} pages | Avg Score: {avg_score}% | Total Issues: {total_issues}")
+        self.summary_label.setText(f"\f00c Analyzed {len(html_files)} pages | Avg Score: {avg_score}% | Total Issues: {total_issues}")
         
         QMessageBox.information(self, "Analysis Complete", 
             f"📊 SEO Score Analysis\n\n"
