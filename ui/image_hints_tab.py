@@ -175,7 +175,7 @@ class ImageHintsTab(QWidget):
         self.scan_btn.setEnabled(True)
 
         total = missing_dim_count + oversized_count
-        self.log_msg(f"\f00c Scan complete! Found {total} image issues across {len(html_files)} files.\n"
+        self.log_msg(f"\uf00c Scan complete! Found {total} image issues across {len(html_files)} files.\n"
                      f"  • Missing width/height: {missing_dim_count}\n"
                      f"  • Oversized images: {oversized_count}")
 
