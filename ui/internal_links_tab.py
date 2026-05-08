@@ -47,7 +47,7 @@ class InternalLinksTab(QWidget):
         self.orphan_tree.header().setSectionResizeMode(0, QHeaderView.Stretch)
         self.orphan_tree.header().setSectionResizeMode(1, QHeaderView.Stretch)
         orphan_layout.addWidget(self.orphan_tree)
-        self.result_tabs.addTab(self.orphan_tab, "\f15c Orphan Pages")
+        self.result_tabs.addTab(self.orphan_tab, "\uf15c Orphan Pages")
 
         # Tab 2: Pages with few incoming links
         self.few_links_tab = QWidget()
@@ -58,7 +58,7 @@ class InternalLinksTab(QWidget):
         self.few_links_tree.header().setSectionResizeMode(1, QHeaderView.ResizeToContents)
         self.few_links_tree.header().setSectionResizeMode(2, QHeaderView.Stretch)
         few_layout.addWidget(self.few_links_tree)
-        self.result_tabs.addTab(self.few_links_tab, "\f0c1 Low Link Pages")
+        self.result_tabs.addTab(self.few_links_tab, "\uf0c1 Low Link Pages")
 
         # Tab 3: Suggested Link Locations
         self.suggestions_tab = QWidget()
@@ -69,7 +69,7 @@ class InternalLinksTab(QWidget):
         self.suggestions_tree.header().setSectionResizeMode(1, QHeaderView.Stretch)
         self.suggestions_tree.header().setSectionResizeMode(2, QHeaderView.Stretch)
         suggestions_layout.addWidget(self.suggestions_tree)
-        self.result_tabs.addTab(self.suggestions_tab, "\f0eb Link Suggestions")
+        self.result_tabs.addTab(self.suggestions_tab, "\uf0eb Link Suggestions")
 
         # Progress bar
         self.progress = QProgressBar()
@@ -186,7 +186,7 @@ class InternalLinksTab(QWidget):
         self.progress.setVisible(False)
         self.scan_btn.setEnabled(True)
         
-        summary = f"\f00c Analysis complete!\n"
+        summary = f"\uf00c Analysis complete!\n"
         summary += f"• Orphan pages: {len(orphans)}\n"
         summary += f"• Pages with low incoming links: {len(few_links)}\n"
         summary += f"• Link suggestions generated: {len(suggestions)}"
