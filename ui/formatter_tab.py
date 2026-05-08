@@ -34,13 +34,13 @@ class FormatterTab(QWidget):
 
         # File operations row
         file_row = QHBoxLayout()
-        self.new_btn = QPushButton("📄 New / Paste")
+        self.new_btn = QPushButton("\f15c New / Paste")
         self.new_btn.clicked.connect(self.new_file)
-        self.open_btn = QPushButton("📂 Open File")
+        self.open_btn = QPushButton("\f07c Open File")
         self.open_btn.clicked.connect(self.open_file)
-        self.save_btn = QPushButton("💾 Save Left as File...")
+        self.save_btn = QPushButton("\f019 Save Left as File...")
         self.save_btn.clicked.connect(self.save_file)
-        self.save_as_btn = QPushButton("📑 Save Left As...")
+        self.save_as_btn = QPushButton("\f305 Save Left As...")
         self.save_as_btn.clicked.connect(self.save_as)
         file_row.addWidget(self.new_btn)
         file_row.addWidget(self.open_btn)
@@ -51,14 +51,14 @@ class FormatterTab(QWidget):
 
         # Format controls row
         format_row = QHBoxLayout()
-        self.format_btn = QPushButton("🎨 Format → Right Panel")
+        self.format_btn = QPushButton("\f53f Format → Right Panel")
         self.format_btn.clicked.connect(self.format_current)
         self.lang_combo = QComboBox()
         self.lang_combo.addItems(
             ["Auto Detect", "Python", "JavaScript", "HTML", "CSS", "TypeScript"]
         )
         self.lang_combo.setToolTip("Select language or let Auto Detect guess")
-        self.copy_btn = QPushButton("📋 Copy Right → Left")
+        self.copy_btn = QPushButton("\f15c Copy Right → Left")
         self.copy_btn.clicked.connect(self.copy_right_to_left)
         format_row.addWidget(self.format_btn)
         format_row.addWidget(QLabel("Language:"))
