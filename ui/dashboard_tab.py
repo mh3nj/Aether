@@ -11,6 +11,7 @@ from PySide6.QtWidgets import (
 )
 from PySide6.QtCore import Qt, QPropertyAnimation, QEasingCurve, QTimer, Property
 from PySide6.QtGui import QFont
+from ui.data_bridge import DataBridge
 
 
 class DashboardTab(QWidget):
@@ -21,6 +22,11 @@ class DashboardTab(QWidget):
         self.has_project = False
         self.init_ui()
         self.start_animations()
+        
+        # Setup data bridge
+        self.data_bridge = DataBridge()
+        self.data_bridge.scan_completed.connect(self.on_scan_completed)
+        self.data_bridge.issue_fixed.connect(self.on_issue_fixed)
 
     def init_ui(self):
         # Main layout
@@ -107,12 +113,12 @@ class DashboardTab(QWidget):
         quick_actions = [
             ("📝 Format Code", "Ctrl+2", self.go_to_formatter),
             ("🔍 SEO Check", "Ctrl+3", self.go_to_seo),
-            ("🖼️ Optimize Images", "Ctrl+6", self.go_to_media),
-            ("🔗 Fix Broken Links", "Ctrl+7", self.go_to_links),
-            ("♿ Accessibility", "Ctrl+13", self.go_to_accessibility),
-            ("💾 Backup Project", "Ctrl+16", self.go_to_backup),
-            ("⚡ Performance", "Ctrl+20", self.go_to_performance),
-            ("📊 Schema", "Ctrl+8", self.go_to_schema),
+            ("🖼️ Optimize Images", "Ctrl+5", self.go_to_media),
+            ("🔗 Fix Broken Links", "Ctrl+6", self.go_to_links),
+            ("♿ Accessibility", "Ctrl+7", self.go_to_accessibility),
+            ("💾 Backup Project", "Ctrl+9", self.go_to_backup),
+            ("⚡ Performance", "Ctrl+8", self.go_to_performance),
+            ("📊 Schema", "Ctrl+4", self.go_to_schema),
         ]
 
         for i, (name, shortcut, callback) in enumerate(quick_actions):
@@ -248,6 +254,47 @@ class DashboardTab(QWidget):
         footer.setStyleSheet("color: #8095AB; padding: 10px;")
         main_layout.addWidget(footer)
 
+    def create_card(self):
+        card = QFrame()
+        card.setStyleSheet("""
+            QFrame {
+                background-color: rgba(128, 149, 171, 0.05);
+                border-radius: 12px;
+                padding: 15px;
+                margin: 5px;
+                border: 1px solid transparent;
+            }
+        """)
+        return card
+
+    def on_scan_completed(self, data):
+        """Handle scan completion from any tab"""
+        self.has_project = True
+        self.project_status.setText("📁 Project Loaded")
+        self.metric_widgets['pages_count'].setText(f"📄 {data.get('pages', 0)}")
+        self.metric_widgets['issues_count'].setText(f"⚠️ {data.get('issues', 0)}")
+        
+        score = data.get('score', 0)
+        if score > 0:
+            self.metric_widgets['avg_score'].setText(f"⭐ {score}%")
+            self.animation.setEndValue(score)
+            self.animation.start()
+        
+        self.issues_list.setText(f"• Found {data.get('issues', 0)} issues to fix")
+    
+    def on_issue_fixed(self, fix_type, count):
+        """Handle issue fixes from any tab"""
+        current_text = self.metric_widgets['fixes_count'].text()
+        current_fixes = int(current_text.replace("✅ ", "")) if "✅" in current_text else 0
+        new_fixes = current_fixes + count
+        self.metric_widgets['fixes_count'].setText(f"✅ {new_fixes}")
+        
+        current_fixes_text = self.fixes_list.text()
+        if current_fixes_text == "• No fixes yet\n• Apply fixes to see them here":
+            self.fixes_list.setText(f"• Fixed {count} {fix_type}(s)")
+        else:
+            self.fixes_list.setText(f"{current_fixes_text}\n• Fixed {count} {fix_type}(s)")
+
     def add_log_entry(self, log_entry):
         """Add a log entry to the mini viewer"""
         if hasattr(self, 'mini_logs_list'):
@@ -270,19 +317,6 @@ class DashboardTab(QWidget):
                 if "Logs" in self.main_window.tabs.tabText(i):
                     self.main_window.tabs.setCurrentIndex(i)
                     break
-
-    def create_card(self):
-        card = QFrame()
-        card.setStyleSheet("""
-            QFrame {
-                background-color: rgba(128, 149, 171, 0.05);
-                border-radius: 12px;
-                padding: 15px;
-                margin: 5px;
-                border: 1px solid transparent;
-            }
-        """)
-        return card
 
     def start_animations(self):
         self.animation = QPropertyAnimation(self, b"animValue")
@@ -317,22 +351,58 @@ class DashboardTab(QWidget):
             self.score_label.setStyleSheet("color: #4CAF50;")
             self.score_status.setText("Good! Keep optimizing.")
 
-    def update_from_scan(self, scan_data):
-        """Called when a scan is performed in other tabs"""
-        self.has_project = True
-        self.project_status.setText("📁 Project Loaded")
-        self.project_hint.setText("Metrics updated from latest scan")
-        
-        if 'pages' in scan_data:
-            self.metric_widgets['pages_count'].setText(f"📄 {scan_data['pages']}")
-        if 'issues' in scan_data:
-            self.metric_widgets['issues_count'].setText(f"⚠️ {scan_data['issues']}")
-        if 'score' in scan_data:
-            self.metric_widgets['avg_score'].setText(f"⭐ {scan_data['score']}%")
-            self.animation.setEndValue(int(scan_data['score']))
-            self.animation.start()
-        if 'fixes' in scan_data:
-            self.metric_widgets['fixes_count'].setText(f"✅ {scan_data['fixes']}")
+    def update_theme(self, is_dark):
+        """Update colors when theme changes"""
+        if is_dark:
+            self.setStyleSheet("""
+                QLabel { color: #E8E8E8; }
+                QProgressBar::chunk { background-color: #8095AB; }
+                QFrame { border-color: #3E4045; }
+                QPushButton {
+                    background-color: #2B2D31;
+                    color: #E8E8E8;
+                    border: 1px solid #8095AB;
+                }
+                QPushButton:hover {
+                    background-color: #8095AB;
+                    color: #1E1F22;
+                }
+            """)
+            for card in self.findChildren(QFrame):
+                card.setStyleSheet("""
+                    QFrame {
+                        background-color: rgba(128, 149, 171, 0.1);
+                        border-radius: 12px;
+                        padding: 15px;
+                        margin: 5px;
+                        border: 1px solid #3E4045;
+                    }
+                """)
+        else:
+            self.setStyleSheet("""
+                QLabel { color: #2C3E50; }
+                QProgressBar::chunk { background-color: #8095AB; }
+                QFrame { border-color: #D0D7DE; }
+                QPushButton {
+                    background-color: #E9ECF1;
+                    color: #2C3E50;
+                    border: 1px solid #8095AB;
+                }
+                QPushButton:hover {
+                    background-color: #8095AB;
+                    color: white;
+                }
+            """)
+            for card in self.findChildren(QFrame):
+                card.setStyleSheet("""
+                    QFrame {
+                        background-color: rgba(128, 149, 171, 0.05);
+                        border-radius: 12px;
+                        padding: 15px;
+                        margin: 5px;
+                        border: 1px solid #D0D7DE;
+                    }
+                """)
 
     # Navigation methods
     def go_to_formatter(self):
@@ -345,52 +415,37 @@ class DashboardTab(QWidget):
 
     def go_to_media(self):
         if self.main_window:
-            self.main_window.tabs.setCurrentIndex(6)
+            self.main_window.tabs.setCurrentIndex(4)
 
     def go_to_links(self):
         if self.main_window:
-            self.main_window.tabs.setCurrentIndex(7)
+            self.main_window.tabs.setCurrentIndex(5)
 
     def go_to_accessibility(self):
         if self.main_window:
-            self.main_window.tabs.setCurrentIndex(13)
+            self.main_window.tabs.setCurrentIndex(6)
 
     def go_to_backup(self):
         if self.main_window:
-            self.main_window.tabs.setCurrentIndex(16)
+            self.main_window.tabs.setCurrentIndex(8)
 
     def go_to_performance(self):
         if self.main_window:
-            self.main_window.tabs.setCurrentIndex(20)
+            self.main_window.tabs.setCurrentIndex(7)
 
     def go_to_schema(self):
         if self.main_window:
-            self.main_window.tabs.setCurrentIndex(8)
+            self.main_window.tabs.setCurrentIndex(3)
 
     def go_to_tab_by_name(self, name):
         if not self.main_window:
             return
         tab_indexes = {
             "🔍 SEO": 2,
-            "🔗 Links": 7,
-            "🖼️ Images": 6,
-            "💾 Backup": 16,
-            "📊 Schema": 8,
+            "🔗 Links": 5,
+            "🖼️ Images": 4,
+            "💾 Backup": 8,
+            "📊 Schema": 3,
         }
         if name in tab_indexes:
             self.main_window.tabs.setCurrentIndex(tab_indexes[name])
-
-    def update_theme(self, is_dark):
-        """Update colors when theme changes"""
-        if is_dark:
-            self.setStyleSheet("""
-                QLabel { color: #E8E8E8; }
-                QProgressBar::chunk { background-color: #8095AB; }
-                QFrame { border-color: #3E4045; }
-            """)
-        else:
-            self.setStyleSheet("""
-                QLabel { color: #2C3E50; }
-                QProgressBar::chunk { background-color: #8095AB; }
-                QFrame { border-color: #D0D7DE; }
-            """)
