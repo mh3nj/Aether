@@ -76,7 +76,7 @@ class SEOAPITab(QWidget):
         self.url_input = QLineEdit()
         self.url_input.setPlaceholderText("https://example.com")
         self.url_input.setMinimumHeight(30)
-        self.test_btn = QPushButton("📊 Run PageSpeed Test")
+        self.test_btn = QPushButton("\f080 Run PageSpeed Test")
         self.test_btn.clicked.connect(self.run_pagespeed)
         url_layout.addWidget(self.url_input)
         url_layout.addWidget(self.test_btn)
@@ -144,11 +144,11 @@ class SEOAPITab(QWidget):
         self.test_btn.setEnabled(False)
         self.progress.setVisible(True)
         self.results.clear()
-        self.results.appendPlainText(f"🔍 Testing: {url}\n")
+        self.results.appendPlainText(f"\f002 Testing: {url}\n")
         self.results.appendPlainText("=" * 60 + "\n")
         
         strategy = self.get_strategy()
-        self.results.appendPlainText(f"📊 Fetching PageSpeed Insights ({strategy.upper()})...\n")
+        self.results.appendPlainText(f"\f080 Fetching PageSpeed Insights ({strategy.upper()})...\n")
         
         self.worker = PageSpeedWorker(url, strategy)
         self.worker.finished.connect(self.on_pagespeed_result)
@@ -158,7 +158,7 @@ class SEOAPITab(QWidget):
     def on_pagespeed_result(self, result):
         self.results.appendPlainText(result)
         self.results.appendPlainText("\n" + "=" * 60)
-        self.results.appendPlainText("\n💡 For full report, visit: https://pagespeed.web.dev/")
+        self.results.appendPlainText("\n \f0eb For full report, visit: https://pagespeed.web.dev/")
         self.progress.setVisible(False)
         self.test_btn.setEnabled(True)
         self.status_label.setText("PageSpeed test completed")
@@ -172,8 +172,8 @@ class SEOAPITab(QWidget):
                 self.data_bridge.report_scan(1, 0, self.pagespeed_score)
 
     def on_pagespeed_error(self, error):
-        self.results.appendPlainText(f"❌ Error: {error}")
-        self.results.appendPlainText("\n💡 This might be due to:\n")
+        self.results.appendPlainText(f"\58 Error: {error}")
+        self.results.appendPlainText("\n \f0eb This might be due to:\n")
         self.results.appendPlainText("• Invalid URL (make sure it's reachable)\n")
         self.results.appendPlainText("• Rate limiting (try again in a minute)\n")
         self.results.appendPlainText("• The website might be blocking bots")
