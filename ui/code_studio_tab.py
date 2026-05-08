@@ -22,8 +22,8 @@ class CodeStudioTab(QWidget):
         self.formatter_tab = FormatterTab(self.parent_window)
         self.css_tab = CSSOptimizerTab()
         
-        self.tabs.addTab(self.formatter_tab, "\f31c Code Formatter")
-        self.tabs.addTab(self.css_tab, "\f53f CSS Optimizer")
+        self.tabs.addTab(self.formatter_tab, "\uf31c Code Formatter")
+        self.tabs.addTab(self.css_tab, "\uf53f CSS Optimizer")
         
         layout.addWidget(self.tabs)
     
