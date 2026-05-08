@@ -17,7 +17,8 @@ class DashboardTab(QWidget):
     def __init__(self, parent=None, main_window=None):
         super().__init__(parent)
         self.main_window = main_window
-        self._anim_value = 0  # Store animation value
+        self._anim_value = 0
+        self.has_project = False
         self.init_ui()
         self.start_animations()
 
@@ -49,6 +50,19 @@ class DashboardTab(QWidget):
         stats_line.setStyleSheet("color: #8095AB; font-size: 14px;")
         scroll_layout.addWidget(stats_line)
 
+        # ========== PROJECT STATUS CARD ==========
+        self.project_card = self.create_card()
+        project_layout = QVBoxLayout(self.project_card)
+        self.project_status = QLabel("📁 No Project Loaded")
+        self.project_status.setFont(QFont("", 12, QFont.Bold))
+        self.project_status.setAlignment(Qt.AlignCenter)
+        project_layout.addWidget(self.project_status)
+        self.project_hint = QLabel("Select a project folder from any tool to see metrics")
+        self.project_hint.setAlignment(Qt.AlignCenter)
+        self.project_hint.setStyleSheet("color: #8095AB; font-size: 12px;")
+        project_layout.addWidget(self.project_hint)
+        scroll_layout.addWidget(self.project_card)
+
         # ========== HEALTH SCORE CARD ==========
         health_card = self.create_card()
         health_layout = QVBoxLayout(health_card)
@@ -57,23 +71,22 @@ class DashboardTab(QWidget):
         health_title.setFont(QFont("", 14, QFont.Bold))
         health_layout.addWidget(health_title)
 
-        # Score circle (simulated for now)
-        self.score_label = QLabel("78%")
+        # Score circle
+        self.score_label = QLabel("--")
         score_font = QFont()
         score_font.setPointSize(48)
         score_font.setBold(True)
         self.score_label.setFont(score_font)
         self.score_label.setAlignment(Qt.AlignCenter)
-        self.score_label.setStyleSheet("color: #4CAF50;")
+        self.score_label.setStyleSheet("color: #8095AB;")
         health_layout.addWidget(self.score_label)
 
-        self.score_status = QLabel("Good! Keep optimizing.")
+        self.score_status = QLabel("Select a project folder to begin")
         self.score_status.setAlignment(Qt.AlignCenter)
         health_layout.addWidget(self.score_status)
 
-        # Progress ring style
         self.health_progress = QProgressBar()
-        self.health_progress.setValue(78)
+        self.health_progress.setValue(0)
         self.health_progress.setTextVisible(False)
         self.health_progress.setFixedHeight(8)
         health_layout.addWidget(self.health_progress)
@@ -131,14 +144,15 @@ class DashboardTab(QWidget):
         metrics_title.setFont(QFont("", 14, QFont.Bold))
         metrics_layout.addWidget(metrics_title, 0, 0, 1, 2)
 
+        self.metric_widgets = {}
         metrics_data = [
-            ("Pages Analyzed", "0", "📄"),
-            ("Issues Found", "0", "⚠️"),
-            ("Avg SEO Score", "0%", "⭐"),
-            ("Fixes Applied", "0", "✅"),
+            ("pages_count", "Pages Analyzed", "0", "📄"),
+            ("issues_count", "Issues Found", "0", "⚠️"),
+            ("avg_score", "Avg SEO Score", "0%", "⭐"),
+            ("fixes_count", "Fixes Applied", "0", "✅"),
         ]
 
-        for i, (label, value, icon) in enumerate(metrics_data):
+        for i, (key, label, value, icon) in enumerate(metrics_data):
             card = QFrame()
             card.setStyleSheet("""
                 QFrame {
@@ -156,6 +170,7 @@ class DashboardTab(QWidget):
             card_layout.addWidget(val_label)
             card_layout.addWidget(name_label)
             metrics_layout.addWidget(card, 1 + i // 2, i % 2)
+            self.metric_widgets[key] = val_label
 
         scroll_layout.addWidget(metrics_card)
 
@@ -170,7 +185,7 @@ class DashboardTab(QWidget):
         issues_title.setFont(QFont("", 12, QFont.Bold))
         issues_layout.addWidget(issues_title)
 
-        self.issues_list = QLabel("• No data yet\nRun a scan to see issues")
+        self.issues_list = QLabel("• No project loaded\n• Select a folder to see issues")
         self.issues_list.setWordWrap(True)
         issues_layout.addWidget(self.issues_list)
 
@@ -181,7 +196,7 @@ class DashboardTab(QWidget):
         fixes_title.setFont(QFont("", 12, QFont.Bold))
         fixes_layout.addWidget(fixes_title)
 
-        self.fixes_list = QLabel("• No fixes yet\nApply fixes to see them here")
+        self.fixes_list = QLabel("• No fixes yet\n• Apply fixes to see them here")
         self.fixes_list.setWordWrap(True)
         fixes_layout.addWidget(self.fixes_list)
 
@@ -206,6 +221,24 @@ class DashboardTab(QWidget):
         tabs_layout.addLayout(tabs_grid)
         scroll_layout.addWidget(tabs_card)
 
+        # ========== MINI LOGS VIEWER ==========
+        logs_card = self.create_card()
+        logs_layout = QVBoxLayout(logs_card)
+        logs_title = QLabel("📋 RECENT ACTIVITY")
+        logs_title.setFont(QFont("", 12, QFont.Bold))
+        logs_layout.addWidget(logs_title)
+
+        self.mini_logs_list = QLabel("• No recent activity")
+        self.mini_logs_list.setWordWrap(True)
+        self.mini_logs_list.setMaximumHeight(100)
+        logs_layout.addWidget(self.mini_logs_list)
+
+        self.view_all_logs_btn = QPushButton("View All Logs →")
+        self.view_all_logs_btn.clicked.connect(self.go_to_logs_tab)
+        logs_layout.addWidget(self.view_all_logs_btn)
+
+        scroll_layout.addWidget(logs_card)
+
         scroll.setWidget(scroll_content)
         main_layout.addWidget(scroll)
 
@@ -215,6 +248,29 @@ class DashboardTab(QWidget):
         footer.setStyleSheet("color: #8095AB; padding: 10px;")
         main_layout.addWidget(footer)
 
+    def add_log_entry(self, log_entry):
+        """Add a log entry to the mini viewer"""
+        if hasattr(self, 'mini_logs_list'):
+            current_text = self.mini_logs_list.text()
+            if current_text == "• No recent activity":
+                current_text = ""
+            time = log_entry.get('timestamp', '')
+            operation = log_entry.get('operation', '')[:60]
+            new_entry = f"• {time} - {operation}"
+            lines = current_text.split('\n')
+            lines.insert(0, new_entry)
+            if len(lines) > 5:
+                lines = lines[:5]
+            self.mini_logs_list.setText('\n'.join(lines))
+
+    def go_to_logs_tab(self):
+        """Switch to logs tab"""
+        if self.main_window:
+            for i in range(self.main_window.tabs.count()):
+                if "Logs" in self.main_window.tabs.tabText(i):
+                    self.main_window.tabs.setCurrentIndex(i)
+                    break
+
     def create_card(self):
         card = QFrame()
         card.setStyleSheet("""
@@ -223,30 +279,33 @@ class DashboardTab(QWidget):
                 border-radius: 12px;
                 padding: 15px;
                 margin: 5px;
+                border: 1px solid transparent;
             }
         """)
         return card
 
     def start_animations(self):
-        # Animate the health score counting up
         self.animation = QPropertyAnimation(self, b"animValue")
         self.animation.setDuration(1000)
         self.animation.setStartValue(0)
-        self.animation.setEndValue(78)
+        self.animation.setEndValue(0)
         self.animation.setEasingCurve(QEasingCurve.OutCubic)
         self.animation.valueChanged.connect(self.update_score_display)
-        QTimer.singleShot(500, self.animation.start)
 
     def get_anim_value(self):
         return self._anim_value
 
     def set_anim_value(self, value):
         self._anim_value = value
-        self.score_label.setText(f"{int(value)}%")
+        self.score_label.setText(f"{int(value)}%" if value > 0 else "--")
 
     animValue = Property(int, get_anim_value, set_anim_value)
 
     def update_score_display(self, value):
+        if value <= 0:
+            self.score_label.setText("--")
+            self.score_status.setText("Select a project folder to begin")
+            return
         self.score_label.setText(f"{int(value)}%")
         if value < 50:
             self.score_label.setStyleSheet("color: #F44336;")
@@ -257,6 +316,23 @@ class DashboardTab(QWidget):
         else:
             self.score_label.setStyleSheet("color: #4CAF50;")
             self.score_status.setText("Good! Keep optimizing.")
+
+    def update_from_scan(self, scan_data):
+        """Called when a scan is performed in other tabs"""
+        self.has_project = True
+        self.project_status.setText("📁 Project Loaded")
+        self.project_hint.setText("Metrics updated from latest scan")
+        
+        if 'pages' in scan_data:
+            self.metric_widgets['pages_count'].setText(f"📄 {scan_data['pages']}")
+        if 'issues' in scan_data:
+            self.metric_widgets['issues_count'].setText(f"⚠️ {scan_data['issues']}")
+        if 'score' in scan_data:
+            self.metric_widgets['avg_score'].setText(f"⭐ {scan_data['score']}%")
+            self.animation.setEndValue(int(scan_data['score']))
+            self.animation.start()
+        if 'fixes' in scan_data:
+            self.metric_widgets['fixes_count'].setText(f"✅ {scan_data['fixes']}")
 
     # Navigation methods
     def go_to_formatter(self):
@@ -304,19 +380,17 @@ class DashboardTab(QWidget):
         if name in tab_indexes:
             self.main_window.tabs.setCurrentIndex(tab_indexes[name])
 
-    def update_metrics(self, scan_data=None):
-        """Update dashboard with real data from scans"""
-        pass
-
     def update_theme(self, is_dark):
         """Update colors when theme changes"""
         if is_dark:
             self.setStyleSheet("""
                 QLabel { color: #E8E8E8; }
                 QProgressBar::chunk { background-color: #8095AB; }
+                QFrame { border-color: #3E4045; }
             """)
         else:
             self.setStyleSheet("""
                 QLabel { color: #2C3E50; }
                 QProgressBar::chunk { background-color: #8095AB; }
+                QFrame { border-color: #D0D7DE; }
             """)
