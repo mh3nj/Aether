@@ -212,11 +212,7 @@ class SEOScoreTab(QWidget):
         
         # Send data to dashboard via bridge
         if self.data_bridge:
-            self.data_bridge.report_scan(
-                file_count=len(html_files),
-                issue_count=total_issues,
-                score=avg_score
-            )
+            self.data_bridge.report_scan(len(html_files), total_issues, avg_score)
         
         self.summary_label.setText(f"✅ Analyzed {len(html_files)} pages | Avg Score: {avg_score}% | Total Issues: {total_issues}")
         
