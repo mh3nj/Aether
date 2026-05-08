@@ -37,6 +37,7 @@ from ui.performance_lab_tab import PerformanceLabTab
 from ui.security_backup_tab import SecurityBackupTab
 from ui.analytics_tab import AnalyticsTab
 from ui.batch_ops_tab import BatchOpsTab
+from ui.data_bridge import DataBridge
 
 # Import other core components
 from ui.project_setup_wizard import ProjectSetupWizard, ProjectConfig
@@ -92,6 +93,9 @@ class MainWindow(QMainWindow):
         # Create dashboard tab FIRST
         self.dashboard_tab = DashboardTab(self, self)
         
+        # Initialize Data Bridge BEFORE creating tabs that need it
+        self.data_bridge = DataBridge()
+        
         # Create all merged tabs
         self.code_studio_tab = CodeStudioTab(self)
         self.seo_command_tab = SEOCommandTab()
@@ -120,6 +124,11 @@ class MainWindow(QMainWindow):
             self.batch_ops_tab,
             self.logs_tab
         ]
+
+        # Connect data bridge to all tabs that support it
+        for tab in self.all_tabs:
+            if hasattr(tab, 'set_data_bridge'):
+                tab.set_data_bridge(self.data_bridge)
 
         # Add tabs to the widget (without visible tab bar)
         self.tabs.addTab(self.dashboard_tab, "🏠 Dashboard")
@@ -223,7 +232,7 @@ class MainWindow(QMainWindow):
         self.load_project_config()
 
         self.statusBar().showMessage("Ready - 12 powerful merged tools | Ctrl+1 for Dashboard")
-
+                
     def setup_keyboard_shortcuts(self):
         """Setup keyboard shortcuts for tab navigation"""
         # Dashboard is Ctrl+1 (already set in sidebar)
