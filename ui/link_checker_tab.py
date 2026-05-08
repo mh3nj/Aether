@@ -1,3 +1,7 @@
+"""
+Aether Link Checker - Find broken internal and external links
+"""
+
 import os
 import requests
 from pathlib import Path
@@ -21,12 +25,13 @@ class LinkCheckerWorker(QThread):
         self.project_folder = project_folder
         self.check_external = check_external
         self.results = []
+        self.html_files = []
         
     def run(self):
-        html_files = list(Path(self.project_folder).rglob("*.html"))
-        total = len(html_files)
+        self.html_files = list(Path(self.project_folder).rglob("*.html"))
+        total = len(self.html_files)
         
-        for idx, html_path in enumerate(html_files):
+        for idx, html_path in enumerate(self.html_files):
             try:
                 with open(html_path, 'r', encoding='utf-8') as f:
                     soup = BeautifulSoup(f, 'html.parser')
@@ -48,7 +53,7 @@ class LinkCheckerWorker(QThread):
                                 link_path = self.resolve_internal_link(html_path, link)
                                 if link_path and not link_path.exists():
                                     self.results.append({
-                                        "type": "Broken Internal Link",
+                                        "type": "🔗 Broken Internal Link",
                                         "file": rel_path,
                                         "element": f"<{tag.name}>",
                                         "link": link,
@@ -59,7 +64,7 @@ class LinkCheckerWorker(QThread):
                                 is_valid = self.check_external_link(link)
                                 if not is_valid:
                                     self.results.append({
-                                        "type": "Broken External Link",
+                                        "type": "🌐 Broken External Link",
                                         "file": rel_path,
                                         "element": f"<{tag.name}>",
                                         "link": link,
@@ -67,8 +72,8 @@ class LinkCheckerWorker(QThread):
                                     })
             except Exception as e:
                 self.results.append({
-                    "type": "Parse Error",
-                    "file": rel_path,
+                    "type": "⚠️ Parse Error",
+                    "file": str(html_path.name),
                     "element": "",
                     "link": "",
                     "details": str(e)[:100]
@@ -121,6 +126,7 @@ class LinkCheckerTab(QWidget):
         self.project_folder = None
         self.worker = None
         self.results = []
+        self.data_bridge = None
         self.init_ui()
 
     def init_ui(self):
@@ -129,9 +135,9 @@ class LinkCheckerTab(QWidget):
         # Folder selection
         folder_row = QHBoxLayout()
         self.folder_label = QLabel("No project folder selected")
-        self.select_btn = QPushButton("Select Project Folder")
+        self.select_btn = QPushButton("📁 Select Project Folder")
         self.select_btn.clicked.connect(self.select_folder)
-        self.scan_btn = QPushButton("Scan for Broken Links")
+        self.scan_btn = QPushButton("🔍 Scan for Broken Links")
         self.scan_btn.clicked.connect(self.scan_links)
         folder_row.addWidget(self.select_btn)
         folder_row.addWidget(self.scan_btn)
@@ -142,7 +148,7 @@ class LinkCheckerTab(QWidget):
         # Options
         opts_group = QGroupBox("Scan Options")
         opts_layout = QHBoxLayout()
-        self.check_external = QCheckBox("Check external links (requires internet, slower)")
+        self.check_external = QCheckBox("🌐 Check external links (requires internet, slower)")
         self.check_external.setChecked(False)
         opts_layout.addWidget(self.check_external)
         opts_group.setLayout(opts_layout)
@@ -167,6 +173,10 @@ class LinkCheckerTab(QWidget):
         self.summary_label = QLabel("Ready - Select a folder and click Scan")
         layout.addWidget(self.summary_label)
 
+    def set_data_bridge(self, bridge):
+        """Set the data bridge for dashboard communication"""
+        self.data_bridge = bridge
+
     def select_folder(self):
         path = QFileDialog.getExistingDirectory(self, "Select Project Folder")
         if path:
@@ -190,20 +200,21 @@ class LinkCheckerTab(QWidget):
         self.worker.finished_signal.connect(self.scan_finished)
         self.worker.start()
 
-        self.summary_label.setText("Scanning for broken links...")
+        self.summary_label.setText("🔍 Scanning for broken links...")
 
     def update_progress(self, value):
         self.progress.setValue(value)
 
     def scan_finished(self):
         self.results = self.worker.results
+        html_files = self.worker.html_files
         
         for result in self.results:
             item = QTreeWidgetItem([
                 result["type"],
                 result["file"],
                 result["element"],
-                result["link"],
+                result["link"][:80],
                 result["details"]
             ])
             # Color broken links red
@@ -216,23 +227,28 @@ class LinkCheckerTab(QWidget):
         self.progress.setVisible(False)
         self.scan_btn.setEnabled(True)
         
+        # Report to dashboard
+        if self.data_bridge:
+            self.data_bridge.report_scan(len(html_files), total_broken, 0)
+        
         if total_broken == 0:
-            self.summary_label.setText(f"✅ Scan complete! No broken links found.")
+            self.summary_label.setText(f"✅ Scan complete! No broken links found across {len(html_files)} files.")
         else:
-            self.summary_label.setText(f"⚠️ Scan complete! Found {total_broken} broken links.")
+            self.summary_label.setText(f"⚠️ Scan complete! Found {total_broken} broken links across {len(html_files)} files.")
         
         QMessageBox.information(self, "Scan Complete", 
-                                f"Found {total_broken} broken links.\n"
-                                f"Check the results panel for details.")
+                                f"Found {total_broken} broken links.\n\n"
+                                f"Check the results panel for details.\n"
+                                f"💡 Use Link Manager to fix them!")
 
     def update_theme(self, is_dark):
         """Called from main window when theme changes."""
         if is_dark:
             self.results_tree.setStyleSheet("""
                 QTreeWidget {
-                    alternate-background-color: #3E4045;
                     background-color: #2B2D31;
                     color: #E8E8E8;
+                    alternate-background-color: #3E4045;
                 }
                 QHeaderView::section {
                     background-color: #2B2D31;
@@ -243,9 +259,9 @@ class LinkCheckerTab(QWidget):
         else:
             self.results_tree.setStyleSheet("""
                 QTreeWidget {
-                    alternate-background-color: #F8F9FA;
                     background-color: #FFFFFF;
                     color: #2C3E50;
+                    alternate-background-color: #F8F9FA;
                 }
                 QHeaderView::section {
                     background-color: #F1F3F5;
