@@ -17,43 +17,32 @@ from PySide6.QtWidgets import (
     QToolBar,
     QPushButton,
     QMessageBox,
+    QWidget,
+    QHBoxLayout,
 )
 from PySide6.QtGui import QAction, QKeySequence, QIcon
-from PySide6.QtCore import QSettings
+from PySide6.QtCore import Qt, QSettings
 
-# Import all tabs
+# Import dashboard
 from ui.dashboard_tab import DashboardTab
-from ui.formatter_tab import FormatterTab
-from ui.seo_tab import SEOTab
-from ui.favicon_tab import FaviconTab
-from ui.breadcrumb_tab import BreadcrumbTab
-from ui.robots_tab import RobotsTab
-from ui.webp_tab import WebPTab
-from ui.link_manager import LinkManagerTab
-from ui.schema_tab import SchemaTab
-from ui.lazy_load_tab import LazyLoadTab
-from ui.og_preview_tab import OGPreviewTab
-from ui.image_hints_tab import ImageHintsTab
-from ui.link_checker_tab import LinkCheckerTab
-from ui.accessibility_tab import AccessibilityTab
-from ui.alt_checker_tab import AltCheckerTab
-from ui.css_optimizer_tab import CSSOptimizerTab
-from ui.backup_tab import BackupTab
-from ui.seo_score_tab import SEOScoreTab
-from ui.duplicate_detector_tab import DuplicateDetectorTab
-from ui.security_tab import SecurityTab
-from ui.performance_tab import PerformanceTab
-from ui.seo_api_tab import SEOAPITab
-from ui.meta_refresh_tab import MetaRefreshTab
-from ui.serp_preview import SERPPreviewTab
-from ui.spell_checker_tab import SpellCheckerTab
-from ui.keyword_density_tab import KeywordDensityTab
-from ui.internal_links_tab import InternalLinksTab
-from ui.content_length_tab import ContentLengthTab
-from ui.batch_meta_updater import BatchMetaUpdaterTab
+
+# Import merged tabs
+from ui.code_studio_tab import CodeStudioTab
+from ui.seo_command_tab import SEOCommandTab
+from ui.schema_social_tab import SchemaSocialTab
+from ui.media_studio_tab import MediaStudioTab
+from ui.link_studio_tab import LinkStudioTab
+from ui.accessibility_hub_tab import AccessibilityHubTab
+from ui.performance_lab_tab import PerformanceLabTab
+from ui.security_backup_tab import SecurityBackupTab
+from ui.analytics_tab import AnalyticsTab
+from ui.batch_ops_tab import BatchOpsTab
+
+# Import other core components
 from ui.project_setup_wizard import ProjectSetupWizard, ProjectConfig
 from ui.undo_manager import UndoManager
 from ui.logs_tab import LogsTab
+from ui.sidebar import Sidebar
 
 # Import About Dialog
 from ui.about_dialog import AboutDialog
@@ -71,165 +60,90 @@ class MainWindow(QMainWindow):
         # Project configuration
         self.project_config = None
 
-        # Create tab widget
-        self.tabs = QTabWidget()
-        self.setCentralWidget(self.tabs)
-
         # Settings
         self.settings = QSettings("WebDevTools", "Preferences")
 
         # Initialize Undo Manager
         self.undo_manager = UndoManager(self)
 
+        # Create central widget with horizontal layout for sidebar
+        self.central_widget = QWidget()
+        self.setCentralWidget(self.central_widget)
+        main_layout = QHBoxLayout(self.central_widget)
+        main_layout.setContentsMargins(0, 0, 0, 0)
+        main_layout.setSpacing(0)
+
+        # Add sidebar
+        self.sidebar = Sidebar(self, self)
+        main_layout.addWidget(self.sidebar)
+
+        # Create tab widget (with hidden tab bar)
+        self.tabs = QTabWidget()
+        self.tabs.setStyleSheet("""
+            QTabWidget::pane {
+                border: none;
+            }
+            QTabBar {
+                display: none;
+            }
+        """)
+        main_layout.addWidget(self.tabs)
+
         # Create dashboard tab FIRST
         self.dashboard_tab = DashboardTab(self, self)
         
-        # Create all other tabs
-        self.formatter_tab = FormatterTab(self)
-        self.seo_tab = SEOTab()
-        self.favicon_tab = FaviconTab()
-        self.breadcrumb_tab = BreadcrumbTab()
-        self.robots_tab = RobotsTab()
-        self.webp_tab = WebPTab()
-        self.link_manager_tab = LinkManagerTab()
-        self.schema_tab = SchemaTab()
-        self.lazy_load_tab = LazyLoadTab()
-        self.og_preview_tab = OGPreviewTab()
-        self.image_hints_tab = ImageHintsTab()
-        self.link_checker_tab = LinkCheckerTab()
-        self.accessibility_tab = AccessibilityTab()
-        self.alt_checker_tab = AltCheckerTab()
-        self.css_optimizer_tab = CSSOptimizerTab()
-        self.backup_tab = BackupTab()
-        self.seo_score_tab = SEOScoreTab()
-        self.duplicate_tab = DuplicateDetectorTab()
-        self.security_tab = SecurityTab()
-        self.performance_tab = PerformanceTab()
-        self.seo_api_tab = SEOAPITab()
-        self.meta_refresh_tab = MetaRefreshTab()
-        self.serp_preview_tab = SERPPreviewTab()
-        self.spell_checker_tab = SpellCheckerTab()
-        self.keyword_density_tab = KeywordDensityTab()
-        self.internal_links_tab = InternalLinksTab()
-        self.content_length_tab = ContentLengthTab()
-        self.batch_meta_tab = BatchMetaUpdaterTab()
+        # Create all merged tabs
+        self.code_studio_tab = CodeStudioTab(self)
+        self.seo_command_tab = SEOCommandTab()
+        self.schema_social_tab = SchemaSocialTab()
+        self.media_studio_tab = MediaStudioTab()
+        self.link_studio_tab = LinkStudioTab()
+        self.accessibility_hub_tab = AccessibilityHubTab()
+        self.performance_lab_tab = PerformanceLabTab()
+        self.security_backup_tab = SecurityBackupTab()
+        self.analytics_tab = AnalyticsTab()
+        self.batch_ops_tab = BatchOpsTab()
         self.logs_tab = LogsTab(self, self.undo_manager)
 
         # Add all tabs to the list for theme updates
         self.all_tabs = [
             self.dashboard_tab,
-            self.formatter_tab,
-            self.seo_tab,
-            self.favicon_tab,
-            self.breadcrumb_tab,
-            self.robots_tab,
-            self.webp_tab,
-            self.link_manager_tab,
-            self.schema_tab,
-            self.lazy_load_tab,
-            self.og_preview_tab,
-            self.image_hints_tab,
-            self.link_checker_tab,
-            self.accessibility_tab,
-            self.alt_checker_tab,
-            self.css_optimizer_tab,
-            self.backup_tab,
-            self.seo_score_tab,
-            self.duplicate_tab,
-            self.security_tab,
-            self.performance_tab,
-            self.seo_api_tab,
-            self.meta_refresh_tab,
-            self.serp_preview_tab,
-            self.spell_checker_tab,
-            self.keyword_density_tab,
-            self.internal_links_tab,
-            self.content_length_tab,
-            self.batch_meta_tab,
+            self.code_studio_tab,
+            self.seo_command_tab,
+            self.schema_social_tab,
+            self.media_studio_tab,
+            self.link_studio_tab,
+            self.accessibility_hub_tab,
+            self.performance_lab_tab,
+            self.security_backup_tab,
+            self.analytics_tab,
+            self.batch_ops_tab,
             self.logs_tab
         ]
 
-        # Add tabs to the widget (Dashboard FIRST)
+        # Add tabs to the widget (without visible tab bar)
         self.tabs.addTab(self.dashboard_tab, "🏠 Dashboard")
-        self.tabs.addTab(self.formatter_tab, "📝 Code Formatter")
-        self.tabs.addTab(self.seo_tab, "🔍 SEO Optimizer")
-        self.tabs.addTab(self.favicon_tab, "🎨 Favicon Generator")
-        self.tabs.addTab(self.breadcrumb_tab, "🧾 Breadcrumb Builder")
-        self.tabs.addTab(self.robots_tab, "🤖 Robots & Sitemap")
-        self.tabs.addTab(self.webp_tab, "🖼️ WebP Converter")
-        self.tabs.addTab(self.link_manager_tab, "🔗 Link Manager")
-        self.tabs.addTab(self.schema_tab, "📊 Schema Library")
-        self.tabs.addTab(self.lazy_load_tab, "🌸 Smart Lazy Load")
-        self.tabs.addTab(self.og_preview_tab, "📱 OG Preview")
-        self.tabs.addTab(self.image_hints_tab, "📐 Image Hints")
-        self.tabs.addTab(self.link_checker_tab, "🔍 Link Checker")
-        self.tabs.addTab(self.accessibility_tab, "♿ Accessibility")
-        self.tabs.addTab(self.alt_checker_tab, "🏷️ Alt Checker")
-        self.tabs.addTab(self.css_optimizer_tab, "📄 CSS Optimizer")
-        self.tabs.addTab(self.backup_tab, "💾 Backup & Restore")
-        self.tabs.addTab(self.seo_score_tab, "📈 SEO Score")
-        self.tabs.addTab(self.duplicate_tab, "🔄 Duplicate Detector")
-        self.tabs.addTab(self.security_tab, "🛡️ Security")
-        self.tabs.addTab(self.performance_tab, "⚡ Performance")
-        self.tabs.addTab(self.seo_api_tab, "🌐 SEO API")
-        self.tabs.addTab(self.meta_refresh_tab, "🔄 Meta Refresh")
-        self.tabs.addTab(self.serp_preview_tab, "🔍 SERP Preview")
-        self.tabs.addTab(self.spell_checker_tab, "📝 Spell Checker")
-        self.tabs.addTab(self.keyword_density_tab, "📊 Keyword Density")
-        self.tabs.addTab(self.internal_links_tab, "🔗 Internal Links")
-        self.tabs.addTab(self.content_length_tab, "📏 Content Length")
-        self.tabs.addTab(self.batch_meta_tab, "⚡ Batch Meta")
+        self.tabs.addTab(self.code_studio_tab, "📝 Code Studio")
+        self.tabs.addTab(self.seo_command_tab, "🔍 SEO Command")
+        self.tabs.addTab(self.schema_social_tab, "📊 Schema & Social")
+        self.tabs.addTab(self.media_studio_tab, "🖼️ Media Studio")
+        self.tabs.addTab(self.link_studio_tab, "🔗 Link Studio")
+        self.tabs.addTab(self.accessibility_hub_tab, "♿ Accessibility Hub")
+        self.tabs.addTab(self.performance_lab_tab, "⚡ Performance Lab")
+        self.tabs.addTab(self.security_backup_tab, "🛡️ Security & Backup")
+        self.tabs.addTab(self.analytics_tab, "📈 Analytics")
+        self.tabs.addTab(self.batch_ops_tab, "⚙️ Batch Ops")
         self.tabs.addTab(self.logs_tab, "📋 Logs")
+
+        # Connect tab change signal to update sidebar
+        self.tabs.currentChanged.connect(self.on_tab_changed)
 
         # Connect logs to dashboard
         self.logs_tab.log_added.connect(self.dashboard_tab.add_log_entry)
 
-        # Tooltips
-        tooltips = {
-            0: "🏠 Dashboard – Overview and quick actions",
-            1: "Format Python, JS, HTML, CSS, TS, JSX files with diff view",
-            2: "Edit meta tags, generate hreflang, 404 presets",
-            3: "Generate all favicon sizes and inject into HTML",
-            4: "Auto-generate BreadcrumbList JSON-LD from URL",
-            5: "Create robots.txt and sitemap.xml",
-            6: "Convert images to WebP and update HTML",
-            7: "Bulk find/replace links across all files",
-            8: "Generate FAQ, Product, Article, Event, Recipe, HowTo schema",
-            9: "Smart lazy loading with blur-up WebP previews",
-            10: "Social media preview (Facebook, Twitter) with injection",
-            11: "Detect missing width/height, oversized images",
-            12: "Find broken internal and external links",
-            13: "Check alt text, lang, headings, labels",
-            14: "Bulk fix missing alt attributes",
-            15: "Generate print and speech CSS, semantic HTML",
-            16: "Create backups and restore previous versions",
-            17: "Analyze SEO score (0-100) for each page",
-            18: "Find duplicate titles, descriptions, H1 tags",
-            19: "CSP & SRI security headers",
-            20: "Preload scanner and injector",
-            21: "PageSpeed Insights & Core Web Vitals",
-            22: "Detect meta refresh redirects",
-            23: "Google SERP preview simulator",
-            24: "Spelling and grammar checker",
-            25: "Keyword density analyzer",
-            26: "Internal link suggestions",
-            27: "Content length analyzer",
-            28: "Batch meta tag updater",
-            29: "Complete operation history"
-        }
-        for idx, tip in tooltips.items():
-            if idx < self.tabs.count():
-                self.tabs.setTabToolTip(idx, tip)
-
         # Create menu bar
         menubar = self.menuBar()
-        view_menu = menubar.addMenu("View")
-
-        self.theme_action = QAction("Toggle Dark Mode", self, checkable=True)
-        self.theme_action.setShortcut(QKeySequence("Ctrl+Shift+T"))
-        self.theme_action.triggered.connect(self.toggle_theme)
-        view_menu.addAction(self.theme_action)
-
+        
         # Edit menu for Undo/Redo
         edit_menu = menubar.addMenu("Edit")
         
@@ -245,8 +159,14 @@ class MainWindow(QMainWindow):
         self.redo_action.setEnabled(False)
         edit_menu.addAction(self.redo_action)
         
-        edit_menu.addSeparator()
-        
+        # View menu
+        view_menu = menubar.addMenu("View")
+
+        self.theme_action = QAction("Toggle Dark Mode", self, checkable=True)
+        self.theme_action.setShortcut(QKeySequence("Ctrl+Shift+T"))
+        self.theme_action.triggered.connect(self.toggle_theme)
+        view_menu.addAction(self.theme_action)
+
         # Project menu
         project_menu = menubar.addMenu("Project")
         setup_project_action = QAction("⚙️ Project Setup Wizard", self)
@@ -292,11 +212,8 @@ class MainWindow(QMainWindow):
         self.undo_manager.undo_available_changed.connect(self.update_undo_ui)
         self.undo_manager.redo_available_changed.connect(self.update_redo_ui)
 
-        # Add Dashboard shortcut (Ctrl+1)
-        dashboard_action = QAction("Dashboard", self)
-        dashboard_action.setShortcut(QKeySequence("Ctrl+1"))
-        dashboard_action.triggered.connect(lambda: self.tabs.setCurrentIndex(0))
-        self.addAction(dashboard_action)
+        # Add keyboard shortcuts for all tabs
+        self.setup_keyboard_shortcuts()
 
         # Load saved theme preference
         is_dark = self.settings.value("dark_mode", False, type=bool)
@@ -305,7 +222,36 @@ class MainWindow(QMainWindow):
         # Load project configuration
         self.load_project_config()
 
-        self.statusBar().showMessage("Ready - 29 powerful tools at your fingertips | Ctrl+1 for Dashboard")
+        self.statusBar().showMessage("Ready - 12 powerful merged tools | Ctrl+1 for Dashboard")
+
+    def setup_keyboard_shortcuts(self):
+        """Setup keyboard shortcuts for tab navigation"""
+        # Dashboard is Ctrl+1 (already set in sidebar)
+        
+        shortcuts = [
+            (Qt.Key_2, 1),   # Code Studio
+            (Qt.Key_3, 2),   # SEO Command
+            (Qt.Key_4, 3),   # Schema & Social
+            (Qt.Key_5, 4),   # Media Studio
+            (Qt.Key_6, 5),   # Link Studio
+            (Qt.Key_7, 6),   # Accessibility Hub
+            (Qt.Key_8, 7),   # Performance Lab
+            (Qt.Key_9, 8),   # Security & Backup
+            (Qt.Key_0, 9),   # Analytics
+            (Qt.Key_B, 10),  # Batch Ops
+            (Qt.Key_L, 11),  # Logs
+        ]
+        
+        for key, tab_index in shortcuts:
+            action = QAction(self)
+            if key == Qt.Key_B:
+                action.setShortcut(QKeySequence("Ctrl+B"))
+            elif key == Qt.Key_L:
+                action.setShortcut(QKeySequence("Ctrl+L"))
+            else:
+                action.setShortcut(QKeySequence(f"Ctrl+{chr(key).upper()}"))
+            action.triggered.connect(lambda checked, idx=tab_index: self.tabs.setCurrentIndex(idx))
+            self.addAction(action)
 
     def set_window_logo(self, is_dark):
         """Set the window icon based on theme"""
@@ -348,6 +294,10 @@ class MainWindow(QMainWindow):
             self.statusBar().showMessage(f"Project configured: {self.project_config.root_path}")
             return True
         return False
+
+    def on_tab_changed(self, index):
+        """Update sidebar when tab changes"""
+        self.sidebar.update_active_button(index)
 
     def undo(self):
         """Perform undo operation"""
@@ -415,6 +365,10 @@ class MainWindow(QMainWindow):
         self.apply_theme(is_dark)
         self.settings.setValue("dark_mode", is_dark)
         self.set_window_logo(is_dark)
+        
+        # Update sidebar theme
+        self.sidebar.update_theme(is_dark)
+        
         # Propagate theme to all tabs that have update_theme method
         for tab in self.all_tabs:
             if hasattr(tab, "update_theme"):
@@ -425,23 +379,6 @@ class MainWindow(QMainWindow):
             style = """
             QMainWindow, QDialog {
                 background-color: #1E1F22;
-            }
-            QTabWidget::pane {
-                background-color: #2B2D31;
-                border: 1px solid #3E4045;
-            }
-            QTabBar::tab {
-                background-color: #2B2D31;
-                color: #E8E8E8;
-                padding: 8px 16px;
-                margin-right: 2px;
-            }
-            QTabBar::tab:selected {
-                background-color: #3E4045;
-                border-bottom: 2px solid #8095AB;
-            }
-            QTabBar::tab:hover {
-                background-color: #4B4E54;
             }
             QPlainTextEdit, QTextEdit, QLineEdit, QComboBox, QTreeView, QTableWidget, QListWidget {
                 background-color: #2B2D31;
@@ -497,24 +434,6 @@ class MainWindow(QMainWindow):
             style = """
             QMainWindow, QDialog {
                 background-color: #F8F9FA;
-            }
-            QTabWidget::pane {
-                background-color: #FFFFFF;
-                border: 1px solid #D0D7DE;
-            }
-            QTabBar::tab {
-                background-color: #F1F3F5;
-                color: #2C3E50;
-                padding: 8px 16px;
-                margin-right: 2px;
-            }
-            QTabBar::tab:selected {
-                background-color: #FFFFFF;
-                border-bottom: 2px solid #8095AB;
-            }
-            QTabBar::tab:hover {
-                background-color: #8095AB;
-                color: white;
             }
             QPlainTextEdit, QTextEdit, QLineEdit, QComboBox, QTreeView, QTableWidget, QListWidget {
                 background-color: #FFFFFF;
