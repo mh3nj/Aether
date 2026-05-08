@@ -92,19 +92,19 @@ class Sidebar(QWidget):
         
         # Navigation buttons
         self.nav_buttons = []
-        self.nav_items = [
-            ("🏠", "Dashboard", "Ctrl+1", 0),
-            ("📝", "Code Studio", "Ctrl+2", 1),
-            ("🔍", "SEO Command", "Ctrl+3", 2),
-            ("📊", "Schema & Social", "Ctrl+4", 3),
-            ("🖼️", "Media Studio", "Ctrl+5", 4),
-            ("🔗", "Link Studio", "Ctrl+6", 5),
-            ("♿", "Accessibility Hub", "Ctrl+7", 6),
-            ("⚡", "Performance Lab", "Ctrl+8", 7),
-            ("🛡️", "Security & Backup", "Ctrl+9", 8),
-            ("📈", "Analytics", "Ctrl+0", 9),
-            ("⚙️", "Batch Ops", "Ctrl+B", 10),
-            ("📋", "Logs", "Ctrl+L", 11),
+        nav_items = [
+            ("\uf015", "Dashboard", "Ctrl+1", 0),      # fa-home
+            ("\uf121", "Code Studio", "Ctrl+2", 1),    # fa-code
+            ("\uf002", "SEO Command", "Ctrl+3", 2),    # fa-search
+            ("\uf0e8", "Schema & Social", "Ctrl+4", 3), # fa-share-alt
+            ("\uf302", "Media Studio", "Ctrl+5", 4),   # fa-image
+            ("\uf0c1", "Link Studio", "Ctrl+6", 5),    # fa-link
+            ("\uf29a", "Accessibility Hub", "Ctrl+7", 6), # fa-universal-access
+            ("\uf3fd", "Performance Lab", "Ctrl+8", 7), # fa-gauge-high
+            ("\uf3ed", "Security & Backup", "Ctrl+9", 8), # fa-shield
+            ("\uf080", "Analytics", "Ctrl+0", 9),      # fa-chart-line
+            ("\uf013", "Batch Ops", "Ctrl+B", 10),     # fa-gear
+            ("\uf017", "Logs", "Ctrl+L", 11),          # fa-clock
         ]
         
         for icon, text, shortcut, tab_index in self.nav_items:
