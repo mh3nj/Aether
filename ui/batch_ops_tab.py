@@ -21,8 +21,8 @@ class BatchOpsTab(QWidget):
         self.batch_meta_tab = BatchMetaUpdaterTab()
         self.robots_tab = RobotsTab()
         
-        self.tabs.addTab(self.batch_meta_tab, "⚡ Batch Meta Updater")
-        self.tabs.addTab(self.robots_tab, "🤖 Robots & Sitemap")
+        self.tabs.addTab(self.batch_meta_tab, "\f0e7 Batch Meta Updater")
+        self.tabs.addTab(self.robots_tab, "\f544 Robots & Sitemap")
         
         layout.addWidget(self.tabs)
     
