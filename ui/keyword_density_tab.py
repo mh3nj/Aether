@@ -19,6 +19,8 @@ class KeywordDensityTab(QWidget):
     def __init__(self):
         super().__init__()
         self.project_folder = None
+        self.data_bridge = None
+        self.current_results = []
         self.init_ui()
 
     def init_ui(self):
@@ -32,7 +34,7 @@ class KeywordDensityTab(QWidget):
         # Folder selection
         folder_row = QHBoxLayout()
         self.folder_label = QLabel("No folder selected")
-        self.select_btn = QPushButton("Select Project Folder")
+        self.select_btn = QPushButton("📁 Select Project Folder")
         self.select_btn.clicked.connect(self.select_folder)
         folder_row.addWidget(self.select_btn)
         folder_row.addWidget(self.folder_label)
@@ -44,7 +46,7 @@ class KeywordDensityTab(QWidget):
         self.keyword_input = QLineEdit()
         self.keyword_input.setPlaceholderText("Enter keyword to analyze (e.g., 'web design')")
         self.keyword_input.setMinimumHeight(30)
-        self.analyze_btn = QPushButton("Analyze Keyword Density")
+        self.analyze_btn = QPushButton("🔍 Analyze Keyword Density")
         self.analyze_btn.clicked.connect(self.analyze_keyword)
         keyword_row.addWidget(self.keyword_input)
         keyword_row.addWidget(self.analyze_btn)
@@ -71,7 +73,19 @@ class KeywordDensityTab(QWidget):
         self.results_table.horizontalHeader().setSectionResizeMode(2, QHeaderView.ResizeToContents)
         self.results_table.horizontalHeader().setSectionResizeMode(3, QHeaderView.ResizeToContents)
         self.results_table.horizontalHeader().setSectionResizeMode(4, QHeaderView.ResizeToContents)
+        self.results_table.setAlternatingRowColors(True)
         layout.addWidget(self.results_table)
+
+        # Density guidelines
+        guidelines = QLabel(
+            "📊 Keyword Density Guidelines:\n"
+            "• < 0.5%: ⚠️ Under-optimized - add more keyword variations\n"
+            "• 0.5% - 3.0%: ✅ Optimal range\n"
+            "• > 3.0%: ❌ Keyword stuffing - reduce usage to avoid penalties"
+        )
+        guidelines.setWordWrap(True)
+        guidelines.setStyleSheet("padding: 8px; border-radius: 4px; margin-top: 5px;")
+        layout.addWidget(guidelines)
 
         # Progress bar
         self.progress = QProgressBar()
@@ -82,6 +96,10 @@ class KeywordDensityTab(QWidget):
         layout.addWidget(self.summary_label)
 
         self.current_results = []
+
+    def set_data_bridge(self, bridge):
+        """Set the data bridge for dashboard communication"""
+        self.data_bridge = bridge
 
     def select_folder(self):
         path = QFileDialog.getExistingDirectory(self, "Select Project Folder")
@@ -95,6 +113,22 @@ class KeywordDensityTab(QWidget):
         text = re.sub(r'[^\w\s]', ' ', text)
         text = re.sub(r'\s+', ' ', text)
         return text.strip()
+
+    def get_keyword_variations(self, keyword):
+        """Generate variations of the keyword (singular/plural, common forms)"""
+        variations = {keyword}
+        
+        # Add singular/plural variations
+        if keyword.endswith('s'):
+            variations.add(keyword[:-1])
+        else:
+            variations.add(keyword + 's')
+        
+        # Add common suffixes
+        for suffix in ['ing', 'ed', 'er', 'or']:
+            variations.add(keyword + suffix)
+        
+        return variations
 
     def analyze_keyword(self):
         if not self.project_folder:
@@ -120,6 +154,7 @@ class KeywordDensityTab(QWidget):
         total_words = 0
         total_keyword_count = 0
         keyword_variations = self.get_keyword_variations(keyword)
+        issue_count = 0
 
         for idx, html_path in enumerate(html_files):
             try:
@@ -150,9 +185,11 @@ class KeywordDensityTab(QWidget):
                 if density < 0.5:
                     status = "⚠️ Under-optimized"
                     status_color = "orange"
+                    issue_count += 1
                 elif density > 3.0:
                     status = "❌ Keyword Stuffing!"
                     status_color = "red"
+                    issue_count += 1
                 else:
                     status = "✅ Good"
                     status_color = "green"
@@ -167,7 +204,12 @@ class KeywordDensityTab(QWidget):
                 self.results_table.setItem(row, 3, QTableWidgetItem(f"{density:.2f}%"))
                 
                 status_item = QTableWidgetItem(status)
-                status_item.setForeground(Qt.GlobalColor(getattr(Qt, status_color)))
+                if status_color == "green":
+                    status_item.setForeground(Qt.GlobalColor(Qt.darkGreen))
+                elif status_color == "orange":
+                    status_item.setForeground(Qt.GlobalColor(Qt.darkYellow))
+                else:
+                    status_item.setForeground(Qt.GlobalColor(Qt.red))
                 self.results_table.setItem(row, 4, status_item)
                 
                 total_words += word_count
@@ -189,6 +231,10 @@ class KeywordDensityTab(QWidget):
 
         self.progress.setVisible(False)
         self.analyze_btn.setEnabled(True)
+        
+        # Report to dashboard
+        if self.data_bridge:
+            self.data_bridge.report_scan(len(html_files), issue_count, 0)
         
         # Update stats
         overall_density = (total_keyword_count / total_words) * 100 if total_words > 0 else 0
@@ -219,23 +265,8 @@ class KeywordDensityTab(QWidget):
         self.stats_label.setText(stats_text)
         self.summary_label.setText(f"✅ Analyzed {len(html_files)} files for keyword '{keyword}'")
 
-    def get_keyword_variations(self, keyword):
-        """Generate variations of the keyword (singular/plural, common forms)"""
-        variations = {keyword}
-        
-        # Add singular/plural variations
-        if keyword.endswith('s'):
-            variations.add(keyword[:-1])
-        else:
-            variations.add(keyword + 's')
-        
-        # Add common suffixes
-        for suffix in ['ing', 'ed', 'er', 'or']:
-            variations.add(keyword + suffix)
-        
-        return variations
-
     def update_theme(self, is_dark):
+        """Called from main window when theme changes."""
         if is_dark:
             self.results_table.setStyleSheet("""
                 QTableWidget {
