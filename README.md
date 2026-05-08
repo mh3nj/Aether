@@ -229,8 +229,6 @@ Aether/
 - GitHub: [@parsegan](https://github.com/parsegan) | [@mh3nj](https://github.com/mh3nj)
 - LinkedIn: linkedin.com/in/parsegan [linkedin.com/in/parsegan](https://linkedin.com/in/parsegan)
 
-> Special thanks to the AI coding companion that co-wrote the code and helped debug every feature across all 12 merged tools.
-
 ---
 
 ## License
