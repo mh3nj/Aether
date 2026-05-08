@@ -1,12 +1,14 @@
 import os
 from pathlib import Path
 from datetime import datetime
+from bs4 import BeautifulSoup  # ← ADD THIS
 from PySide6.QtWidgets import (
     QWidget, QVBoxLayout, QHBoxLayout, QPushButton, QFileDialog,
     QLabel, QPlainTextEdit, QMessageBox, QGroupBox, QFormLayout,
     QLineEdit, QCheckBox, QTreeWidget, QTreeWidgetItem, QSplitter
 )
 from PySide6.QtCore import Qt
+
 
 class RobotsTab(QWidget):
     def __init__(self):
@@ -64,10 +66,18 @@ class RobotsTab(QWidget):
         sitemap_layout.addRow("Change frequency:", self.change_freq)
         left_layout.addWidget(sitemap_group)
 
-        # Generate button
+        # Generate buttons row
+        generate_row = QHBoxLayout()
         self.generate_btn = QPushButton("Generate robots.txt & sitemap.xml")
         self.generate_btn.clicked.connect(self.generate_files)
-        left_layout.addWidget(self.generate_btn)
+        self.image_sitemap_btn = QPushButton("Generate Image Sitemap")
+        self.image_sitemap_btn.clicked.connect(self.generate_image_sitemap)
+        self.video_sitemap_btn = QPushButton("Generate Video Sitemap")
+        self.video_sitemap_btn.clicked.connect(self.generate_video_sitemap)
+        generate_row.addWidget(self.generate_btn)
+        generate_row.addWidget(self.image_sitemap_btn)
+        generate_row.addWidget(self.video_sitemap_btn)
+        left_layout.addLayout(generate_row)
 
         splitter.addWidget(left_widget)
 
@@ -122,11 +132,8 @@ class RobotsTab(QWidget):
         self.update_previews()
 
     def update_previews(self):
-        # Update robots.txt preview
         robots_content = self.generate_robots_text()
         self.preview_robots.setPlainText(robots_content)
-
-        # Update sitemap preview
         sitemap_content = self.generate_sitemap_text()
         self.preview_sitemap.setPlainText(sitemap_content)
 
@@ -145,13 +152,11 @@ class RobotsTab(QWidget):
             lines.append("Disallow:")
 
         if self.sitemap_check.isChecked() and self.project_root:
-            # Assume sitemap will be placed at root
-            sitemap_url = f"https://example.com/sitemap.xml"  # user should replace domain
+            sitemap_url = f"https://example.com/sitemap.xml"
             lines.append(f"Sitemap: {sitemap_url}")
         return "\n".join(lines)
 
     def generate_image_sitemap(self):
-        """Generate sitemap with images for Google Images SEO"""
         if not self.html_files:
             QMessageBox.warning(self, "Warning", "Scan for HTML files first.")
             return
@@ -165,12 +170,11 @@ class RobotsTab(QWidget):
                 with open(filepath, 'r', encoding='utf-8') as f:
                     soup = BeautifulSoup(f, 'html.parser')
                 
-                rel_path = filepath.relative_to(self.project_folder)
+                rel_path = filepath.relative_to(self.project_root)
                 url = f"https://example.com/{rel_path.as_posix()}"
                 lines.append(f"  <url>")
                 lines.append(f"    <loc>{url}</loc>")
                 
-                # Find all images
                 for img in soup.find_all('img'):
                     src = img.get('src')
                     if src and not src.startswith('data:'):
@@ -186,14 +190,13 @@ class RobotsTab(QWidget):
         
         lines.append("</urlset>")
         
-        output_path = Path(self.project_folder) / "image-sitemap.xml"
+        output_path = Path(self.project_root) / "image-sitemap.xml"
         with open(output_path, 'w', encoding='utf-8') as f:
             f.write("\n".join(lines))
         
         QMessageBox.information(self, "Success", f"Image sitemap saved to:\n{output_path}")
 
     def generate_video_sitemap(self):
-        """Generate video sitemap for Google Video SEO"""
         if not self.html_files:
             QMessageBox.warning(self, "Warning", "Scan for HTML files first.")
             return
@@ -207,11 +210,9 @@ class RobotsTab(QWidget):
                 with open(filepath, 'r', encoding='utf-8') as f:
                     content = f.read()
                 
-                # Look for video embeds
-                rel_path = filepath.relative_to(self.project_folder)
+                rel_path = filepath.relative_to(self.project_root)
                 url = f"https://example.com/{rel_path.as_posix()}"
                 
-                # Simple video detection (YouTube, Vimeo, etc.)
                 if 'youtube.com/embed' in content or 'vimeo.com' in content:
                     lines.append(f"  <url>")
                     lines.append(f"    <loc>{url}</loc>")
@@ -227,7 +228,7 @@ class RobotsTab(QWidget):
         
         lines.append("</urlset>")
         
-        output_path = Path(self.project_folder) / "video-sitemap.xml"
+        output_path = Path(self.project_root) / "video-sitemap.xml"
         with open(output_path, 'w', encoding='utf-8') as f:
             f.write("\n".join(lines))
         
@@ -246,9 +247,7 @@ class RobotsTab(QWidget):
         lines.append('<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">')
         for filepath in self.html_files:
             rel_path = filepath.relative_to(self.project_root)
-            # Convert to URL (placeholder – user will replace domain)
             url = f"https://example.com/{rel_path.as_posix()}"
-            # Get last modified if possible
             lastmod = datetime.fromtimestamp(filepath.stat().st_mtime).date().isoformat()
             lines.append("  <url>")
             lines.append(f"    <loc>{url}</loc>")
@@ -264,13 +263,11 @@ class RobotsTab(QWidget):
             QMessageBox.warning(self, "Warning", "Select a project folder first.")
             return
 
-        # Write robots.txt
         robots_path = Path(self.project_root) / "robots.txt"
         robots_content = self.generate_robots_text()
         with open(robots_path, "w", encoding="utf-8") as f:
             f.write(robots_content)
 
-        # Write sitemap.xml
         sitemap_path = Path(self.project_root) / "sitemap.xml"
         sitemap_content = self.generate_sitemap_text()
         with open(sitemap_path, "w", encoding="utf-8") as f:
@@ -278,3 +275,36 @@ class RobotsTab(QWidget):
 
         QMessageBox.information(self, "Success", f"Files created:\n{robots_path}\n{sitemap_path}")
         self.status_label.setText(f"Generated robots.txt and sitemap.xml in {self.project_root}")
+
+    def update_theme(self, is_dark):
+        """Called from main window when theme changes."""
+        if is_dark:
+            self.html_tree.setStyleSheet("""
+                QTreeWidget {
+                    background-color: #2B2D31;
+                    color: #E8E8E8;
+                    alternate-background-color: #3E4045;
+                }
+                QHeaderView::section {
+                    background-color: #2B2D31;
+                    color: #E8E8E8;
+                    border: 1px solid #3E4045;
+                }
+            """)
+            self.preview_robots.setStyleSheet("background-color: #2B2D31; color: #E8E8E8;")
+            self.preview_sitemap.setStyleSheet("background-color: #2B2D31; color: #E8E8E8;")
+        else:
+            self.html_tree.setStyleSheet("""
+                QTreeWidget {
+                    background-color: #FFFFFF;
+                    color: #2C3E50;
+                    alternate-background-color: #F8F9FA;
+                }
+                QHeaderView::section {
+                    background-color: #F1F3F5;
+                    color: #2C3E50;
+                    border: 1px solid #D0D7DE;
+                }
+            """)
+            self.preview_robots.setStyleSheet("background-color: #FFFFFF; color: #2C3E50;")
+            self.preview_sitemap.setStyleSheet("background-color: #FFFFFF; color: #2C3E50;")
