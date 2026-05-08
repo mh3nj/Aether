@@ -35,7 +35,7 @@ class DashboardTab(QWidget):
         scroll_layout.setSpacing(20)
 
         # Header
-        header = QLabel("\f3a5 AETHER DASHBOARD")
+        header = QLabel("\uf3a5 AETHER DASHBOARD")
         header_font = QFont()
         header_font.setPointSize(24)
         header_font.setBold(True)
@@ -60,7 +60,7 @@ class DashboardTab(QWidget):
             }
         """)
         project_layout = QVBoxLayout(self.project_card)
-        self.project_status = QLabel("\f07c No Project Loaded")
+        self.project_status = QLabel("\uf07c No Project Loaded")
         self.project_status.setFont(QFont("", 12, QFont.Bold))
         self.project_status.setAlignment(Qt.AlignCenter)
         project_layout.addWidget(self.project_status)
@@ -82,7 +82,7 @@ class DashboardTab(QWidget):
         """)
         health_layout = QVBoxLayout(health_card)
 
-        health_title = QLabel("\f201 OVERALL SEO HEALTH")
+        health_title = QLabel("\uf201 OVERALL SEO HEALTH")
         health_title.setFont(QFont("", 14, QFont.Bold))
         health_layout.addWidget(health_title)
 
@@ -119,7 +119,7 @@ class DashboardTab(QWidget):
         """)
         actions_layout = QVBoxLayout(actions_card)
 
-        actions_title = QLabel("\f140 QUICK ACTIONS")
+        actions_title = QLabel("\uf140 QUICK ACTIONS")
         actions_title.setFont(QFont("", 14, QFont.Bold))
         actions_layout.addWidget(actions_title)
 
@@ -127,14 +127,14 @@ class DashboardTab(QWidget):
         actions_grid.setSpacing(10)
 
         quick_actions = [
-            ("\f31c Format Code", "Ctrl+2", self.go_to_formatter),
-            ("\f002 SEO Check", "Ctrl+3", self.go_to_seo),
-            ("\f03e Optimize Images", "Ctrl+5", self.go_to_media),
-            ("\f0c1 Fix Broken Links", "Ctrl+6", self.go_to_links),
+            ("\uf31c Format Code", "Ctrl+2", self.go_to_formatter),
+            ("\uf002 SEO Check", "Ctrl+3", self.go_to_seo),
+            ("\uf03e Optimize Images", "Ctrl+5", self.go_to_media),
+            ("\uf0c1 Fix Broken Links", "Ctrl+6", self.go_to_links),
             ("\e2ce Accessibility", "Ctrl+7", self.go_to_accessibility),
-            ("\f019 Backup Project", "Ctrl+9", self.go_to_backup),
-            ("\f0e7 Performance", "Ctrl+8", self.go_to_performance),
-            ("\f201 Schema", "Ctrl+4", self.go_to_schema),
+            ("\uf019 Backup Project", "Ctrl+9", self.go_to_backup),
+            ("\uf0e7 Performance", "Ctrl+8", self.go_to_performance),
+            ("\uf201 Schema", "Ctrl+4", self.go_to_schema),
         ]
 
         for i, (name, shortcut, callback) in enumerate(quick_actions):
@@ -170,16 +170,16 @@ class DashboardTab(QWidget):
         """)
         metrics_layout = QGridLayout(metrics_card)
 
-        metrics_title = QLabel("\f201 KEY METRICS")
+        metrics_title = QLabel("\uf201 KEY METRICS")
         metrics_title.setFont(QFont("", 14, QFont.Bold))
         metrics_layout.addWidget(metrics_title, 0, 0, 1, 2)
 
         self.metric_widgets = {}
         metrics_data = [
-            ("pages_count", "Pages Analyzed", "0", "\f15c"),
-            ("issues_count", "Issues Found", "0", "\f071"),
-            ("avg_score", "Avg SEO Score", "0%", "\f005"),
-            ("fixes_count", "Fixes Applied", "0", "\f00c"),
+            ("pages_count", "Pages Analyzed", "0", "\uf15c"),
+            ("issues_count", "Issues Found", "0", "\uf071"),
+            ("avg_score", "Avg SEO Score", "0%", "\uf005"),
+            ("fixes_count", "Fixes Applied", "0", "\uf00c"),
         ]
 
         for i, (key, label, value, icon) in enumerate(metrics_data):
@@ -212,7 +212,7 @@ class DashboardTab(QWidget):
             }
         """)
         issues_layout = QVBoxLayout(issues_card)
-        issues_title = QLabel("\f071 TOP ISSUES")
+        issues_title = QLabel("\uf071 TOP ISSUES")
         issues_title.setFont(QFont("", 12, QFont.Bold))
         issues_layout.addWidget(issues_title)
 
@@ -230,7 +230,7 @@ class DashboardTab(QWidget):
             }
         """)
         fixes_layout = QVBoxLayout(fixes_card)
-        fixes_title = QLabel("\f00c RECENT FIXES")
+        fixes_title = QLabel("\uf00c RECENT FIXES")
         fixes_title.setFont(QFont("", 12, QFont.Bold))
         fixes_layout.addWidget(fixes_title)
 
@@ -253,12 +253,12 @@ class DashboardTab(QWidget):
             }
         """)
         tabs_layout = QVBoxLayout(tabs_card)
-        tabs_title = QLabel("\f135 RECENT TABS")
+        tabs_title = QLabel("\uf135 RECENT TABS")
         tabs_title.setFont(QFont("", 12, QFont.Bold))
         tabs_layout.addWidget(tabs_title)
 
         tabs_grid = QHBoxLayout()
-        recent_tabs = ["\f002 SEO", "\f0c1 Links", "\f03e Images", "\f019 Backup", "\f201 Schema"]
+        recent_tabs = ["\uf002 SEO", "\uf0c1 Links", "\uf03e Images", "\uf019 Backup", "\uf201 Schema"]
         for tab_name in recent_tabs:
             btn = QPushButton(tab_name)
             btn.clicked.connect(lambda checked, t=tab_name: self.go_to_tab_by_name(t))
@@ -278,7 +278,7 @@ class DashboardTab(QWidget):
             }
         """)
         logs_layout = QVBoxLayout(logs_card)
-        logs_title = QLabel("\f15c RECENT ACTIVITY")
+        logs_title = QLabel("\uf15c RECENT ACTIVITY")
         logs_title.setFont(QFont("", 12, QFont.Bold))
         logs_layout.addWidget(logs_title)
 
@@ -296,7 +296,7 @@ class DashboardTab(QWidget):
         scroll.setWidget(scroll_content)
         main_layout.addWidget(scroll)
 
-        footer = QLabel("\f0eb Tip: Use Ctrl+1 to return here anytime")
+        footer = QLabel("\uf0eb Tip: Use Ctrl+1 to return here anytime")
         footer.setAlignment(Qt.AlignCenter)
         footer.setStyleSheet("color: #8095AB; padding: 10px;")
         main_layout.addWidget(footer)
@@ -304,18 +304,18 @@ class DashboardTab(QWidget):
     def on_scan_completed(self, data):
         """Handle scan completion from any tab - UPDATED"""
         self.has_project = True
-        self.project_status.setText("\f07c Project Loaded")
+        self.project_status.setText("\uf07c Project Loaded")
         self.project_hint.setText(f"Last scan: {data.get('pages', 0)} pages analyzed")
         
         # Update metrics
         if 'pages' in data:
-            self.metric_widgets['pages_count'].setText(f"\f15c {data['pages']}")
+            self.metric_widgets['pages_count'].setText(f"\uf15c {data['pages']}")
         if 'issues' in data:
-            self.metric_widgets['issues_count'].setText(f"\f071 {data['issues']}")
+            self.metric_widgets['issues_count'].setText(f"\uf071 {data['issues']}")
         
         score = data.get('score', 0)
         if score > 0:
-            self.metric_widgets['avg_score'].setText(f"\f005 {score}%")
+            self.metric_widgets['avg_score'].setText(f"\uf005 {score}%")
             self.animation.setEndValue(score)
             self.animation.start()
         
@@ -328,9 +328,9 @@ class DashboardTab(QWidget):
         """Handle issue fixes from any tab - UPDATED"""
         # Update fixes count
         current_text = self.metric_widgets['fixes_count'].text()
-        current_fixes = int(current_text.replace("\f00c ", "").split()[0]) if "\f00c" in current_text else 0
+        current_fixes = int(current_text.replace("\uf00c ", "").split()[0]) if "\uf00c" in current_text else 0
         new_fixes = current_fixes + count
-        self.metric_widgets['fixes_count'].setText(f"\f00c {new_fixes}")
+        self.metric_widgets['fixes_count'].setText(f"\uf00c {new_fixes}")
         
         # Update recent fixes list
         current_fixes_text = self.fixes_list.text()
@@ -523,11 +523,11 @@ class DashboardTab(QWidget):
         if not self.main_window:
             return
         tab_indexes = {
-            "\f002 SEO": 2,
-            "\f0c1 Links": 5,
-            "\f03e Images": 4,
-            "\f019 Backup": 8,
-            "\f201 Schema": 3,
+            "\uf002 SEO": 2,
+            "\uf0c1 Links": 5,
+            "\uf03e Images": 4,
+            "\uf019 Backup": 8,
+            "\uf201 Schema": 3,
         }
         if name in tab_indexes:
             self.main_window.tabs.setCurrentIndex(tab_indexes[name])
