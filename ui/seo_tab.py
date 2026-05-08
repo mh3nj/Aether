@@ -402,4 +402,86 @@ class SEOTab(QWidget):
         pass
 
     def update_theme(self, is_dark):
-        pass
+        """Called from main window when theme changes."""
+        if is_dark:
+            self.setStyleSheet("""
+                QLineEdit, QTextEdit, QComboBox {
+                    background-color: #2B2D31;
+                    color: #E8E8E8;
+                    border: 1px solid #3E4045;
+                    selection-background-color: #8095AB;
+                    selection-color: #FFFFFF;
+                }
+                QGroupBox {
+                    color: #E8E8E8;
+                    border: 1px solid #3E4045;
+                    margin-top: 10px;
+                }
+                QGroupBox::title {
+                    color: #E8E8E8;
+                }
+                QLabel {
+                    color: #E8E8E8;
+                }
+                QPushButton {
+                    background-color: #2B2D31;
+                    color: #E8E8E8;
+                    border: 1px solid #8095AB;
+                    border-radius: 4px;
+                    padding: 5px 10px;
+                }
+                QPushButton:hover {
+                    background-color: #8095AB;
+                    color: #1E1F22;
+                }
+                QCheckBox {
+                    color: #E8E8E8;
+                    spacing: 5px;
+                }
+                QTreeView {
+                    background-color: #2B2D31;
+                    color: #E8E8E8;
+                    border: 1px solid #3E4045;
+                }
+            """)
+        else:
+            self.setStyleSheet("""
+                QLineEdit, QTextEdit, QComboBox {
+                    background-color: #FFFFFF;
+                    color: #2C3E50;
+                    border: 1px solid #D0D7DE;
+                    selection-background-color: #8095AB;
+                    selection-color: white;
+                }
+                QGroupBox {
+                    color: #2C3E50;
+                    border: 1px solid #D0D7DE;
+                    margin-top: 10px;
+                }
+                QGroupBox::title {
+                    color: #2C3E50;
+                }
+                QLabel {
+                    color: #2C3E50;
+                }
+                QPushButton {
+                    background-color: #E9ECF1;
+                    color: #2C3E50;
+                    border: 1px solid #8095AB;
+                    border-radius: 4px;
+                    padding: 5px 10px;
+                }
+                QPushButton:hover {
+                    background-color: #8095AB;
+                    color: white;
+                }
+                QCheckBox {
+                    color: #2C3E50;
+                    spacing: 5px;
+                }
+                QTreeView {
+                    background-color: #FFFFFF;
+                    color: #2C3E50;
+                    border: 1px solid #D0D7DE;
+                }
+            """)
