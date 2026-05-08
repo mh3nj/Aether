@@ -30,7 +30,7 @@ class LogsTab(QWidget):
         layout = QVBoxLayout(self)
         
         # Header
-        header = QLabel("📋 Operation History")
+        header = QLabel("\f15b Operation History")
         header.setFont(QFont("", 16, QFont.Bold))
         header.setAlignment(Qt.AlignCenter)
         layout.addWidget(header)
@@ -48,10 +48,10 @@ class LogsTab(QWidget):
         self.search_box.setPlaceholderText("Search logs...")
         self.search_box.textChanged.connect(self.apply_filters)
         
-        self.clear_btn = QPushButton("🗑️ Clear Logs")
+        self.clear_btn = QPushButton("\f1f8 Clear Logs")
         self.clear_btn.clicked.connect(self.clear_logs)
         
-        self.refresh_btn = QPushButton("🔄 Refresh")
+        self.refresh_btn = QPushButton("\f1b8 Refresh")
         self.refresh_btn.clicked.connect(self.apply_filters)
         
         filter_layout.addWidget(QLabel("Type:"))
@@ -109,7 +109,7 @@ class LogsTab(QWidget):
             "type": category,
             "operation": message[:50],
             "details": details[:200] if details else message,
-            "status": "✅ Success" if "✓" in message else "ℹ️ Info",
+            "status": "\f00c Success" if "✓" in message else "\f05a Info",
             "raw_message": message
         }
         
@@ -174,11 +174,11 @@ class LogsTab(QWidget):
             
             # Status
             status_item = QTableWidgetItem(entry["status"])
-            if "✅" in entry["status"]:
+            if "\f00c" in entry["status"]:
                 status_item.setForeground(QColor(76, 175, 80))
-            elif "⚠️" in entry["status"]:
+            elif "\f071" in entry["status"]:
                 status_item.setForeground(QColor(255, 193, 7))
-            elif "❌" in entry["status"]:
+            elif "\58" in entry["status"]:
                 status_item.setForeground(QColor(244, 67, 54))
             self.log_table.setItem(row, 4, status_item)
         
