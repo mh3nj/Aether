@@ -124,18 +124,18 @@ class MainWindow(QMainWindow):
                 tab.set_data_bridge(self.data_bridge)
 
         # Add tabs to the widget (without visible tab bar)
-        self.tabs.addTab(self.dashboard_tab, "🏠 Dashboard")
-        self.tabs.addTab(self.code_studio_tab, "📝 Code Studio")
-        self.tabs.addTab(self.seo_command_tab, "🔍 SEO Command")
-        self.tabs.addTab(self.schema_social_tab, "📊 Schema & Social")
-        self.tabs.addTab(self.media_studio_tab, "🖼️ Media Studio")
-        self.tabs.addTab(self.link_studio_tab, "🔗 Link Studio")
-        self.tabs.addTab(self.accessibility_hub_tab, "♿ Accessibility Hub")
-        self.tabs.addTab(self.performance_lab_tab, "⚡ Performance Lab")
-        self.tabs.addTab(self.security_backup_tab, "🛡️ Security & Backup")
-        self.tabs.addTab(self.analytics_tab, "📈 Analytics")
-        self.tabs.addTab(self.batch_ops_tab, "⚙️ Batch Ops")
-        self.tabs.addTab(self.logs_tab, "📋 Logs")
+        self.tabs.addTab(self.dashboard_tab, "\uf015 Dashboard")      # fa-home
+        self.tabs.addTab(self.code_studio_tab, "\uf121 Code Studio") # fa-code
+        self.tabs.addTab(self.seo_command_tab, "\uf002 SEO Command") # fa-search
+        self.tabs.addTab(self.schema_social_tab, "\uf0e8 Schema & Social") # fa-share-alt
+        self.tabs.addTab(self.media_studio_tab, "\uf302 Media Studio") # fa-image
+        self.tabs.addTab(self.link_studio_tab, "\uf0c1 Link Studio")  # fa-link
+        self.tabs.addTab(self.accessibility_hub_tab, "\uf29a Accessibility Hub") # fa-universal-access
+        self.tabs.addTab(self.performance_lab_tab, "\uf3fd Performance Lab") # fa-gauge-high
+        self.tabs.addTab(self.security_backup_tab, "\uf3ed Security & Backup") # fa-shield
+        self.tabs.addTab(self.analytics_tab, "\uf080 Analytics")      # fa-chart-line
+        self.tabs.addTab(self.batch_ops_tab, "\uf013 Batch Ops")      # fa-gear
+        self.tabs.addTab(self.logs_tab, "\uf017 Logs")                # fa-clock
 
         # Connect tab change signal to update sidebar
         self.tabs.currentChanged.connect(self.on_tab_changed)
@@ -149,13 +149,13 @@ class MainWindow(QMainWindow):
         # Edit menu for Undo/Redo
         edit_menu = menubar.addMenu("Edit")
         
-        self.undo_action = QAction("Undo", self)
+        self.undo_action = QAction("\uf0e2 Undo", self)  # fa-undo
         self.undo_action.setShortcut(QKeySequence("Ctrl+Z"))
         self.undo_action.triggered.connect(self.undo)
         self.undo_action.setEnabled(False)
         edit_menu.addAction(self.undo_action)
         
-        self.redo_action = QAction("Redo", self)
+        self.redo_action = QAction("\uf01e Redo", self)  # fa-redo
         self.redo_action.setShortcut(QKeySequence("Ctrl+Y"))
         self.redo_action.triggered.connect(self.redo)
         self.redo_action.setEnabled(False)
@@ -164,20 +164,20 @@ class MainWindow(QMainWindow):
         # View menu
         view_menu = menubar.addMenu("View")
 
-        self.theme_action = QAction("Toggle Dark Mode", self, checkable=True)
+        self.theme_action = QAction("\uf186 Toggle Dark Mode", self, checkable=True)  # fa-moon
         self.theme_action.setShortcut(QKeySequence("Ctrl+Shift+T"))
         self.theme_action.triggered.connect(self.toggle_theme)
         view_menu.addAction(self.theme_action)
 
         # Project menu
         project_menu = menubar.addMenu("Project")
-        setup_project_action = QAction("⚙️ Project Setup Wizard", self)
+        setup_project_action = QAction("\uf013 Project Setup Wizard", self)  # fa-gear
         setup_project_action.triggered.connect(self.run_project_setup)
         project_menu.addAction(setup_project_action)
 
         # Help menu
         help_menu = menubar.addMenu("Help")
-        about_action = QAction("About Aether", self)
+        about_action = QAction("\uf059 About Aether", self)  # fa-question-circle
         about_action.triggered.connect(self.show_about)
         help_menu.addAction(about_action)
 
@@ -186,26 +186,26 @@ class MainWindow(QMainWindow):
         self.addToolBar(toolbar)
         
         # Project status button
-        self.project_status_btn = QPushButton("📁 No Project")
+        self.project_status_btn = QPushButton("\uf187 No Project")  # fa-hdd
         self.project_status_btn.clicked.connect(self.run_project_setup)
         toolbar.addWidget(self.project_status_btn)
         
         toolbar.addSeparator()
         
         # Undo/Redo toolbar buttons
-        self.undo_btn = QPushButton("↩️ Undo")
+        self.undo_btn = QPushButton("\uf0e2 Undo")
         self.undo_btn.clicked.connect(self.undo)
         self.undo_btn.setEnabled(False)
         toolbar.addWidget(self.undo_btn)
         
-        self.redo_btn = QPushButton("↪️ Redo")
+        self.redo_btn = QPushButton("\uf01e Redo")
         self.redo_btn.clicked.connect(self.redo)
         self.redo_btn.setEnabled(False)
         toolbar.addWidget(self.redo_btn)
         
         toolbar.addSeparator()
         
-        self.theme_button = QPushButton("🌓 Toggle Theme")
+        self.theme_button = QPushButton("\uf186 Toggle Theme")
         self.theme_button.setCheckable(True)
         self.theme_button.clicked.connect(self.on_theme_button_clicked)
         toolbar.addWidget(self.theme_button)
@@ -282,7 +282,7 @@ class MainWindow(QMainWindow):
             config_path = Path(last_project) / ".aether-config.json"
             if config_path.exists():
                 self.project_config.load(config_path)
-                self.project_status_btn.setText(f"📁 {Path(last_project).name}")
+                self.project_status_btn.setText(f"\uf187 {Path(last_project).name}")
                 # Set undo manager project root
                 self.undo_manager.set_project_root(last_project)
                 self.statusBar().showMessage(f"Project loaded: {last_project}")
@@ -296,7 +296,7 @@ class MainWindow(QMainWindow):
             self.project_config = wizard.get_config()
             self.settings.setValue("last_project", self.project_config.root_path)
             project_name = Path(self.project_config.root_path).name
-            self.project_status_btn.setText(f"📁 {project_name}")
+            self.project_status_btn.setText(f"\uf187 {project_name}")
             # Set undo manager project root
             self.undo_manager.set_project_root(self.project_config.root_path)
             self.statusBar().showMessage(f"Project configured: {self.project_config.root_path}")
@@ -310,32 +310,32 @@ class MainWindow(QMainWindow):
     def undo(self):
         """Perform undo operation"""
         if self.undo_manager.undo():
-            self.statusBar().showMessage("✓ Undo completed", 3000)
+            self.statusBar().showMessage("\uf00c Undo completed", 3000)  # fa-check
             current_tab = self.tabs.currentWidget()
             if hasattr(current_tab, 'refresh'):
                 current_tab.refresh()
         else:
-            self.statusBar().showMessage("Nothing to undo", 2000)
+            self.statusBar().showMessage("\uf071 Nothing to undo", 2000)  # fa-exclamation-triangle
 
     def redo(self):
         """Perform redo operation"""
         if self.undo_manager.redo():
-            self.statusBar().showMessage("✓ Redo completed", 3000)
+            self.statusBar().showMessage("\uf00c Redo completed", 3000)  # fa-check
             current_tab = self.tabs.currentWidget()
             if hasattr(current_tab, 'refresh'):
                 current_tab.refresh()
         else:
-            self.statusBar().showMessage("Nothing to redo", 2000)
+            self.statusBar().showMessage("\uf071 Nothing to redo", 2000)  # fa-exclamation-triangle
 
     def update_undo_ui(self, available):
         """Update undo button state"""
         self.undo_action.setEnabled(available)
         self.undo_btn.setEnabled(available)
         if available:
-            self.undo_action.setText(self.undo_manager.get_undo_text())
+            self.undo_action.setText(f"\uf0e2 {self.undo_manager.get_undo_text()}")
             self.undo_btn.setToolTip(self.undo_manager.get_undo_text())
         else:
-            self.undo_action.setText("Undo")
+            self.undo_action.setText("\uf0e2 Undo")
             self.undo_btn.setToolTip("Undo")
 
     def update_redo_ui(self, available):
@@ -343,10 +343,10 @@ class MainWindow(QMainWindow):
         self.redo_action.setEnabled(available)
         self.redo_btn.setEnabled(available)
         if available:
-            self.redo_action.setText(self.undo_manager.get_redo_text())
+            self.redo_action.setText(f"\uf01e {self.undo_manager.get_redo_text()}")
             self.redo_btn.setToolTip(self.undo_manager.get_redo_text())
         else:
-            self.redo_action.setText("Redo")
+            self.redo_action.setText("\uf01e Redo")
             self.redo_btn.setToolTip("Redo")
 
     def show_about(self):
@@ -411,6 +411,7 @@ class MainWindow(QMainWindow):
                 border: 1px solid #8095AB;
                 padding: 5px 10px;
                 border-radius: 4px;
+                font-family: 'Font Awesome 6 Free', 'Segoe UI', sans-serif;
             }
             QPushButton:hover, QToolButton:hover {
                 background-color: #8095AB;
@@ -437,6 +438,9 @@ class MainWindow(QMainWindow):
             }
             QProgressBar::chunk {
                 background-color: #8095AB;
+            }
+            .fas, .far, .fab {
+                color: #E8E8E8;
             }
             """
         else:
@@ -466,6 +470,7 @@ class MainWindow(QMainWindow):
                 border: 1px solid #8095AB;
                 padding: 5px 10px;
                 border-radius: 4px;
+                font-family: 'Font Awesome 6 Free', 'Segoe UI', sans-serif;
             }
             QPushButton:hover, QToolButton:hover {
                 background-color: #8095AB;
@@ -492,6 +497,9 @@ class MainWindow(QMainWindow):
             }
             QProgressBar::chunk {
                 background-color: #8095AB;
+            }
+            .fas, .far, .fab {
+                color: #2C3E50;
             }
             """
         self.setStyleSheet(style)
