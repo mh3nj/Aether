@@ -58,8 +58,8 @@ class SEOScoreTab(QWidget):
             "🖼️ **Image Alt Text:** Describes image for screen readers and SEO\n\n"
             "📱 **Viewport:** Required for mobile-friendly ranking (Google mobile-first index)\n\n"
             "⭐ **Score Guide:**\n"
-            "   • 80-100: \f00c Excellent – Optimized for search engines\n"
-            "   • 60-79:  \f071 Needs Improvement – Fix critical issues\n"
+            "   • 80-100: \uf00c Excellent – Optimized for search engines\n"
+            "   • 60-79:  \uf071 Needs Improvement – Fix critical issues\n"
             "   • 0-59:   \58 Critical – Major SEO problems detected"
         )
         tips_text.setWordWrap(True)
@@ -153,7 +153,7 @@ class SEOScoreTab(QWidget):
                     issues.append("\58 No H1 tag - critical for structure")
                 elif h1_count > 1:
                     score -= 10
-                    issues.append(f"\f071 {h1_count} H1 tags - use only one")
+                    issues.append(f"\uf071 {h1_count} H1 tags - use only one")
 
                 # Image alt text (-15 max)
                 img_tags = soup.find_all('img')
@@ -214,7 +214,7 @@ class SEOScoreTab(QWidget):
         if self.data_bridge:
             self.data_bridge.report_scan(len(html_files), total_issues, avg_score)
         
-        self.summary_label.setText(f"\f00c Analyzed {len(html_files)} pages | Avg Score: {avg_score}% | Total Issues: {total_issues}")
+        self.summary_label.setText(f"\uf00c Analyzed {len(html_files)} pages | Avg Score: {avg_score}% | Total Issues: {total_issues}")
         
         QMessageBox.information(self, "Analysis Complete", 
             f"📊 SEO Score Analysis\n\n"
