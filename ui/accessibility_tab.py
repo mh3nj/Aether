@@ -29,9 +29,9 @@ class AccessibilityTab(QWidget):
         # Folder selection
         folder_row = QHBoxLayout()
         self.folder_label = QLabel("No project folder selected")
-        self.select_btn = QPushButton("📁 Select Project Folder")
+        self.select_btn = QPushButton("\f07c Select Project Folder")
         self.select_btn.clicked.connect(self.select_folder)
-        self.scan_btn = QPushButton("♿ Scan for Accessibility Issues")
+        self.scan_btn = QPushButton("\e2ce Scan for Accessibility Issues")
         self.scan_btn.clicked.connect(self.scan_accessibility)
         folder_row.addWidget(self.select_btn)
         folder_row.addWidget(self.scan_btn)
@@ -239,7 +239,7 @@ class AccessibilityTab(QWidget):
         if self.data_bridge:
             self.data_bridge.report_scan(len(html_files), total, 0)
         
-        summary_text = f"✅ Scan complete! Found {total} accessibility issues across {len(html_files)} files.\n"
+        summary_text = f"\f00c Scan complete! Found {total} accessibility issues across {len(html_files)} files.\n"
         summary_text += f"  • Missing alt: {issue_counts['missing_alt']}\n"
         summary_text += f"  • Missing lang: {issue_counts['missing_lang']}\n"
         summary_text += f"  • Empty links: {issue_counts['empty_links']}\n"
@@ -251,7 +251,7 @@ class AccessibilityTab(QWidget):
         QMessageBox.information(self, "Scan Complete", 
                                 f"Found {total} accessibility issues across {len(html_files)} files.\n\n"
                                 f"Check the results panel for details.\n"
-                                f"💡 Use Alt Checker tab to fix missing alt text!")
+                                f"\f0eb Use Alt Checker tab to fix missing alt text!")
 
     def _add_result(self, issue_type, file_path, element, description):
         item = QTreeWidgetItem([issue_type, file_path, element, description])
