@@ -1,6 +1,6 @@
 import os
 from pathlib import Path
-from PySide6.QtWidgets (
+from PySide6.QtWidgets import (
     QWidget, QHBoxLayout, QVBoxLayout, QFormLayout, QTreeView, QLineEdit,
     QTextEdit, QComboBox, QPushButton, QMessageBox, QLabel, QDialog,
     QFileDialog, QPlainTextEdit, QFileSystemModel, QApplication, QGroupBox,
