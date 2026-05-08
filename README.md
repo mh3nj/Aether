@@ -1,141 +1,255 @@
 # Aether – Complete Web Development Toolkit
-> Connectivity Note: Due to internet restrictions in Iran during development, compiled binaries (`.exe`) and screenshots are not included in this repository. **The full source code is provided** – clone, install dependencies, and run `python main.py` to use the application. All 28 tabs are fully functional. Media assets will be uploaded when connectivity permits.
-**Status:** Stable Release v1.1  
-**Build Date:** May 4, 2026
----
 
-# Aether
-Web Development Toolkit: SEO, Formatting, Optimization.
+**Status:** Stable Release v2.0  
+**Build Date:** May 8, 2026
 
-**Status:** Stable Release v1.1  
-**Build Date:** May 4 2026
-
-A professional desktop application with **28 powerful tools** for web developers, SEO specialists, and content creators – all in one offline, privacy‑focused application.
+A professional desktop application with **12 powerful merged tools** (originally 29 standalone features) for web developers, SEO specialists, and content creators – all in one offline, privacy-focused application.
 
 ---
 
 ## About Aether
 
-Aether helps you:
-- **Format code** – Python, JS, HTML, CSS, TypeScript with diff view
-- **Optimize SEO** – Meta tags, Open Graph, Twitter Cards, hreflang
-- **Generate Schema** – FAQ, Product, Article, Event, Recipe, HowTo, LocalBusiness, Video
-- **Optimize images** – WebP conversion, smart lazy loading with blur‑up previews
-- **Manage links** – Bulk find/replace, broken link detection
-- **Improve accessibility** – Alt text checker, WCAG compliance scans
-- **Boost performance** – Preload scanner, Core Web Vitals (PageSpeed Insights)
-- **Backup & restore** – Never lose work during bulk operations
+Aether (pronounced "ee-ther") is a complete web development command center named after the classical element believed to fill the universe. Just as aether carries light across the cosmos, Aether carries your code to perfection through formatting, optimization, and validation.
 
-**28 integrated tools** | **Dark/Light theme** | **100% offline** | **Zero telemetry**
+### What Aether Helps You Do
 
----
+- Format code – Python, JS, HTML, CSS, TypeScript with diff view
+- Optimize SEO – Meta tags, Open Graph, Twitter Cards, hreflang
+- Generate Schema – FAQ, Product, Article, Event, Recipe, HowTo, LocalBusiness, Video
+- Optimize images – WebP conversion, smart lazy loading with blur-up previews
+- Manage links – Bulk find/replace, broken link detection, internal link suggestions
+- Improve accessibility – Alt text checker, WCAG compliance scans
+- Boost performance – Preload scanner, PageSpeed Insights (Core Web Vitals)
+- Secure your site – CSP & SRI security headers
+- Backup & restore – Never lose work during bulk operations
 
-## Features
-
-| # | Tab | Description |
-|---|-----|-------------|
-| 1 | Code Formatter | Python, JS, HTML, CSS, TS formatting + diff view |
-| 2 | SEO Optimizer | Meta tags, hreflang, PWA, verification, 404 preset |
-| 3 | Favicon Generator | Multi-size icons + HTML injection |
-| 4 | Breadcrumb Builder | JSON-LD breadcrumbs from URL |
-| 5 | Robots & Sitemap | robots.txt + sitemap.xml |
-| 6 | WebP Converter | Convert images + update HTML |
-| 7 | Link Manager | Bulk find/replace links + single edit |
-| 8 | Schema Library | 8 schema types with validation |
-| 9 | Smart Lazy Load | Blur-up WebP previews, no layout shift |
-| 10 | OG Preview | Social media mockup + injection |
-| 11 | Image Hints | Missing dimensions, oversized images |
-| 12 | Link Checker | Broken internal/external links |
-| 13 | Accessibility Checker | Alt text, lang, headings, labels |
-| 14 | Alt Checker | Bulk fix missing alt attributes |
-| 15 | CSS Optimizer | Print + speech CSS, semantic HTML |
-| 16 | Backup & Restore | Project backups with restore |
-| 17 | SEO Score | 0-100 scoring per page |
-| 18 | Duplicate Detector | Duplicate titles, descriptions, H1s |
-| 19 | Security | CSP + SRI generator |
-| 20 | Performance | Preload scanner + injector |
-| 21 | SEO API | PageSpeed Insights + Core Web Vitals |
-| 22 | Meta Refresh | Detects harmful meta refresh redirects |
-| 23 | SERP Preview | Google search result preview |
-| 24 | Spell Checker | Spelling and grammar checker |
-| 25 | Keyword Density | Analyze keyword usage, detect stuffing |
-| 26 | Internal Links | Find orphan pages, link suggestions |
-| 27 | Content Length | Word count analysis per page |
-| 28 | Batch Meta | Bulk update meta tags across files |
+**12 integrated tools** | **Dark/Light theme** | **100% offline** | **Zero telemetry**
 
 ---
 
-Project Structure
+## The 12 Tools (Merged from 29 Original Features)
 
-Aether/  
+| Tab | Description |
+|-----|-------------|
+| Dashboard | Command center with real-time metrics and quick actions |
+| Code Studio | Code Formatter + CSS Optimizer (print + speech CSS) |
+| SEO Command | SEO Optimizer + SEO Score + Duplicate Detector + Meta Refresh |
+| Schema & Social | Schema Library + OG Preview + Breadcrumb Builder |
+| Media Studio | Favicon Generator + WebP Converter + Lazy Load + Image Hints |
+| Link Studio | Link Manager + Link Checker + Internal Links |
+| Accessibility Hub | Accessibility Checker + Alt Checker + Spell Checker + Content Length |
+| Performance Lab | Preload Scanner + PageSpeed Insights |
+| Security & Backup | CSP Generator + SRI Hash + Backup & Restore |
+| Analytics | Keyword Density + SEO Score History |
+| Batch Ops | Batch Meta Updater + Robots & Sitemap |
+| Logs | Complete operation history with filters and export |
 
-├── main.py  
+---
 
-├── ui/  
+## Getting Started
 
-├── assets/  
+### Option 1: From Source (Python required)
 
-├── presets/  
+```
+git clone https://github.com/mh3nj/Aether.git
+cd Aether
+python -m venv venv
+venv\Scripts\activate  (Windows)
+# source venv/bin/activate  (Mac/Linux)
+pip install -r requirements.txt
+python main.py
+```
 
+### Option 2: Standalone Executable
+
+Download from GitHub Releases. No Python installation required. Just unzip and run Aether.exe.
+
+---
+
+## Keyboard Shortcuts
+
+| Shortcut | Action |
+|----------|--------|
+| Ctrl+1 | Dashboard |
+| Ctrl+2 | Code Studio |
+| Ctrl+3 | SEO Command |
+| Ctrl+4 | Schema & Social |
+| Ctrl+5 | Media Studio |
+| Ctrl+6 | Link Studio |
+| Ctrl+7 | Accessibility Hub |
+| Ctrl+8 | Performance Lab |
+| Ctrl+9 | Security & Backup |
+| Ctrl+0 | Analytics |
+| Ctrl+B | Batch Ops |
+| Ctrl+L | Logs |
+| Ctrl+Z | Undo |
+| Ctrl+Y / Ctrl+Shift+Z | Redo |
+| Ctrl+Shift+T | Toggle Dark/Light Theme |
+
+---
+
+## Features In Detail
+
+### Code Studio
+- Format Python (Black), JavaScript/TypeScript/HTML/CSS (Prettier or jsbeautifier)
+- Split-view before/after with diff highlighting
+- Generate print-optimized CSS and speech-optimized CSS for screen readers
+
+### SEO Command
+- Edit all meta tags with real-time character counters (title: 50-60, description: 150-160)
+- Generate hreflang tags for multi-language sites
+- Score each page 0-100 with actionable recommendations
+- Find duplicate titles, descriptions, and H1 tags
+- Detect harmful meta refresh redirects
+
+### Schema & Social
+- Generate JSON-LD for 8 schema types (FAQ, Product, Article, Event, Recipe, HowTo, LocalBusiness, Video)
+- Validate schema against Google's requirements
+- Preview Open Graph and Twitter Card appearance
+- Inject JSON-LD directly into any HTML file
+
+### Media Studio
+- Generate all favicon sizes (ICO + PNGs) from a single source image
+- Bulk convert JPG/PNG to WebP with adjustable quality
+- Smart lazy loading with blur-up WebP previews (no layout shift)
+- Detect missing width/height attributes and oversized images
+
+### Link Studio
+- Bulk find/replace links across all HTML files (regex support)
+- Check for broken internal and external links
+- Find orphan pages and get internal link suggestions
+- Preview changes before applying
+
+### Accessibility Hub
+- Check for missing alt text, html lang attribute, empty links, heading hierarchy, iframe titles, form labels
+- Bulk fix missing alt attributes (with smart suggestions from filename or surrounding text)
+- Spell checker for English content
+- Analyze content length with word count guidelines
+
+### Performance Lab
+- Scan for preload opportunities (CSS, JS, fonts, hero images)
+- Inject preload links into HTML files
+- Run PageSpeed Insights tests (Mobile/Desktop)
+- Get Core Web Vitals metrics (LCP, CLS, FID)
+
+### Security & Backup
+- Generate Content Security Policy (CSP) meta tags with presets
+- Generate Subresource Integrity (SRI) hashes for CDN resources
+- Create timestamped backups of entire projects
+- Restore any previous backup with one click
+
+### Analytics
+- Analyze keyword density (detect under-optimization and keyword stuffing)
+- Track SEO score history across pages
+
+### Batch Ops
+- Update meta tags across hundreds of files at once
+- Generate robots.txt and sitemap.xml
+- Generate image sitemaps and video sitemaps
+
+### Logs
+- Complete operation history with filters (by type, search)
+- Export logs as CSV
+- Mini-logs viewer in Dashboard shows recent activity
+
+### Dashboard
+- Real-time SEO health score
+- Key metrics (pages analyzed, issues found, average score, fixes applied)
+- Top issues and recent fixes
+- Quick actions panel
+- Recent activity log
+
+---
+
+## Project Structure
+
+```
+Aether/
+├── main.py                 # Entry point
+├── ui/
+│   ├── dashboard_tab.py
+│   ├── code_studio_tab.py
+│   ├── seo_command_tab.py
+│   ├── schema_social_tab.py
+│   ├── media_studio_tab.py
+│   ├── link_studio_tab.py
+│   ├── accessibility_hub_tab.py
+│   ├── performance_lab_tab.py
+│   ├── security_backup_tab.py
+│   ├── analytics_tab.py
+│   ├── batch_ops_tab.py
+│   ├── logs_tab.py
+│   ├── sidebar.py
+│   ├── undo_manager.py
+│   ├── data_bridge.py
+│   └── project_setup_wizard.py
+├── assets/
+│   ├── css/
+│   ├── fonts/
+│   └── logos/
+├── presets/
 └── requirements.txt
+```
 
 ---
 
-Keyboard Shortcuts
+## Requirements
 
-Shortcut	Action
-Ctrl+Shift+T	Toggle Dark/Light theme
-
----
-
-Requirements
-
-  Python 3.11+
-
-  PySide6
-
-  BeautifulSoup4
-
-  Pillow
-
-  requests
-
-  jsbeautifier
-
-  black
-
-  pyspellchecker
+- Python 3.11+
+- PySide6 (Qt6 for Python)
+- BeautifulSoup4
+- Pillow
+- requests
+- black (optional)
+- jsbeautifier
+- pyspellchecker (optional)
 
 ---
 
-Author
+## Development Timeline
 
-Mohsen Jafari – Parsegan, Dahgan
+| Phase | Duration | Key Achievements |
+|-------|----------|------------------|
+| Day 1 (May 4) | ~10 hours | Foundation: Formatter, SEO, Favicon, WebP, Link Manager, Robots |
+| Day 2 (May 5) | ~10 hours | Expansion: Schema, Lazy Load, OG, Image Hints, Link Checker, SEO Score |
+| Day 3 (May 6) | ~10 hours | Advanced: Alt Checker, CSS Optimizer, Keyword Density, Security, Performance |
+| Day 4 (May 7) | ~10 hours | Integration: PageSpeed, Backup, Undo/Redo, Logs, Tab merging, Sidebar |
+| Day 5 (May 8) | ~8 hours | Polish: Dark/Light theme fixes, Documentation, Release |
 
-  Email: parsegan@proton.me
-
-  Website: parsegan.com, dahgan.com
-
-  GitHub: @parsegan @mh3nj
-
----
-
-License
-
-MIT License – Free for personal and commercial use.
+**Total:** ~48 hours | **Lines of code:** 18,000+ | **Tabs:** 12 merged (from 29 original)
 
 ---
 
-Acknowledgements
+## Author
 
-  PySide6 team (Qt for Python)
+**Mohsen Jafari** – Creator, Developer, Designer
 
-  BeautifulSoup4, Pillow, Black, Prettier
+- Email: parsegan@proton.me
+- Websites: parsegan.com, dahgan.com
+- GitHub: @parsegan / @mh3nj
+- LinkedIn: linkedin.com/in/parsegan
 
-  Google PageSpeed Insights API
+> Special thanks to the AI coding companion that co-wrote the code and helped debug every feature across all 12 merged tools.
 
 ---
 
-Built offline due to internet restrictions in Iran.
-Creativity doesn't wait for connection.
-Much love and peace to ppl of world <3.
+## License
+
+MIT License – Free for personal and commercial use with attribution. Because web development tools should be accessible to everyone.
+
+---
+
+## Acknowledgments
+
+- PySide6 team (Qt for Python)
+- BeautifulSoup4, Pillow, Black, Prettier, jsbeautifier
+- Google PageSpeed Insights API
+- The open-source community
+
+---
+
+*This project was created during internet restrictions in Iran – proof that creativity and persistence know no boundaries.*
+
+**Aether – The breathing light of code.**
+
+---
