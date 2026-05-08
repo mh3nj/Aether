@@ -1,3 +1,7 @@
+"""
+Aether Schema Library – JSON-LD Generator for SEO
+"""
+
 import json
 from pathlib import Path
 from datetime import datetime
@@ -10,88 +14,8 @@ from PySide6.QtWidgets import (
 from PySide6.QtCore import Qt, QDateTime
 from bs4 import BeautifulSoup
 
-class SchemaTab(QWidget):
-    def update_theme(self, is_dark):
-        """Called from main window when theme changes."""
-        if is_dark:
-            self.schema_tabs.setStyleSheet("""
-                QTabWidget::pane {
-                    background-color: #2B2D31;
-                    border: 1px solid #3E4045;
-                }
-                QTabBar::tab {
-                    background-color: #2B2D31;
-                    color: #E8E8E8;
-                    padding: 6px 12px;
-                }
-                QTabBar::tab:selected {
-                    background-color: #3E4045;
-                }
-                QScrollArea, QWidget {
-                    background-color: #2B2D31;
-                }
-                QGroupBox {
-                    color: #E8E8E8;
-                    border: 1px solid #3E4045;
-                }
-                QLineEdit, QTextEdit, QComboBox, QDateTimeEdit, QSpinBox {
-                    background-color: #2B2D31;
-                    color: #E8E8E8;
-                    border: 1px solid #3E4045;
-                }
-                QLabel {
-                    color: #E8E8E8;
-                }
-                QPushButton {
-                    background-color: #2B2D31;
-                    color: #E8E8E8;
-                    border: 1px solid #8095AB;
-                }
-                QPushButton:hover {
-                    background-color: #8095AB;
-                    color: #1E1F22;
-                }
-            """)
-        else:
-            self.schema_tabs.setStyleSheet("""
-                QTabWidget::pane {
-                    background-color: #FFFFFF;
-                    border: 1px solid #D0D7DE;
-                }
-                QTabBar::tab {
-                    background-color: #F1F3F5;
-                    color: #2C3E50;
-                    padding: 6px 12px;
-                }
-                QTabBar::tab:selected {
-                    background-color: #FFFFFF;
-                }
-                QScrollArea, QWidget {
-                    background-color: #FFFFFF;
-                }
-                QGroupBox {
-                    color: #2C3E50;
-                    border: 1px solid #D0D7DE;
-                }
-                QLineEdit, QTextEdit, QComboBox, QDateTimeEdit, QSpinBox {
-                    background-color: #FFFFFF;
-                    color: #2C3E50;
-                    border: 1px solid #D0D7DE;
-                }
-                QLabel {
-                    color: #2C3E50;
-                }
-                QPushButton {
-                    background-color: #E9ECF1;
-                    color: #2C3E50;
-                    border: 1px solid #8095AB;
-                }
-                QPushButton:hover {
-                    background-color: #8095AB;
-                    color: white;
-                }
-            """)
 
+class SchemaTab(QWidget):
     def __init__(self):
         super().__init__()
         self.current_file = None
@@ -107,15 +31,17 @@ class SchemaTab(QWidget):
         self.select_btn.clicked.connect(self.select_html_file)
         self.inject_btn = QPushButton("Inject Schema into HTML")
         self.inject_btn.clicked.connect(self.inject_schema)
+        self.validate_btn = QPushButton("✓ Validate Schema")
+        self.validate_btn.clicked.connect(self.validate_schema)
         file_row.addWidget(self.select_btn)
         file_row.addWidget(self.inject_btn)
+        file_row.addWidget(self.validate_btn)
         file_row.addWidget(self.file_label)
         file_row.addStretch()
         layout.addLayout(file_row)
 
         # Tab widget for different schema types
         self.schema_tabs = QTabWidget()
-        self.schema_tabs.setDocumentMode(True)  # Better theme integration
         layout.addWidget(self.schema_tabs)
 
         # Create all schema tabs
@@ -126,20 +52,10 @@ class SchemaTab(QWidget):
         self.setup_recipe_tab()
         self.setup_howto_tab()
         self.setup_localbusiness_tab()
+        self.setup_video_tab()
 
         # JSON preview
         preview_group = QGroupBox("Generated JSON-LD Preview")
-        preview_group.setStyleSheet("""
-            QGroupBox {
-                font-weight: bold;
-                margin-top: 10px;
-            }
-            QGroupBox::title {
-                subcontrol-origin: margin;
-                left: 10px;
-                padding: 0 5px;
-            }
-        """)
         preview_layout = QVBoxLayout(preview_group)
         self.json_preview = QPlainTextEdit()
         self.json_preview.setReadOnly(True)
@@ -152,45 +68,11 @@ class SchemaTab(QWidget):
 
         self.current_schema_data = None
 
-        # Apply initial theme
-        self.apply_theme_styles()
-
-    def apply_theme_styles(self):
-        """Ensure all widgets inherit the correct theme."""
-        # This will be called from main window when theme changes
-        # For now, just set basic styles
-        self.setStyleSheet("""
-            QTabWidget::pane {
-                border: none;
-            }
-            QTabBar::tab {
-                padding: 6px 12px;
-                margin-right: 2px;
-            }
-            QLineEdit, QTextEdit, QComboBox, QDateTimeEdit, QSpinBox {
-                padding: 4px;
-                border-radius: 3px;
-            }
-            QGroupBox {
-                font-weight: bold;
-                margin-top: 10px;
-            }
-            QGroupBox::title {
-                subcontrol-origin: margin;
-                left: 10px;
-                padding: 0 5px;
-            }
-        """)
-
     def select_html_file(self):
         path, _ = QFileDialog.getOpenFileName(self, "Select HTML File", "", "HTML Files (*.html)")
         if path:
             self.current_file = path
             self.file_label.setText(Path(path).name)
-
-    def log_msg(self, msg):
-        self.status_label.setText(msg)
-        QApplication.processEvents()
 
     def update_json_preview(self, schema_data):
         if schema_data:
@@ -215,7 +97,7 @@ class SchemaTab(QWidget):
             head = soup.new_tag('head')
             soup.html.insert(0, head)
 
-        # Remove existing schema of the same type to avoid duplicates
+        # Remove existing schema of the same type
         schema_type = self.current_schema_data.get('@type')
         for script in soup.find_all('script', type='application/ld+json'):
             try:
@@ -234,18 +116,178 @@ class SchemaTab(QWidget):
             f.write(str(soup))
 
         QMessageBox.information(self, "Success", f"{schema_type} schema injected into HTML file.")
-        self.log_msg(f"Injected {schema_type} schema into {self.current_file}")
+        self.status_label.setText(f"Injected {schema_type} schema into {self.current_file}")
 
-    # ==================================================================
-    # FAQ Page Schema
-    # ==================================================================
+    def validate_schema(self):
+        """Validate the current schema against Google's requirements."""
+        if not self.current_schema_data:
+            QMessageBox.warning(self, "Warning", "Generate a schema first.")
+            return
+        
+        schema_type = self.current_schema_data.get('@type')
+        issues = []
+        warnings = []
+        
+        required_fields = {
+            "FAQPage": ["mainEntity"],
+            "Product": ["name", "offers"],
+            "Article": ["headline", "author", "datePublished"],
+            "Event": ["name", "startDate", "location"],
+            "Recipe": ["name", "recipeIngredient", "recipeInstructions"],
+            "HowTo": ["name", "step"],
+            "LocalBusiness": ["name", "address"],
+            "VideoObject": ["name", "description", "contentUrl"]
+        }
+        
+        for field in required_fields.get(schema_type, []):
+            if not self.current_schema_data.get(field):
+                issues.append(f"Missing required field: {field}")
+        
+        if schema_type == "Product" and "offers" in self.current_schema_data:
+            offers = self.current_schema_data["offers"]
+            if not offers.get("price"):
+                issues.append("Product offer missing 'price'")
+            if not offers.get("priceCurrency"):
+                issues.append("Product offer missing 'priceCurrency'")
+        
+        if schema_type == "FAQPage":
+            main_entity = self.current_schema_data.get("mainEntity", [])
+            if len(main_entity) == 0:
+                issues.append("FAQPage has no questions")
+        
+        if schema_type == "LocalBusiness":
+            address = self.current_schema_data.get("address", {})
+            if not address.get("addressLocality") and not address.get("streetAddress"):
+                warnings.append("Address may be incomplete (missing locality or street)")
+        
+        if not issues and not warnings:
+            QMessageBox.information(self, "Schema Valid", f"✅ {schema_type} schema is valid!\n\nNo issues found.")
+        else:
+            message = ""
+            if issues:
+                message += "❌ ISSUES (must fix):\n"
+                for issue in issues:
+                    message += f"  • {issue}\n"
+            if warnings:
+                message += "\n⚠️ WARNINGS (recommended):\n"
+                for warning in warnings:
+                    message += f"  • {warning}\n"
+            message += "\nGoogle requires these fields for rich results."
+            QMessageBox.warning(self, "Schema Issues", message)
+
+    # ========== DARK/LIGHT THEME SUPPORT ==========
+    def update_theme(self, is_dark):
+        """Called from main window when theme changes."""
+        if is_dark:
+            self.schema_tabs.setStyleSheet("""
+                QTabWidget::pane {
+                    background-color: #1E1F22;
+                    border: 1px solid #3E4045;
+                }
+                QTabBar::tab {
+                    background-color: #2B2D31;
+                    color: #E8E8E8;
+                    padding: 6px 12px;
+                }
+                QTabBar::tab:selected {
+                    background-color: #3E4045;
+                }
+                QTabBar::tab:hover {
+                    background-color: #4B4E54;
+                }
+                QScrollArea, QWidget {
+                    background-color: #1E1F22;
+                }
+                QGroupBox {
+                    color: #E8E8E8;
+                    border: 1px solid #3E4045;
+                }
+                QGroupBox::title {
+                    color: #E8E8E8;
+                }
+                QLineEdit, QTextEdit, QComboBox, QDateTimeEdit, QSpinBox {
+                    background-color: #2B2D31;
+                    color: #E8E8E8;
+                    border: 1px solid #3E4045;
+                }
+                QLabel {
+                    color: #E8E8E8;
+                }
+                QPushButton {
+                    background-color: #2B2D31;
+                    color: #E8E8E8;
+                    border: 1px solid #8095AB;
+                }
+                QPushButton:hover {
+                    background-color: #8095AB;
+                    color: #1E1F22;
+                }
+                QPlainTextEdit {
+                    background-color: #2B2D31;
+                    color: #E8E8E8;
+                    border: 1px solid #3E4045;
+                }
+            """)
+        else:
+            self.schema_tabs.setStyleSheet("""
+                QTabWidget::pane {
+                    background-color: #FFFFFF;
+                    border: 1px solid #D0D7DE;
+                }
+                QTabBar::tab {
+                    background-color: #F1F3F5;
+                    color: #2C3E50;
+                    padding: 6px 12px;
+                }
+                QTabBar::tab:selected {
+                    background-color: #FFFFFF;
+                }
+                QTabBar::tab:hover {
+                    background-color: #8095AB;
+                    color: white;
+                }
+                QScrollArea, QWidget {
+                    background-color: #FFFFFF;
+                }
+                QGroupBox {
+                    color: #2C3E50;
+                    border: 1px solid #D0D7DE;
+                }
+                QGroupBox::title {
+                    color: #2C3E50;
+                }
+                QLineEdit, QTextEdit, QComboBox, QDateTimeEdit, QSpinBox {
+                    background-color: #FFFFFF;
+                    color: #2C3E50;
+                    border: 1px solid #D0D7DE;
+                }
+                QLabel {
+                    color: #2C3E50;
+                }
+                QPushButton {
+                    background-color: #E9ECF1;
+                    color: #2C3E50;
+                    border: 1px solid #8095AB;
+                }
+                QPushButton:hover {
+                    background-color: #8095AB;
+                    color: white;
+                }
+                QPlainTextEdit {
+                    background-color: #FFFFFF;
+                    color: #2C3E50;
+                    border: 1px solid #D0D7DE;
+                }
+            """)
+
+    # ========== FAQ PAGE SCHEMA ==========
     def setup_faq_tab(self):
         tab = QWidget()
+        tab.setStyleSheet("background-color: transparent;")
         layout = QVBoxLayout(tab)
         
         scroll = QScrollArea()
         scroll.setWidgetResizable(True)
-        scroll.setStyleSheet("QScrollArea { border: none; background: transparent; }")
         scroll_content = QWidget()
         scroll_content.setStyleSheet("background: transparent;")
         form_layout = QFormLayout(scroll_content)
@@ -276,9 +318,7 @@ class SchemaTab(QWidget):
             return
         
         main_entity = []
-        lines = qa_text.split('\n')
-        
-        for line in lines:
+        for line in qa_text.split('\n'):
             if '|||' in line:
                 q, a = line.split('|||', 1)
                 main_entity.append({
@@ -302,16 +342,14 @@ class SchemaTab(QWidget):
         }
         self.update_json_preview(schema)
 
-    # ==================================================================
-    # Product Schema
-    # ==================================================================
+    # ========== PRODUCT SCHEMA ==========
     def setup_product_tab(self):
         tab = QWidget()
+        tab.setStyleSheet("background-color: transparent;")
         layout = QVBoxLayout(tab)
         
         scroll = QScrollArea()
         scroll.setWidgetResizable(True)
-        scroll.setStyleSheet("QScrollArea { border: none; background: transparent; }")
         scroll_content = QWidget()
         scroll_content.setStyleSheet("background: transparent;")
         form_layout = QFormLayout(scroll_content)
@@ -348,7 +386,7 @@ class SchemaTab(QWidget):
         self.product_generate = QPushButton("Generate Product Schema")
         self.product_generate.clicked.connect(self.generate_product)
         form_layout.addRow(self.product_generate)
-
+        
         scroll.setWidget(scroll_content)
         layout.addWidget(scroll)
         self.schema_tabs.addTab(tab, "🏷️ Product")
@@ -384,16 +422,14 @@ class SchemaTab(QWidget):
         schema = {k: v for k, v in schema.items() if v}
         self.update_json_preview(schema)
 
-    # ==================================================================
-    # Article Schema
-    # ==================================================================
+    # ========== ARTICLE SCHEMA ==========
     def setup_article_tab(self):
         tab = QWidget()
+        tab.setStyleSheet("background-color: transparent;")
         layout = QVBoxLayout(tab)
         
         scroll = QScrollArea()
         scroll.setWidgetResizable(True)
-        scroll.setStyleSheet("QScrollArea { border: none; background: transparent; }")
         scroll_content = QWidget()
         scroll_content.setStyleSheet("background: transparent;")
         form_layout = QFormLayout(scroll_content)
@@ -449,73 +485,17 @@ class SchemaTab(QWidget):
         if self.article_body.toPlainText().strip():
             schema["articleBody"] = self.article_body.toPlainText().strip()
         
-        self.update_json_preview(schema)
-
-
-
-
-    # Video Schema tab setup
-    def setup_video_tab(self):
-        tab = QWidget()
-        layout = QFormLayout(tab)
-        
-        self.video_name = QLineEdit()
-        layout.addRow("Video Name:", self.video_name)
-        
-        self.video_desc = QTextEdit()
-        self.video_desc.setMaximumHeight(80)
-        layout.addRow("Description:", self.video_desc)
-        
-        self.video_url = QLineEdit()
-        layout.addRow("Video URL:", self.video_url)
-        
-        self.video_thumbnail = QLineEdit()
-        layout.addRow("Thumbnail URL:", self.video_thumbnail)
-        
-        self.video_duration = QLineEdit()
-        self.video_duration.setPlaceholderText("PT1H30M (1 hour 30 min)")
-        layout.addRow("Duration (ISO 8601):", self.video_duration)
-        
-        self.video_upload_date = QLineEdit()
-        self.video_upload_date.setPlaceholderText("2024-01-15")
-        layout.addRow("Upload Date:", self.video_upload_date)
-        
-        self.video_generate = QPushButton("Generate Video Schema")
-        self.video_generate.clicked.connect(self.generate_video)
-        layout.addRow(self.video_generate)
-        
-        self.schema_tabs.addTab(tab, "🎬 Video")
-
-    def generate_video(self):
-        name = self.video_name.text().strip()
-        if not name:
-            QMessageBox.warning(self, "Warning", "Video name is required.")
-            return
-        
-        schema = {
-            "@context": "https://schema.org",
-            "@type": "VideoObject",
-            "name": name,
-            "description": self.video_desc.toPlainText().strip() or None,
-            "contentUrl": self.video_url.text().strip() or None,
-            "thumbnailUrl": self.video_thumbnail.text().strip() or None,
-            "duration": self.video_duration.text().strip() or None,
-            "uploadDate": self.video_upload_date.text().strip() or None
-        }
-        
         schema = {k: v for k, v in schema.items() if v}
         self.update_json_preview(schema)
 
-    # ==================================================================
-    # Event Schema
-    # ==================================================================
+    # ========== EVENT SCHEMA ==========
     def setup_event_tab(self):
         tab = QWidget()
+        tab.setStyleSheet("background-color: transparent;")
         layout = QVBoxLayout(tab)
         
         scroll = QScrollArea()
         scroll.setWidgetResizable(True)
-        scroll.setStyleSheet("QScrollArea { border: none; background: transparent; }")
         scroll_content = QWidget()
         scroll_content.setStyleSheet("background: transparent;")
         form_layout = QFormLayout(scroll_content)
@@ -574,18 +554,17 @@ class SchemaTab(QWidget):
         if self.event_url.text().strip():
             schema["url"] = self.event_url.text().strip()
         
+        schema = {k: v for k, v in schema.items() if v}
         self.update_json_preview(schema)
 
-    # ==================================================================
-    # Recipe Schema
-    # ==================================================================
+    # ========== RECIPE SCHEMA ==========
     def setup_recipe_tab(self):
         tab = QWidget()
+        tab.setStyleSheet("background-color: transparent;")
         layout = QVBoxLayout(tab)
         
         scroll = QScrollArea()
         scroll.setWidgetResizable(True)
-        scroll.setStyleSheet("QScrollArea { border: none; background: transparent; }")
         scroll_content = QWidget()
         scroll_content.setStyleSheet("background: transparent;")
         form_layout = QFormLayout(scroll_content)
@@ -654,18 +633,17 @@ class SchemaTab(QWidget):
         if self.recipe_image.text().strip():
             schema["image"] = self.recipe_image.text().strip()
         
+        schema = {k: v for k, v in schema.items() if v}
         self.update_json_preview(schema)
 
-    # ==================================================================
-    # HowTo Schema
-    # ==================================================================
+    # ========== HOWTO SCHEMA ==========
     def setup_howto_tab(self):
         tab = QWidget()
+        tab.setStyleSheet("background-color: transparent;")
         layout = QVBoxLayout(tab)
         
         scroll = QScrollArea()
         scroll.setWidgetResizable(True)
-        scroll.setStyleSheet("QScrollArea { border: none; background: transparent; }")
         scroll_content = QWidget()
         scroll_content.setStyleSheet("background: transparent;")
         form_layout = QFormLayout(scroll_content)
@@ -726,16 +704,14 @@ class SchemaTab(QWidget):
         
         self.update_json_preview(schema)
 
-    # ==================================================================
-    # Local Business Schema
-    # ==================================================================
+    # ========== LOCAL BUSINESS SCHEMA ==========
     def setup_localbusiness_tab(self):
         tab = QWidget()
+        tab.setStyleSheet("background-color: transparent;")
         layout = QVBoxLayout(tab)
         
         scroll = QScrollArea()
         scroll.setWidgetResizable(True)
-        scroll.setStyleSheet("QScrollArea { border: none; background: transparent; }")
         scroll_content = QWidget()
         scroll_content.setStyleSheet("background: transparent;")
         form_layout = QFormLayout(scroll_content)
@@ -836,6 +812,67 @@ class SchemaTab(QWidget):
             schema["logo"] = self.biz_logo.text().strip()
         if self.biz_image.text().strip():
             schema["image"] = self.biz_image.text().strip()
+        
+        schema = {k: v for k, v in schema.items() if v}
+        self.update_json_preview(schema)
+
+    # ========== VIDEO SCHEMA ==========
+    def setup_video_tab(self):
+        tab = QWidget()
+        tab.setStyleSheet("background-color: transparent;")
+        layout = QVBoxLayout(tab)
+        
+        scroll = QScrollArea()
+        scroll.setWidgetResizable(True)
+        scroll_content = QWidget()
+        scroll_content.setStyleSheet("background: transparent;")
+        form_layout = QFormLayout(scroll_content)
+        
+        self.video_name = QLineEdit()
+        form_layout.addRow("Video Name:", self.video_name)
+        
+        self.video_desc = QTextEdit()
+        self.video_desc.setMaximumHeight(80)
+        form_layout.addRow("Description:", self.video_desc)
+        
+        self.video_url = QLineEdit()
+        form_layout.addRow("Video URL:", self.video_url)
+        
+        self.video_thumbnail = QLineEdit()
+        form_layout.addRow("Thumbnail URL:", self.video_thumbnail)
+        
+        self.video_duration = QLineEdit()
+        self.video_duration.setPlaceholderText("PT1H30M (1 hour 30 min)")
+        form_layout.addRow("Duration (ISO 8601):", self.video_duration)
+        
+        self.video_upload_date = QLineEdit()
+        self.video_upload_date.setPlaceholderText("2024-01-15")
+        form_layout.addRow("Upload Date:", self.video_upload_date)
+        
+        self.video_generate = QPushButton("Generate Video Schema")
+        self.video_generate.clicked.connect(self.generate_video)
+        form_layout.addRow(self.video_generate)
+        
+        scroll.setWidget(scroll_content)
+        layout.addWidget(scroll)
+        self.schema_tabs.addTab(tab, "🎬 Video")
+    
+    def generate_video(self):
+        name = self.video_name.text().strip()
+        if not name:
+            QMessageBox.warning(self, "Warning", "Video name is required.")
+            return
+        
+        schema = {
+            "@context": "https://schema.org",
+            "@type": "VideoObject",
+            "name": name,
+            "description": self.video_desc.toPlainText().strip() or None,
+            "contentUrl": self.video_url.text().strip() or None,
+            "thumbnailUrl": self.video_thumbnail.text().strip() or None,
+            "duration": self.video_duration.text().strip() or None,
+            "uploadDate": self.video_upload_date.text().strip() or None
+        }
         
         schema = {k: v for k, v in schema.items() if v}
         self.update_json_preview(schema)
