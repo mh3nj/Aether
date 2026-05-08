@@ -23,9 +23,9 @@ class SchemaSocialTab(QWidget):
         self.og_tab = OGPreviewTab()
         self.breadcrumb_tab = BreadcrumbTab()
         
-        self.tabs.addTab(self.schema_tab, "\f201 Schema Library")
-        self.tabs.addTab(self.og_tab, "\f3ce OG Preview")
-        self.tabs.addTab(self.breadcrumb_tab, "\f0e0 Breadcrumb Builder")
+        self.tabs.addTab(self.schema_tab, "\uf201 Schema Library")
+        self.tabs.addTab(self.og_tab, "\uf3ce OG Preview")
+        self.tabs.addTab(self.breadcrumb_tab, "\uf0e0 Breadcrumb Builder")
         
         layout.addWidget(self.tabs)
     
