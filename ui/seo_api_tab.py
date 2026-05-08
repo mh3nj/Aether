@@ -30,7 +30,7 @@ class PageSpeedWorker(QThread):
             data = response.json()
             
             if 'lighthouseResult' in data:
-                result = f"📊 PageSpeed Insights for: {self.url}\n"
+                result = f"\f080 PageSpeed Insights for: {self.url}\n"
                 result += f"Strategy: {self.strategy.upper()}\n\n"
                 
                 scores = data['lighthouseResult']['categories']
