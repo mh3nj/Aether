@@ -2,7 +2,7 @@
 
 @font-face {
   font-family: "Font Awesome 6 Free";
-  src: url("../fonts/fa-solid-900.ttf") format("truetype");
+  src: url("../fonts/fa-solid-900.woff2") format("truetype");
   font-weight: 900;
   font-style: normal;
 }
@@ -11,9 +11,8 @@
   font-family: "Font Awesome 6 Free";
   font-weight: 900;
   font-style: normal;
-  font-size: 16px;
+  font-size: 14px;
   display: inline-block;
-  line-height: 1;
 }
 
 /* Theme-aware icon colors */
