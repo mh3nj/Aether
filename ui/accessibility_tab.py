@@ -31,7 +31,7 @@ class AccessibilityTab(QWidget):
         self.folder_label = QLabel("No project folder selected")
         self.select_btn = QPushButton("\uf07c Select Project Folder")
         self.select_btn.clicked.connect(self.select_folder)
-        self.scan_btn = QPushButton("\e2ce Scan for Accessibility Issues")
+        self.scan_btn = QPushButton("\ue2ce Scan for Accessibility Issues")
         self.scan_btn.clicked.connect(self.scan_accessibility)
         folder_row.addWidget(self.select_btn)
         folder_row.addWidget(self.scan_btn)
