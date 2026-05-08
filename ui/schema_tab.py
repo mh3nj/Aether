@@ -161,7 +161,7 @@ class SchemaTab(QWidget):
                 warnings.append("Address may be incomplete (missing locality or street)")
         
         if not issues and not warnings:
-            QMessageBox.information(self, "Schema Valid", f"\f00c {schema_type} schema is valid!\n\nNo issues found.")
+            QMessageBox.information(self, "Schema Valid", f"\uf00c {schema_type} schema is valid!\n\nNo issues found.")
         else:
             message = ""
             if issues:
@@ -169,7 +169,7 @@ class SchemaTab(QWidget):
                 for issue in issues:
                     message += f"  • {issue}\n"
             if warnings:
-                message += "\n \f071 WARNINGS (recommended):\n"
+                message += "\n \uf071 WARNINGS (recommended):\n"
                 for warning in warnings:
                     message += f"  • {warning}\n"
             message += "\nGoogle requires these fields for rich results."
@@ -307,7 +307,7 @@ class SchemaTab(QWidget):
         
         scroll.setWidget(scroll_content)
         layout.addWidget(scroll)
-        self.schema_tabs.addTab(tab, "\f059 FAQ Page")
+        self.schema_tabs.addTab(tab, "\uf059 FAQ Page")
     
     def generate_faq(self):
         name = self.faq_name.text().strip()
@@ -389,7 +389,7 @@ class SchemaTab(QWidget):
         
         scroll.setWidget(scroll_content)
         layout.addWidget(scroll)
-        self.schema_tabs.addTab(tab, "\f02b Product")
+        self.schema_tabs.addTab(tab, "\uf02b Product")
     
     def generate_product(self):
         name = self.product_name.text().strip()
@@ -461,7 +461,7 @@ class SchemaTab(QWidget):
         
         scroll.setWidget(scroll_content)
         layout.addWidget(scroll)
-        self.schema_tabs.addTab(tab, "\f1ea Article")
+        self.schema_tabs.addTab(tab, "\uf1ea Article")
     
     def generate_article(self):
         headline = self.article_headline.text().strip()
@@ -528,7 +528,7 @@ class SchemaTab(QWidget):
         
         scroll.setWidget(scroll_content)
         layout.addWidget(scroll)
-        self.schema_tabs.addTab(tab, "\f073 Event")
+        self.schema_tabs.addTab(tab, "\uf073 Event")
     
     def generate_event(self):
         name = self.event_name.text().strip()
@@ -603,7 +603,7 @@ class SchemaTab(QWidget):
         
         scroll.setWidget(scroll_content)
         layout.addWidget(scroll)
-        self.schema_tabs.addTab(tab, "\f002 Recipe")
+        self.schema_tabs.addTab(tab, "\uf002 Recipe")
     
     def generate_recipe(self):
         name = self.recipe_name.text().strip()
@@ -669,7 +669,7 @@ class SchemaTab(QWidget):
         
         scroll.setWidget(scroll_content)
         layout.addWidget(scroll)
-        self.schema_tabs.addTab(tab, "\f31c HowTo")
+        self.schema_tabs.addTab(tab, "\uf31c HowTo")
     
     def generate_howto(self):
         name = self.howto_name.text().strip()
@@ -768,7 +768,7 @@ class SchemaTab(QWidget):
         
         scroll.setWidget(scroll_content)
         layout.addWidget(scroll)
-        self.schema_tabs.addTab(tab, "\f279 Local Business")
+        self.schema_tabs.addTab(tab, "\uf279 Local Business")
     
     def generate_localbusiness(self):
         name = self.biz_name.text().strip()
