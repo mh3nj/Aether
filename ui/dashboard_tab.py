@@ -2,15 +2,12 @@
 Aether Dashboard – Command Center for All Tools
 """
 
-import os
-from pathlib import Path
 from PySide6.QtWidgets import (
     QWidget, QVBoxLayout, QHBoxLayout, QPushButton, QLabel,
     QFrame, QGridLayout, QScrollArea, QProgressBar
 )
 from PySide6.QtCore import Qt, QPropertyAnimation, QEasingCurve, QTimer, Property
-from PySide6.QtGui import QFont, QPalette, QColor
-from ui.data_bridge import DataBridge
+from PySide6.QtGui import QFont
 
 
 class DashboardTab(QWidget):
@@ -21,19 +18,12 @@ class DashboardTab(QWidget):
         self.has_project = False
         self.init_ui()
         self.start_animations()
-        
-        # Setup data bridge
-        self.data_bridge = DataBridge()
-        self.data_bridge.scan_completed.connect(self.on_scan_completed)
-        self.data_bridge.issue_fixed.connect(self.on_issue_fixed)
 
     def init_ui(self):
-        # Main layout
         main_layout = QVBoxLayout(self)
         main_layout.setSpacing(20)
         main_layout.setContentsMargins(20, 20, 20, 20)
 
-        # Scroll area for dashboard
         scroll = QScrollArea()
         scroll.setWidgetResizable(True)
         scroll.setFrameShape(QFrame.NoFrame)
@@ -41,7 +31,7 @@ class DashboardTab(QWidget):
         scroll_layout = QVBoxLayout(scroll_content)
         scroll_layout.setSpacing(20)
 
-        # ========== HEADER ==========
+        # Header
         header = QLabel("🌌 AETHER DASHBOARD")
         header_font = QFont()
         header_font.setPointSize(24)
@@ -50,13 +40,12 @@ class DashboardTab(QWidget):
         header.setAlignment(Qt.AlignCenter)
         scroll_layout.addWidget(header)
 
-        # Stats line
         stats_line = QLabel("Your complete web development command center")
         stats_line.setAlignment(Qt.AlignCenter)
         stats_line.setStyleSheet("color: #8095AB; font-size: 14px;")
         scroll_layout.addWidget(stats_line)
 
-        # ========== PROJECT STATUS CARD ==========
+        # Project Status
         self.project_card = QFrame()
         self.project_card.setFrameShape(QFrame.StyledPanel)
         self.project_card.setStyleSheet("""
@@ -78,7 +67,7 @@ class DashboardTab(QWidget):
         project_layout.addWidget(self.project_hint)
         scroll_layout.addWidget(self.project_card)
 
-        # ========== HEALTH SCORE CARD ==========
+        # Health Score Card
         health_card = QFrame()
         health_card.setStyleSheet("""
             QFrame {
@@ -114,7 +103,7 @@ class DashboardTab(QWidget):
 
         scroll_layout.addWidget(health_card)
 
-        # ========== QUICK ACTIONS GRID ==========
+        # Quick Actions
         actions_card = QFrame()
         actions_card.setStyleSheet("""
             QFrame {
@@ -148,12 +137,24 @@ class DashboardTab(QWidget):
             btn = QPushButton(f"{name}\n{shortcut}")
             btn.setMinimumHeight(70)
             btn.clicked.connect(callback)
+            btn.setStyleSheet("""
+                QPushButton {
+                    text-align: center;
+                    padding: 10px;
+                    border: 1px solid #8095AB;
+                    border-radius: 8px;
+                }
+                QPushButton:hover {
+                    background-color: #8095AB;
+                    color: white;
+                }
+            """)
             actions_grid.addWidget(btn, i // 2, i % 2)
 
         actions_layout.addLayout(actions_grid)
         scroll_layout.addWidget(actions_card)
 
-        # ========== KEY METRICS ==========
+        # Key Metrics
         metrics_card = QFrame()
         metrics_card.setStyleSheet("""
             QFrame {
@@ -193,7 +194,7 @@ class DashboardTab(QWidget):
 
         scroll_layout.addWidget(metrics_card)
 
-        # ========== TOP ISSUES & RECENT FIXES ==========
+        # Top Issues & Recent Fixes
         issues_fixes_layout = QHBoxLayout()
         issues_fixes_layout.setSpacing(20)
 
@@ -237,7 +238,7 @@ class DashboardTab(QWidget):
         issues_fixes_layout.addWidget(fixes_card)
         scroll_layout.addLayout(issues_fixes_layout)
 
-        # ========== QUICK LAUNCH TABS ==========
+        # Quick Launch Tabs
         tabs_card = QFrame()
         tabs_card.setStyleSheet("""
             QFrame {
@@ -262,7 +263,7 @@ class DashboardTab(QWidget):
         tabs_layout.addLayout(tabs_grid)
         scroll_layout.addWidget(tabs_card)
 
-        # ========== MINI LOGS VIEWER ==========
+        # Mini Logs Viewer
         logs_card = QFrame()
         logs_card.setStyleSheet("""
             QFrame {
@@ -291,18 +292,22 @@ class DashboardTab(QWidget):
         scroll.setWidget(scroll_content)
         main_layout.addWidget(scroll)
 
-        # Footer
         footer = QLabel("💡 Tip: Use Ctrl+1 to return here anytime")
         footer.setAlignment(Qt.AlignCenter)
         footer.setStyleSheet("color: #8095AB; padding: 10px;")
         main_layout.addWidget(footer)
 
     def on_scan_completed(self, data):
-        """Handle scan completion from any tab"""
+        """Handle scan completion from any tab - UPDATED"""
         self.has_project = True
         self.project_status.setText("📁 Project Loaded")
-        self.metric_widgets['pages_count'].setText(f"📄 {data.get('pages', 0)}")
-        self.metric_widgets['issues_count'].setText(f"⚠️ {data.get('issues', 0)}")
+        self.project_hint.setText(f"Last scan: {data.get('pages', 0)} pages analyzed")
+        
+        # Update metrics
+        if 'pages' in data:
+            self.metric_widgets['pages_count'].setText(f"📄 {data['pages']}")
+        if 'issues' in data:
+            self.metric_widgets['issues_count'].setText(f"⚠️ {data['issues']}")
         
         score = data.get('score', 0)
         if score > 0:
@@ -310,17 +315,22 @@ class DashboardTab(QWidget):
             self.animation.setEndValue(score)
             self.animation.start()
         
-        self.issues_list.setText(f"• Found {data.get('issues', 0)} issues to fix")
+        if data.get('issues', 0) > 0:
+            self.issues_list.setText(f"• Found {data.get('issues', 0)} issues to fix")
+        else:
+            self.issues_list.setText("• No issues found! Great job!")
 
     def on_issue_fixed(self, fix_type, count):
-        """Handle issue fixes from any tab"""
+        """Handle issue fixes from any tab - UPDATED"""
+        # Update fixes count
         current_text = self.metric_widgets['fixes_count'].text()
-        current_fixes = int(current_text.replace("✅ ", "")) if "✅" in current_text else 0
+        current_fixes = int(current_text.replace("✅ ", "").split()[0]) if "✅" in current_text else 0
         new_fixes = current_fixes + count
         self.metric_widgets['fixes_count'].setText(f"✅ {new_fixes}")
         
+        # Update recent fixes list
         current_fixes_text = self.fixes_list.text()
-        if current_fixes_text == "• No fixes yet\n• Apply fixes to see them here":
+        if "No fixes yet" in current_fixes_text:
             self.fixes_list.setText(f"• Fixed {count} {fix_type}(s)")
         else:
             self.fixes_list.setText(f"{current_fixes_text}\n• Fixed {count} {fix_type}(s)")
@@ -341,7 +351,6 @@ class DashboardTab(QWidget):
             self.mini_logs_list.setText('\n'.join(lines))
 
     def go_to_logs_tab(self):
-        """Switch to logs tab"""
         if self.main_window:
             for i in range(self.main_window.tabs.count()):
                 if "Logs" in self.main_window.tabs.tabText(i):
@@ -382,38 +391,44 @@ class DashboardTab(QWidget):
             self.score_status.setText("Good! Keep optimizing.")
 
     def update_theme(self, is_dark):
-        """Update colors when theme changes"""
+        """Update colors when theme changes - FIXED"""
         if is_dark:
+            # Dark theme
             self.setStyleSheet("""
-                QLabel, QPushButton { color: #E8E8E8; }
+                QLabel { color: #E8E8E8; }
                 QProgressBar::chunk { background-color: #8095AB; }
-                QFrame { background-color: rgba(128, 149, 171, 0.1); }
+                QFrame { background-color: rgba(128, 149, 171, 0.1); border-color: #3E4045; }
                 QPushButton {
                     background-color: #2B2D31;
+                    color: #E8E8E8;
                     border: 1px solid #8095AB;
                     border-radius: 8px;
-                    padding: 5px;
+                    padding: 8px;
                 }
                 QPushButton:hover {
                     background-color: #8095AB;
                     color: #1E1F22;
                 }
+                QScrollArea { background-color: #1E1F22; border: none; }
             """)
         else:
+            # Light theme
             self.setStyleSheet("""
-                QLabel, QPushButton { color: #2C3E50; }
+                QLabel { color: #2C3E50; }
                 QProgressBar::chunk { background-color: #8095AB; }
-                QFrame { background-color: rgba(128, 149, 171, 0.05); }
+                QFrame { background-color: rgba(128, 149, 171, 0.05); border-color: #D0D7DE; }
                 QPushButton {
                     background-color: #E9ECF1;
+                    color: #2C3E50;
                     border: 1px solid #8095AB;
                     border-radius: 8px;
-                    padding: 5px;
+                    padding: 8px;
                 }
                 QPushButton:hover {
                     background-color: #8095AB;
                     color: white;
                 }
+                QScrollArea { background-color: #F8F9FA; border: none; }
             """)
 
     # Navigation methods
