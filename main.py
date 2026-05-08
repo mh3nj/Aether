@@ -311,7 +311,6 @@ class MainWindow(QMainWindow):
         """Perform undo operation"""
         if self.undo_manager.undo():
             self.statusBar().showMessage("✓ Undo completed", 3000)
-            # Refresh current tab if it has refresh method
             current_tab = self.tabs.currentWidget()
             if hasattr(current_tab, 'refresh'):
                 current_tab.refresh()
@@ -364,8 +363,9 @@ class MainWindow(QMainWindow):
 
     def toggle_theme(self):
         """Called when menu action or shortcut is used."""
-        is_dark = self.theme_action.isChecked()
-        self.theme_button.setChecked(is_dark)
+        is_dark = self.theme_action.isChecked() if hasattr(self, 'theme_action') else False
+        if hasattr(self, 'theme_button'):
+            self.theme_button.setChecked(is_dark)
         self._set_theme_state(is_dark)
 
     def _set_theme_state(self, is_dark):
@@ -375,7 +375,8 @@ class MainWindow(QMainWindow):
         self.set_window_logo(is_dark)
         
         # Update sidebar theme
-        self.sidebar.update_theme(is_dark)
+        if hasattr(self, 'sidebar'):
+            self.sidebar.update_theme(is_dark)
         
         # Propagate theme to all tabs that have update_theme method
         for tab in self.all_tabs:
