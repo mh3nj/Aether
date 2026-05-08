@@ -27,9 +27,9 @@ class PerformanceTab(QWidget):
         # Folder selection
         folder_row = QHBoxLayout()
         self.folder_label = QLabel("No folder selected")
-        self.select_btn = QPushButton("📁 Select Project Folder")
+        self.select_btn = QPushButton("\e185 Select Project Folder")
         self.select_btn.clicked.connect(self.select_folder)
-        self.scan_btn = QPushButton("🔍 Scan for Preload Opportunities")
+        self.scan_btn = QPushButton("\f002 Scan for Preload Opportunities")
         self.scan_btn.clicked.connect(self.scan)
         folder_row.addWidget(self.select_btn)
         folder_row.addWidget(self.scan_btn)
@@ -69,7 +69,7 @@ class PerformanceTab(QWidget):
         layout.addWidget(self.progress)
 
         # Inject button
-        self.inject_btn = QPushButton("🚀 Inject Preload Links into HTML")
+        self.inject_btn = QPushButton("\f135 Inject Preload Links into HTML")
         self.inject_btn.clicked.connect(self.inject_preloads)
         self.inject_btn.setEnabled(False)
         layout.addWidget(self.inject_btn)
@@ -123,7 +123,7 @@ class PerformanceTab(QWidget):
                                     'type': 'CSS',
                                     'as_type': 'style'
                                 })
-                                item = QTreeWidgetItem([rel_path, href, 'CSS', '⚡ Preload as style'])
+                                item = QTreeWidgetItem([rel_path, href, 'CSS', '\f0e7 Preload as style'])
                                 self.results_tree.addTopLevelItem(item)
 
                 # 2. Check JS files (not async/defer)
@@ -140,7 +140,7 @@ class PerformanceTab(QWidget):
                                         'type': 'JavaScript',
                                         'as_type': 'script'
                                     })
-                                    item = QTreeWidgetItem([rel_path, src, 'JavaScript', '⚡ Preload as script'])
+                                    item = QTreeWidgetItem([rel_path, src, 'JavaScript', '\f0e7 Preload as script'])
                                     self.results_tree.addTopLevelItem(item)
 
                 # 3. Check hero images (first 3)
@@ -156,7 +156,7 @@ class PerformanceTab(QWidget):
                                     'type': 'Hero Image',
                                     'as_type': 'image'
                                 })
-                                item = QTreeWidgetItem([rel_path, src, 'Hero Image', '⚡ Preload as image'])
+                                item = QTreeWidgetItem([rel_path, src, 'Hero Image', '\f0e7 Preload as image'])
                                 self.results_tree.addTopLevelItem(item)
 
                 # 4. Check web fonts
@@ -172,7 +172,7 @@ class PerformanceTab(QWidget):
                                 'as_type': 'font',
                                 'crossorigin': 'anonymous'
                             })
-                            item = QTreeWidgetItem([rel_path, href, 'Web Font', '⚡ Preload as font'])
+                            item = QTreeWidgetItem([rel_path, href, 'Web Font', '\f0e7 Preload as font'])
                             self.results_tree.addTopLevelItem(item)
 
             except Exception:
@@ -190,13 +190,13 @@ class PerformanceTab(QWidget):
 
         if self.preloads:
             self.inject_btn.setEnabled(True)
-            self.summary_label.setText(f"✅ Found {len(self.preloads)} preload opportunities across {len(html_files)} files")
+            self.summary_label.setText(f"\f00c Found {len(self.preloads)} preload opportunities across {len(html_files)} files")
             QMessageBox.information(self, "Scan Complete", 
                 f"Found {len(self.preloads)} assets that can be preloaded.\n\n"
                 f"Click 'Inject Preload Links' to add them to your HTML files.")
         else:
             self.inject_btn.setEnabled(False)
-            self.summary_label.setText(f"✅ No preload opportunities found. Your site is already optimized!")
+            self.summary_label.setText(f"\f00c No preload opportunities found. Your site is already optimized!")
 
     def inject_preloads(self):
         if not self.preloads:
@@ -254,7 +254,7 @@ class PerformanceTab(QWidget):
         
         QMessageBox.information(self, "Injection Complete", 
             f"Injected {injected} preload links into HTML files.")
-        self.summary_label.setText(f"✅ Injected {injected} preload links")
+        self.summary_label.setText(f"\f00c Injected {injected} preload links")
 
     def update_theme(self, is_dark):
         """Called from main window when theme changes."""
