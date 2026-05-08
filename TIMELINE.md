@@ -220,7 +220,7 @@ Total:             48 hours of focused development
 
 - Email: parsegan@proton.me
 - GitHub: [@parsegan](https://github.com/parsegan) | [@mh3nj](https://github.com/mh3nj)
-- Website: [parsegan.com](https://parsegan.com)
+- Website: [parsegan.com](https://parsegan.com), [dahgan.com](https://dahgan.com)
 
 ---
 
