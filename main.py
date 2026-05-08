@@ -391,6 +391,14 @@ class MainWindow(QMainWindow):
         if dark:
             style = """
             /* ========== DARK THEME ========== */
+            QCheckBox {
+                color: #E8E8E8;
+                spacing: 5px;
+            }
+            QCheckBox::indicator {
+                width: 16px;
+                height: 16px;
+            }
             QMainWindow, QDialog {
                 background-color: #1E1F22;
             }
