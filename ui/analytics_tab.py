@@ -21,8 +21,8 @@ class AnalyticsTab(QWidget):
         self.keyword_tab = KeywordDensityTab()
         self.score_tab = SEOScoreTab()
         
-        self.tabs.addTab(self.keyword_tab, "📊 Keyword Density")
-        self.tabs.addTab(self.score_tab, "📈 SEO Score History")
+        self.tabs.addTab(self.keyword_tab, "\f201 Keyword Density")
+        self.tabs.addTab(self.score_tab, "\f201 SEO Score History")
         
         layout.addWidget(self.tabs)
     
