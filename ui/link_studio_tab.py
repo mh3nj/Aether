@@ -23,9 +23,9 @@ class LinkStudioTab(QWidget):
         self.link_checker_tab = LinkCheckerTab()
         self.internal_links_tab = InternalLinksTab()
         
-        self.tabs.addTab(self.link_manager_tab, "\f0c1 Link Manager")
-        self.tabs.addTab(self.link_checker_tab, "\f002 Link Checker")
-        self.tabs.addTab(self.internal_links_tab, "\f0c1 Internal Links")
+        self.tabs.addTab(self.link_manager_tab, "\uf0c1 Link Manager")
+        self.tabs.addTab(self.link_checker_tab, "\uf002 Link Checker")
+        self.tabs.addTab(self.internal_links_tab, "\uf0c1 Internal Links")
         
         layout.addWidget(self.tabs)
     
