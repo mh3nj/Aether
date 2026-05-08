@@ -25,10 +25,10 @@ class MediaStudioTab(QWidget):
         self.lazy_tab = LazyLoadTab()
         self.image_hints_tab = ImageHintsTab()
         
-        self.tabs.addTab(self.favicon_tab, "\f53f Favicon Generator")
-        self.tabs.addTab(self.webp_tab, "\f565 WebP Converter")
-        self.tabs.addTab(self.lazy_tab, "\f584 Smart Lazy Load")
-        self.tabs.addTab(self.image_hints_tab, "\f545 Image Hints")
+        self.tabs.addTab(self.favicon_tab, "\uf53f Favicon Generator")
+        self.tabs.addTab(self.webp_tab, "\uf565 WebP Converter")
+        self.tabs.addTab(self.lazy_tab, "\uf584 Smart Lazy Load")
+        self.tabs.addTab(self.image_hints_tab, "\uf545 Image Hints")
         
         layout.addWidget(self.tabs)
     
