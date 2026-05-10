@@ -216,11 +216,11 @@ Total:             48 hours of focused development
 
 ## Author
 
-**Mohsen Jafari** – Creator, Developer, Designer
+**Mohsen Jafari** - Creator, Developer, Designer
 
-- Email: parsegan@proton.me
-- GitHub: [@parsegan](https://github.com/parsegan) | [@mh3nj](https://github.com/mh3nj)
-- Website: [parsegan.com](https://parsegan.com), [dahgan.com](https://dahgan.com)
+- GitHub: [mh3nj](https://github.com/mh3nj)
+- LinkedIn: [mh3nj](https://linkedin.com/in/mh3nj)
+- Websites: [Parsegan.com](https://parsegan.com) (logo design), [Dahgan.com](https://dahgan.com) (land surveying/portfolio)
 
 ---
 
