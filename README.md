@@ -222,12 +222,11 @@ Aether/
 
 ## Author
 
-**Mohsen Jafari** – Creator, Developer, Designer
+**Mohsen Jafari** - Creator, Developer, Designer
 
-- Email: parsegan@proton.me
-- Websites: [parsegan.com](https://parsegan.com), [dahgan.com](https://dahgan.com)
-- GitHub: [@parsegan](https://github.com/parsegan) | [@mh3nj](https://github.com/mh3nj)
-- LinkedIn: linkedin.com/in/parsegan [linkedin.com/in/parsegan](https://linkedin.com/in/parsegan)
+- GitHub: [mh3nj](https://github.com/mh3nj)
+- LinkedIn: [mh3nj](https://linkedin.com/in/mh3nj)
+- Websites: [Parsegan.com](https://parsegan.com) (logo design), [Dahgan.com](https://dahgan.com) (land surveying/portfolio)
 
 ---
 
