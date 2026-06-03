@@ -21,7 +21,7 @@ class WebPTab(QWidget):
     def init_ui(self):
         layout = QVBoxLayout(self)
 
-        # Image source folder
+        # image source folder
         img_group = QGroupBox("1. Image Source Folder")
         img_layout = QHBoxLayout()
         self.img_label = QLabel("No folder selected")
@@ -33,7 +33,7 @@ class WebPTab(QWidget):
         img_group.setLayout(img_layout)
         layout.addWidget(img_group)
 
-        # HTML project folder (optional)
+        # html project folder (optional)
         html_group = QGroupBox("2. HTML Project Folder (optional – to update image references)")
         html_layout = QHBoxLayout()
         self.html_label = QLabel("Not selected – will only convert images")
@@ -45,21 +45,23 @@ class WebPTab(QWidget):
         html_group.setLayout(html_layout)
         layout.addWidget(html_group)
 
-        # Web root folder for resolving absolute paths (e.g., if src="/assets/...")
+        # web root folder for resolving absolute paths (e.g., if src="/assets/...")
         webroot_group = QGroupBox("3. Web Root Folder (for absolute paths like /assets/)")
         webroot_layout = QHBoxLayout()
         self.webroot_label = QLabel("Same as HTML folder if not specified")
         self.webroot_btn = QPushButton("Select Web Root")
         self.webroot_btn.clicked.connect(self.select_web_root)
         webroot_layout.addWidget(self.webroot_btn)
+
         webroot_layout.addWidget(self.webroot_label)
         webroot_layout.addStretch()
         webroot_group.setLayout(webroot_layout)
         layout.addWidget(webroot_group)
 
-        # Conversion options
+        # conversion options
         opts_group = QGroupBox("4. Conversion Options")
         opts_layout = QFormLayout()
+
         self.quality_spin = QSpinBox()
         self.quality_spin.setRange(1, 100)
         self.quality_spin.setValue(85)
@@ -73,7 +75,7 @@ class WebPTab(QWidget):
         opts_group.setLayout(opts_layout)
         layout.addWidget(opts_group)
 
-        # Update HTML method
+        # update html method
         method_group = QGroupBox("5. HTML Update Method (if HTML folder selected)")
         method_layout = QVBoxLayout()
         self.update_src_check = QCheckBox("Replace src attribute directly (.png → .webp)")
@@ -82,7 +84,7 @@ class WebPTab(QWidget):
         method_group.setLayout(method_layout)
         layout.addWidget(method_group)
 
-        # Progress and logs
+        # progress and logs
         self.progress = QProgressBar()
         self.progress.setVisible(False)
         layout.addWidget(self.progress)
@@ -94,6 +96,7 @@ class WebPTab(QWidget):
         layout.addWidget(self.log)
 
         self.convert_btn = QPushButton("▶ Convert Images & Update HTML")
+
         self.convert_btn.clicked.connect(self.convert_and_update)
         layout.addWidget(self.convert_btn)
 
@@ -106,6 +109,7 @@ class WebPTab(QWidget):
             self.images_folder = path
             self.img_label.setText(path)
             self.log.appendPlainText(f"Image folder: {path}")
+
 
     def select_html_folder(self):
         path = QFileDialog.getExistingDirectory(self, "Select Project Folder (with HTML files)")
@@ -123,6 +127,7 @@ class WebPTab(QWidget):
 
     def log_msg(self, msg):
         self.log.appendPlainText(msg)
+
         QApplication.processEvents()
 
     def convert_and_update(self):
@@ -133,6 +138,7 @@ class WebPTab(QWidget):
         extensions = (".jpg", ".jpeg", ".png")
         images = []
         for ext in extensions:
+
             images.extend(Path(self.images_folder).glob(f"*{ext}"))
             images.extend(Path(self.images_folder).glob(f"*{ext.upper()}"))
         if not images:
@@ -151,6 +157,7 @@ class WebPTab(QWidget):
         if not suffix.startswith('.'):
             suffix = '.' + suffix
 
+
         converted_paths = {}  # absolute original path -> absolute webp path
         for idx, img_path in enumerate(images):
             try:
@@ -161,6 +168,7 @@ class WebPTab(QWidget):
                 else:
                     img.save(webp_path, "WEBP", quality=quality)
                 converted_paths[str(img_path.resolve())] = str(webp_path.resolve())
+
                 self.log_msg(f"Converted: {img_path.name} → {webp_path.name}")
                 if delete_original:
                     os.remove(img_path)
@@ -169,7 +177,7 @@ class WebPTab(QWidget):
                 self.log_msg(f"ERROR converting {img_path.name}: {e}")
             self.progress.setValue(idx + 1)
 
-        # Update HTML files if folder provided
+        # update html files if folder provided
         if self.html_folder and os.path.isdir(self.html_folder):
             self.update_html_files(converted_paths)
 
@@ -185,17 +193,19 @@ class WebPTab(QWidget):
             self.log_msg("No HTML files found to update.")
             return
 
+
         if not self.update_src_check.isChecked():
             self.log_msg("HTML update not enabled – skipping.")
             return
 
-        # Determine base for absolute paths: if web_root is set, use it; otherwise use html_folder
+        # determine base for absolute paths: if web_root is set, use it; otherwise use html_folder
         base_dir = self.web_root if self.web_root else self.html_folder
         if not base_dir:
             base_dir = self.html_folder
         base_dir = Path(base_dir).resolve()
 
         updated_count = 0
+
         img_extensions = ('.png', '.jpg', '.jpeg', '.JPG', '.JPEG', '.PNG')
         for html_path in html_files:
             with open(html_path, 'r', encoding='utf-8') as f:
@@ -205,24 +215,24 @@ class WebPTab(QWidget):
                 src = img.get('src')
                 if not src:
                     continue
-                # Convert URL to filesystem path
+                # convert url to filesystem path
                 if src.startswith('/'):
-                    # Absolute web path: /assets/img/ppp.png
-                    # Remove leading slash and join with base_dir
+                    # absolute web path: /assets/img/ppp.png
+                    # remove leading slash and join with base_dir
                     rel_path = src.lstrip('/')
                     fs_path = (base_dir / rel_path).resolve()
                 else:
-                    # Relative path: resolve relative to HTML file location
+                    # relative path: resolve relative to html file location
                     fs_path = (html_path.parent / src).resolve()
-                # Check if this file was converted
+                # check if this file was converted
                 if str(fs_path) in converted_paths:
                     webp_abs_path = converted_paths[str(fs_path)]
-                    # Compute new src attribute: maintain same type of path (absolute/relative)
+                    # compute new src attribute: maintain same type of path (absolute/relative)  # i hate this but it works
                     if src.startswith('/'):
-                        # Absolute: compute new URL by replacing extension
+                        # absolute: compute new url by replacing extension
                         new_src = src.rsplit('.', 1)[0] + '.webp'
                     else:
-                        # Relative: compute new relative path from HTML to WebP file
+                        # relative: compute new relative path from html to webp file
                         try:
                             new_src = os.path.relpath(webp_abs_path, html_path.parent)
                         except:
@@ -231,6 +241,7 @@ class WebPTab(QWidget):
                     modified = True
                     self.log_msg(f"Updated {html_path.name}: {src} → {new_src}")
             if modified:
+
                 with open(html_path, 'w', encoding='utf-8') as f:
                     f.write(str(soup))
                 updated_count += 1

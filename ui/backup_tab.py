@@ -13,9 +13,11 @@ from PySide6.QtCore import Qt
 
 class BackupTab(QWidget):
     def __init__(self):
+
         super().__init__()
         self.project_folder = None
         self.backup_folder = None
+
         self.backup_history = []
         self.selected_backup = None
         self.init_ui()
@@ -23,7 +25,7 @@ class BackupTab(QWidget):
     def init_ui(self):
         layout = QVBoxLayout(self)
 
-        # Project folder selection
+        # project folder selection
         folder_row = QHBoxLayout()
         self.folder_label = QLabel("No project folder selected")
         self.select_btn = QPushButton("Select Project Folder")
@@ -33,34 +35,37 @@ class BackupTab(QWidget):
         folder_row.addStretch()
         layout.addLayout(folder_row)
 
-        # Backup location display
+        # backup location display
         backup_row = QHBoxLayout()
         self.backup_label = QLabel("Backup location: (auto-created in project)")
         backup_row.addWidget(self.backup_label)
         backup_row.addStretch()
         layout.addLayout(backup_row)
 
-        # Buttons
+        # buttons
         btn_row = QHBoxLayout()
         self.create_btn = QPushButton("\uf790 Create Backup Now")
         self.create_btn.clicked.connect(self.create_backup)
         self.create_btn.setEnabled(False)
         self.restore_btn = QPushButton("\uf1b8 Restore from Backup")
+
         self.restore_btn.clicked.connect(self.restore_backup)
         self.restore_btn.setEnabled(False)
         btn_row.addWidget(self.create_btn)
         btn_row.addWidget(self.restore_btn)
         layout.addLayout(btn_row)
 
-        # Backup history list
+        # backup history list  # TODO: figure out why
         history_group = QGroupBox("Backup History")
         history_layout = QVBoxLayout(history_group)
         self.history_list = QListWidget()
+
         self.history_list.itemClicked.connect(self.on_history_selected)
         history_layout.addWidget(self.history_list)
         layout.addWidget(history_group)
 
-        # Progress bar
+
+        # progress bar
         self.progress = QProgressBar()
         self.progress.setVisible(False)
         layout.addWidget(self.progress)
@@ -87,13 +92,14 @@ class BackupTab(QWidget):
             self.restore_btn.setEnabled(False)
             return
         
-        # Load manifest if exists
+        # load manifest if exists
         manifest_path = self.backup_folder / "backup_manifest.json"
         if manifest_path.exists():
             with open(manifest_path, 'r', encoding='utf-8') as f:
                 self.backup_history = json.load(f)
         
-        # Populate list
+
+        # populate list
         for backup in self.backup_history:
             item_text = f"{backup['datetime']} - {backup['file_count']} files, {backup['size_kb']} KB"
             item = QListWidgetItem(item_text)
@@ -110,22 +116,22 @@ class BackupTab(QWidget):
             QMessageBox.warning(self, "Warning", "Select a project folder first.")
             return
 
-        # Create backup folder
+        # create backup folder
         self.backup_folder.mkdir(parents=True, exist_ok=True)
         
-        # Create timestamped backup folder
+        # create timestamped backup folder
         timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
         backup_subfolder = self.backup_folder / timestamp
         backup_subfolder.mkdir(parents=True, exist_ok=True)
 
-        # Find all files to backup (HTML, CSS, JS, images, etc.)
+        # find all files to backup (html, css, js, images, etc.)
         extensions = [".html", ".htm", ".css", ".js", ".py", ".json", ".xml", ".txt", 
                       ".jpg", ".jpeg", ".png", ".gif", ".webp", ".svg", ".ico"]
         files_to_backup = []
         for ext in extensions:
             files_to_backup.extend(Path(self.project_folder).rglob(f"*{ext}"))
         
-        # Exclude the backup folder itself
+        # exclude the backup folder itself
         files_to_backup = [f for f in files_to_backup if str(self.backup_folder) not in str(f)]
 
         self.create_btn.setEnabled(False)
@@ -147,11 +153,12 @@ class BackupTab(QWidget):
             QApplication.processEvents()
 
         size_kb = total_size // 1024
-        # Save to manifest
+        # save to manifest
         backup_info = {
             "timestamp": timestamp,
             "datetime": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
             "file_count": len(files_to_backup),
+
             "size_kb": size_kb,
             "folder": str(backup_subfolder)
         }
@@ -195,7 +202,7 @@ class BackupTab(QWidget):
         self.restore_btn.setEnabled(False)
         self.progress.setVisible(True)
         
-        # Count files to restore
+        # count files to restore  # this is cursed but
         files_to_restore = list(backup_folder.rglob("*"))
         files_to_restore = [f for f in files_to_restore if f.is_file()]
         self.progress.setMaximum(len(files_to_restore))
@@ -205,6 +212,7 @@ class BackupTab(QWidget):
             try:
                 rel_path = backup_file.relative_to(backup_folder)
                 dest_path = Path(self.project_folder) / rel_path
+
                 dest_path.parent.mkdir(parents=True, exist_ok=True)
                 shutil.copy2(backup_file, dest_path)
                 restored += 1
@@ -216,6 +224,7 @@ class BackupTab(QWidget):
         self.progress.setVisible(False)
         self.restore_btn.setEnabled(True)
         self.status_label.setText(f"\uf00c Restored {restored} files from backup.")
+
         QMessageBox.information(self, "Restore Complete", 
                                 f"Restored {restored} files.\nYour project has been reverted.")
 

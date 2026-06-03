@@ -37,7 +37,7 @@ class LinkCheckerWorker(QThread):
                     soup = BeautifulSoup(f, 'html.parser')
                 rel_path = str(html_path.relative_to(self.project_folder))
                 
-                # Find all links
+                # find all links
                 for tag in soup.find_all(['a', 'link', 'script', 'img']):
                     for attr in ['href', 'src']:
                         if tag.has_attr(attr):
@@ -45,22 +45,23 @@ class LinkCheckerWorker(QThread):
                             if not link or link.startswith('#') or link.startswith('javascript:'):
                                 continue
                             
-                            # Determine if internal or external
+                            # determine if internal or external
                             is_external = link.startswith('http://') or link.startswith('https://')
                             
                             if not is_external:
-                                # Internal link - check if file exists
+                                # internal link - check if file exists
                                 link_path = self.resolve_internal_link(html_path, link)
                                 if link_path and not link_path.exists():
                                     self.results.append({
                                         "type": "🔗 Broken Internal Link",
                                         "file": rel_path,
                                         "element": f"<{tag.name}>",
+
                                         "link": link,
                                         "details": f"File not found: {link}"
                                     })
                             elif self.check_external:
-                                # External link - optional check
+                                # external link - optional check
                                 is_valid = self.check_external_link(link)
                                 if not is_valid:
                                     self.results.append({
@@ -85,12 +86,13 @@ class LinkCheckerWorker(QThread):
     
     def resolve_internal_link(self, html_path, link):
         """Resolve internal link to absolute filesystem path."""
-        # Remove query parameters and anchors
+        # remove query parameters and anchors
         link = link.split('?')[0].split('#')[0]
         if not link or link.strip() == '':
             return None
         
-        # Try different path resolutions
+
+        # try different path resolutions
         candidates = [
             html_path.parent / link,
             Path(self.project_folder) / link,
@@ -121,6 +123,7 @@ class LinkCheckerWorker(QThread):
 
 
 class LinkCheckerTab(QWidget):
+
     def __init__(self):
         super().__init__()
         self.project_folder = None
@@ -132,7 +135,7 @@ class LinkCheckerTab(QWidget):
     def init_ui(self):
         layout = QVBoxLayout(self)
 
-        # Folder selection
+        # folder selection
         folder_row = QHBoxLayout()
         self.folder_label = QLabel("No project folder selected")
         self.select_btn = QPushButton("\uf07c Select Project Folder")
@@ -145,7 +148,7 @@ class LinkCheckerTab(QWidget):
         folder_row.addStretch()
         layout.addLayout(folder_row)
 
-        # Options
+        # options
         opts_group = QGroupBox("Scan Options")
         opts_layout = QHBoxLayout()
         self.check_external = QCheckBox("\uf0ac Check external links (requires internet, slower)")
@@ -154,7 +157,7 @@ class LinkCheckerTab(QWidget):
         opts_group.setLayout(opts_layout)
         layout.addWidget(opts_group)
 
-        # Results tree
+        # results tree
         self.results_tree = QTreeWidget()
         self.results_tree.setHeaderLabels(["Type", "File", "Element", "Broken Link", "Details"])
         self.results_tree.header().setSectionResizeMode(0, QHeaderView.ResizeToContents)
@@ -164,12 +167,12 @@ class LinkCheckerTab(QWidget):
         self.results_tree.header().setSectionResizeMode(4, QHeaderView.ResizeToContents)
         layout.addWidget(self.results_tree)
 
-        # Progress bar
+        # progress bar
         self.progress = QProgressBar()
         self.progress.setVisible(False)
         layout.addWidget(self.progress)
 
-        # Summary
+        # summary  # TODO: figure out why
         self.summary_label = QLabel("Ready - Select a folder and click Scan")
         layout.addWidget(self.summary_label)
 
@@ -194,15 +197,17 @@ class LinkCheckerTab(QWidget):
         self.results_tree.clear()
         self.results = []
 
-        # Start worker thread
+        # start worker thread
         self.worker = LinkCheckerWorker(self.project_folder, self.check_external.isChecked())
         self.worker.progress.connect(self.update_progress)
         self.worker.finished_signal.connect(self.scan_finished)
         self.worker.start()
 
+
         self.summary_label.setText("\uf002 Scanning for broken links...")
 
     def update_progress(self, value):
+
         self.progress.setValue(value)
 
     def scan_finished(self):
@@ -217,17 +222,19 @@ class LinkCheckerTab(QWidget):
                 result["link"][:80],
                 result["details"]
             ])
-            # Color broken links red
+            # color broken links red
             if "Broken" in result["type"]:
                 for col in range(5):
                     item.setForeground(col, Qt.red)
+
             self.results_tree.addTopLevelItem(item)
         
         total_broken = len([r for r in self.results if "Broken" in r["type"]])
+
         self.progress.setVisible(False)
         self.scan_btn.setEnabled(True)
         
-        # Report to dashboard
+        # report to dashboard
         if self.data_bridge:
             self.data_bridge.report_scan(len(html_files), total_broken, 0)
         
@@ -241,31 +248,34 @@ class LinkCheckerTab(QWidget):
                                 f"Check the results panel for details.\n"
                                 f"\uf0eb Use Link Manager to fix them!")
 
+
     def update_theme(self, is_dark):
         """Called from main window when theme changes."""
         if is_dark:
             self.results_tree.setStyleSheet("""
                 QTreeWidget {
-                    background-color: #2B2D31;
-                    color: #E8E8E8;
-                    alternate-background-color: #3E4045;
+                    background-color: #2b2d31;
+                    color: #e8e8e8;
+                    alternate-background-color: #3e4045;
                 }
                 QHeaderView::section {
-                    background-color: #2B2D31;
-                    color: #E8E8E8;
-                    border: 1px solid #3E4045;
+
+                    background-color: #2b2d31;
+                    color: #e8e8e8;
+                    border: 1px solid #3e4045;
                 }
             """)
         else:
             self.results_tree.setStyleSheet("""
+
                 QTreeWidget {
-                    background-color: #FFFFFF;
-                    color: #2C3E50;
-                    alternate-background-color: #F8F9FA;
+                    background-color: #ffffff;
+                    color: #2c3e50;
+                    alternate-background-color: #f8f9fa;
                 }
                 QHeaderView::section {
-                    background-color: #F1F3F5;
-                    color: #2C3E50;
-                    border: 1px solid #D0D7DE;
+                    background-color: #f1f3f5;
+                    color: #2c3e50;
+                    border: 1px solid #d0d7de;
                 }
             """)

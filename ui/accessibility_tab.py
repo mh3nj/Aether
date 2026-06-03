@@ -26,7 +26,7 @@ class AccessibilityTab(QWidget):
     def init_ui(self):
         layout = QVBoxLayout(self)
 
-        # Folder selection
+        # folder selection
         folder_row = QHBoxLayout()
         self.folder_label = QLabel("No project folder selected")
         self.select_btn = QPushButton("\uf07c Select Project Folder")
@@ -39,7 +39,7 @@ class AccessibilityTab(QWidget):
         folder_row.addStretch()
         layout.addLayout(folder_row)
 
-        # Options
+        # options
         opts_group = QGroupBox("Scan Options")
         opts_layout = QHBoxLayout()
         self.check_alt = QCheckBox("Missing alt text")
@@ -63,7 +63,7 @@ class AccessibilityTab(QWidget):
         opts_group.setLayout(opts_layout)
         layout.addWidget(opts_group)
 
-        # Results tree
+        # results tree
         self.results_tree = QTreeWidget()
         self.results_tree.setHeaderLabels(["Issue Type", "File", "Element", "Description"])
         self.results_tree.header().setSectionResizeMode(0, QHeaderView.ResizeToContents)
@@ -72,16 +72,16 @@ class AccessibilityTab(QWidget):
         self.results_tree.header().setSectionResizeMode(3, QHeaderView.Stretch)
         layout.addWidget(self.results_tree)
 
-        # Progress bar
+        # progress bar
         self.progress = QProgressBar()
         self.progress.setVisible(False)
         layout.addWidget(self.progress)
 
-        # Summary
+        # summary
         self.summary_label = QLabel("Ready - Select a folder and click Scan")
         layout.addWidget(self.summary_label)
 
-        # Fix button (future feature)
+        # fix button (future feature)
         self.fix_btn = QPushButton("🔧 Bulk Fix Issues (Coming Soon)")
         self.fix_btn.setEnabled(False)
         layout.addWidget(self.fix_btn)
@@ -127,7 +127,7 @@ class AccessibilityTab(QWidget):
                     soup = BeautifulSoup(f, 'html.parser')
                 rel_path = str(html_path.relative_to(self.project_folder))
 
-                # 1. Missing alt text on images
+                # 1. missing alt text on images
                 if self.check_alt.isChecked():
                     for img in soup.find_all('img'):
                         alt = img.get('alt', '')
@@ -137,7 +137,7 @@ class AccessibilityTab(QWidget):
                                            "Add descriptive alt attribute")
                             issue_counts["missing_alt"] += 1
 
-                # 2. Missing html lang attribute
+                # 2. missing html lang attribute
                 if self.check_lang.isChecked():
                     html_tag = soup.find('html')
                     if html_tag and not html_tag.get('lang'):
@@ -145,7 +145,7 @@ class AccessibilityTab(QWidget):
                                        "Add lang attribute (e.g., lang='en', lang='fa')")
                         issue_counts["missing_lang"] += 1
 
-                # 3. Empty links
+                # 3. empty links
                 if self.check_empty_links.isChecked():
                     for a in soup.find_all('a', href=True):
                         visible_text = a.get_text(strip=True)
@@ -171,7 +171,7 @@ class AccessibilityTab(QWidget):
                                            "Add text content or aria-label")
                         issue_counts["empty_links"] += 1
 
-                # 4. Heading hierarchy
+                # 4. heading hierarchy
                 if self.check_headings.isChecked():
                     h1_tags = soup.find_all('h1')
                     h1_count = len(h1_tags)
@@ -196,7 +196,7 @@ class AccessibilityTab(QWidget):
                             issue_counts["heading_issues"] += 1
                         expected_level = current_level
 
-                # 5. Missing iframe title
+                # 5. missing iframe title
                 if self.check_iframes.isChecked():
                     for iframe in soup.find_all('iframe'):
                         if not iframe.get('title'):
@@ -205,7 +205,7 @@ class AccessibilityTab(QWidget):
                                            "Add title attribute for screen readers")
                             issue_counts["missing_iframe_title"] += 1
 
-                # 6. Missing form labels
+                # 6. missing form labels
                 if self.check_labels.isChecked():
                     for input_tag in soup.find_all(['input', 'textarea', 'select']):
                         if input_tag.get('type') in ['hidden', 'submit', 'button', 'reset']:
@@ -213,6 +213,7 @@ class AccessibilityTab(QWidget):
                         input_id = input_tag.get('id')
                         if input_id:
                             label = soup.find('label', attrs={'for': input_id})
+
                             if not label and not input_tag.get('aria-label'):
                                 self._add_result("Missing label", rel_path, 
                                                f"<{input_tag.name} id='{input_id}'>", 
@@ -235,7 +236,7 @@ class AccessibilityTab(QWidget):
 
         total = sum(issue_counts.values())
         
-        # Report to dashboard
+        # report to dashboard
         if self.data_bridge:
             self.data_bridge.report_scan(len(html_files), total, 0)
         
@@ -254,6 +255,7 @@ class AccessibilityTab(QWidget):
                                 f"\uf0eb Use Alt Checker tab to fix missing alt text!")
 
     def _add_result(self, issue_type, file_path, element, description):
+
         item = QTreeWidgetItem([issue_type, file_path, element, description])
         self.results_tree.addTopLevelItem(item)
         self.results.append({
@@ -268,26 +270,26 @@ class AccessibilityTab(QWidget):
         if is_dark:
             self.results_tree.setStyleSheet("""
                 QTreeWidget {
-                    background-color: #2B2D31;
-                    color: #E8E8E8;
-                    alternate-background-color: #3E4045;
+                    background-color: #2b2d31;
+                    color: #e8e8e8;
+                    alternate-background-color: #3e4045;
                 }
                 QHeaderView::section {
-                    background-color: #2B2D31;
-                    color: #E8E8E8;
-                    border: 1px solid #3E4045;
+                    background-color: #2b2d31;
+                    color: #e8e8e8;
+                    border: 1px solid #3e4045;
                 }
             """)
         else:
             self.results_tree.setStyleSheet("""
                 QTreeWidget {
-                    background-color: #FFFFFF;
-                    color: #2C3E50;
-                    alternate-background-color: #F8F9FA;
+                    background-color: #ffffff;
+                    color: #2c3e50;
+                    alternate-background-color: #f8f9fa;
                 }
                 QHeaderView::section {
-                    background-color: #F1F3F5;
-                    color: #2C3E50;
-                    border: 1px solid #D0D7DE;
+                    background-color: #f1f3f5;
+                    color: #2c3e50;
+                    border: 1px solid #d0d7de;
                 }
             """)

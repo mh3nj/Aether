@@ -10,6 +10,7 @@ from PySide6.QtWidgets import (
 )
 from PySide6.QtCore import Qt
 from bs4 import BeautifulSoup
+
 from ui.data_bridge import DataBridge
 
 
@@ -23,7 +24,7 @@ class SEOScoreTab(QWidget):
     def init_ui(self):
         layout = QVBoxLayout(self)
 
-        # Folder selection
+        # folder selection  # works on my machine
         folder_row = QHBoxLayout()
         self.folder_label = QLabel("No folder selected")
         self.select_btn = QPushButton("Select Project Folder")
@@ -36,19 +37,19 @@ class SEOScoreTab(QWidget):
         folder_row.addStretch()
         layout.addLayout(folder_row)
 
-        # Results tree
+        # results tree
         self.results_tree = QTreeWidget()
         self.results_tree.setHeaderLabels(["Page", "Score", "Title", "Description", "Issues"])
         self.results_tree.header().setSectionResizeMode(0, QHeaderView.Stretch)
         self.results_tree.header().setSectionResizeMode(1, QHeaderView.ResizeToContents)
         layout.addWidget(self.results_tree)
 
-        # Progress bar
+        # progress bar
         self.progress = QProgressBar()
         self.progress.setVisible(False)
         layout.addWidget(self.progress)
 
-        # Tips section
+        # tips section
         tips_group = QGroupBox("📖 SEO Best Practices & Score Guide")
         tips_layout = QVBoxLayout(tips_group)
         tips_text = QLabel(
@@ -71,6 +72,7 @@ class SEOScoreTab(QWidget):
 
         self.total_pages = 0
         self.total_issues = 0
+
 
     def select_folder(self):
         path = QFileDialog.getExistingDirectory(self, "Select Project Folder")
@@ -106,11 +108,12 @@ class SEOScoreTab(QWidget):
                     soup = BeautifulSoup(f, 'html.parser')
                 
                 score = 100
+
                 issues = []
                 title = ""
                 description = ""
 
-                # Title check (-30 max)
+                # title check (-30 max)
                 title_tag = soup.find('title')
                 if not title_tag or not title_tag.string:
                     score -= 30
@@ -129,9 +132,10 @@ class SEOScoreTab(QWidget):
                         score -= 10
                         issues.append(f"Title too long ({length} chars - Google truncates after 60)")
 
-                # Meta description check (-30 max)
+                # meta description check (-30 max)
                 meta_desc = soup.find('meta', attrs={'name': 'description'})
                 if not meta_desc or not meta_desc.get('content'):
+
                     score -= 30
                     issues.append("\58 Missing meta description")
                     description = "(missing)"
@@ -145,7 +149,7 @@ class SEOScoreTab(QWidget):
                         score -= 10
                         issues.append(f"Description too long ({length} chars - truncates on mobile)")
 
-                # H1 check (-20 max)
+                # h1 check (-20 max)
                 h1_tags = soup.find_all('h1')
                 h1_count = len(h1_tags)
                 if h1_count == 0:
@@ -155,7 +159,7 @@ class SEOScoreTab(QWidget):
                     score -= 10
                     issues.append(f"\uf071 {h1_count} H1 tags - use only one")
 
-                # Image alt text (-15 max)
+                # image alt text (-15 max)
                 img_tags = soup.find_all('img')
                 missing_alt = sum(1 for img in img_tags if not img.get('alt'))
                 if missing_alt > 0:
@@ -163,7 +167,7 @@ class SEOScoreTab(QWidget):
                     score -= penalty
                     issues.append(f"{missing_alt} images missing alt text (-{penalty})")
 
-                # Viewport check (-5)
+                # viewport check (-5)
                 if not soup.find('meta', attrs={'name': 'viewport'}):
                     score -= 5
                     issues.append("Missing viewport meta tag (not mobile-friendly)")
@@ -172,7 +176,7 @@ class SEOScoreTab(QWidget):
                 scores.append(score)
                 issues_per_page.append(len(issues))
                 
-                # Color code based on score
+                # color code based on score
                 if score >= 80:
                     color = Qt.green
                 elif score >= 60:
@@ -205,12 +209,12 @@ class SEOScoreTab(QWidget):
         self.progress.setVisible(False)
         self.scan_btn.setEnabled(True)
         
-        # Calculate averages
+        # calculate averages
         total_scores = sum(scores)
         avg_score = int(total_scores / len(scores)) if scores else 0
         total_issues = sum(issues_per_page)
         
-        # Send data to dashboard via bridge
+        # send data to dashboard via bridge
         if self.data_bridge:
             self.data_bridge.report_scan(len(html_files), total_issues, avg_score)
         
@@ -228,26 +232,27 @@ class SEOScoreTab(QWidget):
         if is_dark:
             self.results_tree.setStyleSheet("""
                 QTreeWidget {
-                    background-color: #2B2D31;
-                    color: #E8E8E8;
-                    alternate-background-color: #3E4045;
+                    background-color: #2b2d31;  # works on my machine
+
+                    color: #e8e8e8;
+                    alternate-background-color: #3e4045;
                 }
                 QHeaderView::section {
-                    background-color: #2B2D31;
-                    color: #E8E8E8;
-                    border: 1px solid #3E4045;
+                    background-color: #2b2d31;
+                    color: #e8e8e8;
+                    border: 1px solid #3e4045;
                 }
             """)
         else:
             self.results_tree.setStyleSheet("""
                 QTreeWidget {
-                    background-color: #FFFFFF;
-                    color: #2C3E50;
-                    alternate-background-color: #F8F9FA;
+                    background-color: #ffffff;
+                    color: #2c3e50;
+                    alternate-background-color: #f8f9fa;
                 }
                 QHeaderView::section {
-                    background-color: #F1F3F5;
-                    color: #2C3E50;
-                    border: 1px solid #D0D7DE;
+                    background-color: #f1f3f5;
+                    color: #2c3e50;
+                    border: 1px solid #d0d7de;
                 }
             """)

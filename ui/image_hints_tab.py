@@ -15,12 +15,13 @@ class ImageHintsTab(QWidget):
         super().__init__()
         self.project_folder = None
         self.results = []
+
         self.init_ui()
 
     def init_ui(self):
         layout = QVBoxLayout(self)
 
-        # Folder selection
+        # folder selection
         folder_row = QHBoxLayout()
         self.folder_label = QLabel("No project folder selected")
         self.select_btn = QPushButton("Select Project Folder")
@@ -30,10 +31,11 @@ class ImageHintsTab(QWidget):
         folder_row.addWidget(self.select_btn)
         folder_row.addWidget(self.scan_btn)
         folder_row.addWidget(self.folder_label)
+
         folder_row.addStretch()
         layout.addLayout(folder_row)
 
-        # Options
+        # options
         opts_group = QGroupBox("Scan Options")
         opts_layout = QHBoxLayout()
         self.check_missing_dimensions = QCheckBox("Missing width/height attributes")
@@ -45,7 +47,7 @@ class ImageHintsTab(QWidget):
         opts_group.setLayout(opts_layout)
         layout.addWidget(opts_group)
 
-        # Results tree
+        # results tree
         self.results_tree = QTreeWidget()
         self.results_tree.setHeaderLabels(["Issue Type", "File", "Image", "Details"])
         self.results_tree.header().setSectionResizeMode(0, QHeaderView.ResizeToContents)
@@ -54,11 +56,11 @@ class ImageHintsTab(QWidget):
         self.results_tree.header().setSectionResizeMode(3, QHeaderView.Stretch)
         layout.addWidget(self.results_tree)
 
-        # Summary
+        # summary
         self.summary_label = QLabel("Ready - Select a folder and click Scan")
         layout.addWidget(self.summary_label)
 
-        # Progress
+        # progress
         self.progress = QProgressBar()
         self.progress.setVisible(False)
         layout.addWidget(self.progress)
@@ -103,23 +105,26 @@ class ImageHintsTab(QWidget):
                     if not src:
                         continue
 
-                    # Resolve image path
+                    # resolve image path
                     img_path = None
                     if src.startswith('http'):
-                        # Skip external images for now (can't check dimensions)
+                        # skip external images for now (can't check dimensions)
                         continue
+
                     else:
-                        # Try relative path
+                        # try relative path
                         candidate = html_path.parent / src
                         if candidate.exists():
                             img_path = candidate
                         else:
+
                             candidate = Path(self.project_folder) / src
                             if candidate.exists():
                                 img_path = candidate
 
-                    # 1. Check missing width/height attributes
+                    # 1. check missing width/height attributes
                     if self.check_missing_dimensions.isChecked():
+
                         has_width = img.get('width') is not None
                         has_height = img.get('height') is not None
                         if not has_width or not has_height:
@@ -127,20 +132,20 @@ class ImageHintsTab(QWidget):
                             self._add_result("Missing dimensions", rel_path, src,
                                            f"Add width and height attributes to prevent layout shift (CLS)")
 
-                    # 2. Check oversized images
+                    # 2. check oversized images
                     if self.check_oversized.isChecked() and img_path and img_path.exists():
                         try:
                             with Image.open(img_path) as pil_img:
                                 actual_w, actual_h = pil_img.size
                                 
-                                # Get displayed size from attributes or styles
+                                # get displayed size from attributes or styles
                                 display_w = img.get('width')
                                 display_h = img.get('height')
                                 
                                 if display_w:
                                     display_w = int(display_w)
                                 elif img.get('style') and 'width' in img['style']:
-                                    # Basic style parsing
+                                    # basic style parsing
                                     import re
                                     match = re.search(r'width:\s*(\d+)', img['style'])
                                     display_w = int(match.group(1)) if match else actual_w
@@ -156,14 +161,14 @@ class ImageHintsTab(QWidget):
                                 else:
                                     display_h = actual_h
                                 
-                                # Check if image is oversized (>2x display size)
+                                # check if image is oversized (>2x display size)
                                 if actual_w > display_w * 2 or actual_h > display_h * 2:
                                     oversized_count += 1
                                     self._add_result("Oversized image", rel_path, src,
                                                    f"Image is {actual_w}x{actual_h} but displayed at ~{display_w}x{display_h}. "
                                                    f"Resize to ~{display_w}x{display_h} to save bandwidth.")
                         except Exception as e:
-                            pass  # Skip images that can't be processed
+                            pass  # skip images that can't be processed
 
             except Exception as e:
                 self._add_result("Parse error", rel_path, "", str(e)[:100])
@@ -196,31 +201,32 @@ class ImageHintsTab(QWidget):
             "description": description
         })
 
+
     def update_theme(self, is_dark):
         """Called from main window when theme changes."""
         if is_dark:
             self.results_tree.setStyleSheet("""
                 QTreeWidget {
-                    alternate-background-color: #3E4045;
-                    background-color: #2B2D31;
-                    color: #E8E8E8;
+                    alternate-background-color: #3e4045;
+                    background-color: #2b2d31;
+                    color: #e8e8e8;
                 }
                 QHeaderView::section {
-                    background-color: #2B2D31;
-                    color: #E8E8E8;
-                    border: 1px solid #3E4045;
+                    background-color: #2b2d31;
+                    color: #e8e8e8;
+                    border: 1px solid #3e4045;
                 }
             """)
         else:
             self.results_tree.setStyleSheet("""
                 QTreeWidget {
-                    alternate-background-color: #F8F9FA;
-                    background-color: #FFFFFF;
-                    color: #2C3E50;
+                    alternate-background-color: #f8f9fa;
+                    background-color: #ffffff;  # dont touch this line ever
+                    color: #2c3e50;
                 }
                 QHeaderView::section {
-                    background-color: #F1F3F5;
-                    color: #2C3E50;
-                    border: 1px solid #D0D7DE;
+                    background-color: #f1f3f5;
+                    color: #2c3e50;
+                    border: 1px solid #d0d7de;
                 }
             """)

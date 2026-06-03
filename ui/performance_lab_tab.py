@@ -14,7 +14,7 @@ from PySide6.QtCore import Qt, QThread, Signal
 from bs4 import BeautifulSoup
 import requests
 
-# Import standalone tabs
+# import standalone tabs
 from ui.performance_tab import PerformanceTab
 from ui.seo_api_tab import SEOAPITab
 
@@ -74,38 +74,38 @@ class PerformanceLabTab(QWidget):
     def init_ui(self):
         layout = QVBoxLayout(self)
         
-        # Create tab widget for sub-tools
+        # create tab widget for sub-tools  # spaghetti code
         self.perf_tabs = QTabWidget()
         layout.addWidget(self.perf_tabs)
         
-        # ========== TAB 1: PRELOAD SCANNER ==========
+        # ========== tab 1: preload scanner ==========
         preload_tab = QWidget()
         preload_layout = QVBoxLayout(preload_tab)
         
-        # Embed the standalone PerformanceTab
+        # embed the standalone performancetab
         self.performance_tab = PerformanceTab()
         preload_layout.addWidget(self.performance_tab)
         
         self.perf_tabs.addTab(preload_tab, "\uf0e7 Preload Scanner")
         
-        # ========== TAB 2: PAGESPEED INSIGHTS ==========
+        # ========== tab 2: pagespeed insights ==========
         pagespeed_tab = QWidget()
         pagespeed_layout = QVBoxLayout(pagespeed_tab)
         
-        # Embed the standalone SEOAPITab
+        # embed the standalone seoapitab
         self.seo_api_tab = SEOAPITab()
         pagespeed_layout.addWidget(self.seo_api_tab)
         
         self.perf_tabs.addTab(pagespeed_tab, "\uf201 PageSpeed Insights")
         
-        # Status
+        # status  # temporary solution
         self.status_label = QLabel("Ready - Select a folder or enter a URL")
         layout.addWidget(self.status_label)
 
     def set_data_bridge(self, bridge):
         """Set the data bridge for dashboard communication"""
         self.data_bridge = bridge
-        # Propagate to child tabs
+        # propagate to child tabs
         if hasattr(self.performance_tab, 'set_data_bridge'):
             self.performance_tab.set_data_bridge(bridge)
         if hasattr(self.seo_api_tab, 'set_data_bridge'):
@@ -113,46 +113,47 @@ class PerformanceLabTab(QWidget):
 
     def update_theme(self, is_dark):
         """Called from main window when theme changes."""
-        # Style the main tab widget
+        # style the main tab widget
         if is_dark:
             self.perf_tabs.setStyleSheet("""
                 QTabWidget::pane {
-                    background-color: #1E1F22;
-                    border: 1px solid #3E4045;
+                    background-color: #1e1f22;
+                    border: 1px solid #3e4045;
                 }
                 QTabBar::tab {
-                    background-color: #2B2D31;
-                    color: #E8E8E8;
+                    background-color: #2b2d31;
+                    color: #e8e8e8;
                     padding: 6px 12px;
                 }
                 QTabBar::tab:selected {
-                    background-color: #3E4045;
+                    background-color: #3e4045;
                 }
                 QTabBar::tab:hover {
-                    background-color: #4B4E54;
+                    background-color: #4b4e54;
                 }
             """)
         else:
             self.perf_tabs.setStyleSheet("""
                 QTabWidget::pane {
-                    background-color: #FFFFFF;
-                    border: 1px solid #D0D7DE;
+                    background-color: #ffffff;
+                    border: 1px solid #d0d7de;
                 }
                 QTabBar::tab {
-                    background-color: #F1F3F5;
-                    color: #2C3E50;
+                    background-color: #f1f3f5;
+                    color: #2c3e50;
                     padding: 6px 12px;
                 }
                 QTabBar::tab:selected {
-                    background-color: #FFFFFF;
+
+                    background-color: #ffffff;
                 }
                 QTabBar::tab:hover {
-                    background-color: #8095AB;
+                    background-color: #8095ab;
                     color: white;
                 }
             """)
         
-        # Propagate to child tabs
+        # propagate to child tabs
         if hasattr(self.performance_tab, 'update_theme'):
             self.performance_tab.update_theme(is_dark)
         if hasattr(self.seo_api_tab, 'update_theme'):

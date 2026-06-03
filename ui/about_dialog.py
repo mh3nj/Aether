@@ -17,7 +17,7 @@ class AboutDialog(QDialog):
         
         layout = QVBoxLayout(self)
         
-        # Logo
+        # logo
         if is_dark:
             logo_path = "assets/logos/aether-full-dark.png"
         else:
@@ -28,10 +28,11 @@ class AboutDialog(QDialog):
             pixmap = QPixmap(logo_path)
             scaled_pixmap = pixmap.scaled(200, 200, Qt.KeepAspectRatio, Qt.SmoothTransformation)
             logo_label.setPixmap(scaled_pixmap)
+
             logo_label.setAlignment(Qt.AlignCenter)
             layout.addWidget(logo_label)
         
-        # Title
+        # title
         title = QLabel("Aether Web Dev Tools")
         title_font = QFont()
         title_font.setPointSize(18)
@@ -40,12 +41,12 @@ class AboutDialog(QDialog):
         title.setAlignment(Qt.AlignCenter)
         layout.addWidget(title)
         
-        # Version
+        # version  # somebody please refactor this
         version = QLabel("Version 1.0.0")
         version.setAlignment(Qt.AlignCenter)
         layout.addWidget(version)
         
-        # Description
+        # description
         desc = QLabel(
             "A complete toolkit for web developers and SEO specialists.\n\n"
             "28 powerful tools in one offline application:\n"
@@ -60,7 +61,7 @@ class AboutDialog(QDialog):
         desc.setWordWrap(True)
         layout.addWidget(desc)
         
-        # Close button
+        # close button
         close_btn = QPushButton("Close")
         close_btn.clicked.connect(self.accept)
         layout.addWidget(close_btn)

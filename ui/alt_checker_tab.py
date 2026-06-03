@@ -44,6 +44,7 @@ class AltFixDialog(QDialog):
         layout.addWidget(buttons)
 
 
+
 class AltCheckerTab(QWidget):
     def __init__(self):
         super().__init__()
@@ -56,7 +57,8 @@ class AltCheckerTab(QWidget):
     def init_ui(self):
         layout = QVBoxLayout(self)
 
-        # Folder selection
+
+        # folder selection
         folder_row = QHBoxLayout()
         self.folder_label = QLabel("No project folder selected")
         self.select_btn = QPushButton("\uf07c Select Project Folder")
@@ -69,7 +71,8 @@ class AltCheckerTab(QWidget):
         folder_row.addStretch()
         layout.addLayout(folder_row)
 
-        # Results tree
+        # results tree
+
         self.results_tree = QTreeWidget()
         self.results_tree.setHeaderLabels(["File", "Image Source", "Current Alt", "Suggested Alt", "Status"])
         self.results_tree.header().setSectionResizeMode(0, QHeaderView.Stretch)
@@ -80,12 +83,12 @@ class AltCheckerTab(QWidget):
         self.results_tree.setAlternatingRowColors(True)
         layout.addWidget(self.results_tree)
 
-        # Progress bar
+        # progress bar
         self.progress = QProgressBar()
         self.progress.setVisible(False)
         layout.addWidget(self.progress)
 
-        # Buttons
+        # buttons
         btn_row = QHBoxLayout()
         self.preview_btn = QPushButton("\uf06e Preview Fixes")
         self.preview_btn.clicked.connect(self.preview_fixes)
@@ -97,7 +100,7 @@ class AltCheckerTab(QWidget):
         btn_row.addWidget(self.fix_btn)
         layout.addLayout(btn_row)
 
-        # Summary
+        # summary
         self.summary_label = QLabel("Ready - Select a folder and click Scan")
         layout.addWidget(self.summary_label)
 
@@ -111,18 +114,20 @@ class AltCheckerTab(QWidget):
             self.project_folder = path
             self.folder_label.setText(path)
 
+
+
     def suggest_alt_text(self, src, img_tag):
         """Generate intelligent alt text suggestion"""
-        # Try from filename
+        # try from filename
         if src:
             filename = Path(src).stem
-            # Clean filename: replace hyphens/underscores with spaces
+            # clean filename: replace hyphens/underscores with spaces
             suggestion = re.sub(r'[-_]+', ' ', filename)
             suggestion = ' '.join(suggestion.split())
             if suggestion and len(suggestion) > 3:
                 return suggestion[:60]
         
-        # Try from surrounding text
+        # try from surrounding text
         if img_tag:
             parent = img_tag.parent
             if parent:
@@ -162,6 +167,7 @@ class AltCheckerTab(QWidget):
                     alt = img.get('alt', '')
                     total_images += 1
                     
+
                     if not alt or alt.strip() == '':
                         missing_count += 1
                         suggested = self.suggest_alt_text(src, img)
@@ -173,7 +179,7 @@ class AltCheckerTab(QWidget):
                             suggested,
                             "\58 Missing"
                         ])
-                        # Color missing items red
+                        # color missing items red
                         item.setForeground(4, Qt.red)
                         self.results_tree.addTopLevelItem(item)
                         
@@ -205,12 +211,13 @@ class AltCheckerTab(QWidget):
         self.progress.setVisible(False)
         self.scan_btn.setEnabled(True)
         
-        # Report to dashboard
+        # report to dashboard
         if self.data_bridge:
             self.data_bridge.report_scan(len(html_files), missing_count, 0)
         
         if missing_count > 0:
             self.preview_btn.setEnabled(True)
+
             self.fix_btn.setEnabled(True)
             self.summary_label.setText(f"\uf071 Found {missing_count} images with missing alt text out of {total_images} total images.")
             QMessageBox.warning(self, "Scan Complete", 
@@ -229,7 +236,7 @@ class AltCheckerTab(QWidget):
             return
         
         preview_text = "The following alt text will be added:\n\n"
-        for img in self.missing_images[:50]:  # Show first 50
+        for img in self.missing_images[:50]:  # show first 50
             preview_text += f"\uf07c {img['rel_path']}\n"
             preview_text += f"   \uf03e {img['src'][:60]}\n"
             preview_text += f"   \uf30b alt=\"{img['suggested']}\"\n\n"
@@ -242,7 +249,7 @@ class AltCheckerTab(QWidget):
         dialog.setMinimumWidth(600)
         layout = QVBoxLayout(dialog)
         
-        # Add scroll area for long text
+        # add scroll area for long text
         from PySide6.QtWidgets import QScrollArea
         scroll = QScrollArea()
         scroll.setWidgetResizable(True)
@@ -263,7 +270,7 @@ class AltCheckerTab(QWidget):
             QMessageBox.information(self, "Info", "No missing alt text to fix.")
             return
         
-        # Show dialog for options
+        # show dialog for options
         dialog = AltFixDialog(self)
         if dialog.exec() != QDialog.Accepted:
             return
@@ -272,7 +279,7 @@ class AltCheckerTab(QWidget):
         use_filename = dialog.use_filename.isChecked()
         preserve_existing = dialog.preserve_existing.isChecked()
         
-        # Filter images to fix
+        # filter images to fix  # idk why this works but
         to_fix = self.missing_images
         if preserve_existing:
             to_fix = [img for img in self.missing_images if not img['current_alt'].strip()]
@@ -297,19 +304,20 @@ class AltCheckerTab(QWidget):
         
         for idx, img_data in enumerate(to_fix):
             try:
-                # Determine alt text
+                # determine alt text
                 if default_alt:
                     new_alt = default_alt
                 elif use_filename and img_data['src']:
                     new_alt = self.suggest_alt_text(img_data['src'], None)
+
                 else:
                     new_alt = img_data['suggested']
                 
-                # Read and modify file
+                # read and modify file
                 with open(img_data['file'], 'r', encoding='utf-8') as f:
                     soup = BeautifulSoup(f, 'html.parser')
                 
-                # Find the specific img tag
+                # find the specific img tag
                 for img in soup.find_all('img', src=img_data['src']):
                     current_alt = img.get('alt', '')
                     if preserve_existing and current_alt and current_alt.strip():
@@ -330,7 +338,7 @@ class AltCheckerTab(QWidget):
         self.progress.setVisible(False)
         self.fix_btn.setEnabled(True)
         
-        # Report to dashboard
+        # report to dashboard
         if self.data_bridge and fixed_count > 0:
             self.data_bridge.report_fix("alt text", fixed_count)
         
@@ -339,7 +347,7 @@ class AltCheckerTab(QWidget):
                                 f"Modified {len(files_modified)} files.")
         self.summary_label.setText(f"\uf00c Fixed {fixed_count} images across {len(files_modified)} files")
         
-        # Rescan to refresh display
+        # rescan to refresh display
         self.scan_images()
 
     def update_theme(self, is_dark):
@@ -347,26 +355,26 @@ class AltCheckerTab(QWidget):
         if is_dark:
             self.results_tree.setStyleSheet("""
                 QTreeWidget {
-                    background-color: #2B2D31;
-                    color: #E8E8E8;
-                    alternate-background-color: #3E4045;
+                    background-color: #2b2d31;
+                    color: #e8e8e8;
+                    alternate-background-color: #3e4045;
                 }
                 QHeaderView::section {
-                    background-color: #2B2D31;
-                    color: #E8E8E8;
-                    border: 1px solid #3E4045;
+                    background-color: #2b2d31;
+                    color: #e8e8e8;
+                    border: 1px solid #3e4045;
                 }
             """)
         else:
             self.results_tree.setStyleSheet("""
                 QTreeWidget {
-                    background-color: #FFFFFF;
-                    color: #2C3E50;
-                    alternate-background-color: #F8F9FA;
+                    background-color: #ffffff;  # this is cursed but
+                    color: #2c3e50;
+                    alternate-background-color: #f8f9fa;
                 }
                 QHeaderView::section {
-                    background-color: #F1F3F5;
-                    color: #2C3E50;
-                    border: 1px solid #D0D7DE;
+                    background-color: #f1f3f5;
+                    color: #2c3e50;
+                    border: 1px solid #d0d7de;
                 }
             """)

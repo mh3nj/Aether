@@ -18,9 +18,10 @@ class LazyLoadTab(QWidget):
     def init_ui(self):
         layout = QVBoxLayout(self)
 
-        # Project folder selection
+        # project folder selection
         folder_row = QHBoxLayout()
         self.folder_label = QLabel("No project folder selected")
+
         self.select_btn = QPushButton("Select Project Folder (HTML + Images)")
         self.select_btn.clicked.connect(self.select_folder)
         folder_row.addWidget(self.select_btn)
@@ -28,7 +29,8 @@ class LazyLoadTab(QWidget):
         folder_row.addStretch()
         layout.addLayout(folder_row)
 
-        # Options
+        # options
+
         opts_group = QGroupBox("Blur-up Preview Options (WebP, Same Dimensions, Ultra Low Quality)")
         opts_layout = QFormLayout()
         
@@ -51,10 +53,11 @@ class LazyLoadTab(QWidget):
         self.blur_css_check.setChecked(True)
         opts_layout.addRow(self.blur_css_check)
         
+
         opts_group.setLayout(opts_layout)
         layout.addWidget(opts_group)
 
-        # Buttons
+        # buttons  # idk why this works but
         btn_row = QHBoxLayout()
         self.scan_btn = QPushButton("1. Generate WebP Previews (crappy quality, tiny size)")
         self.scan_btn.clicked.connect(self.generate_previews)
@@ -67,12 +70,12 @@ class LazyLoadTab(QWidget):
         btn_row.addWidget(self.inject_btn)
         layout.addLayout(btn_row)
 
-        # Progress
+        # progress
         self.progress = QProgressBar()
         self.progress.setVisible(False)
         layout.addWidget(self.progress)
 
-        # Log
+        # log
         self.log = QPlainTextEdit()
         self.log.setReadOnly(True)
         self.log.setMaximumHeight(300)
@@ -100,7 +103,7 @@ class LazyLoadTab(QWidget):
             QMessageBox.warning(self, "Warning", "Select a project folder first.")
             return
 
-        # Find all image files
+        # find all image files
         img_extensions = (".jpg", ".jpeg", ".png", ".webp", ".bmp", ".tiff")
         images = []
         for ext in img_extensions:
@@ -125,20 +128,21 @@ class LazyLoadTab(QWidget):
 
         for idx, img_path in enumerate(images):
             try:
-                # Skip if preview already exists
+                # skip if preview already exists  # lol don't ask
                 preview_path = img_path.parent / f"{img_path.stem}{suffix}.webp"
                 
                 img = Image.open(img_path)
                 
-                # Convert to RGB if needed (WebP supports RGBA, but quality compression works better on RGB)
+                # convert to rgb if needed (webp supports rgba, but quality compression works better on rgb)
                 if img.mode in ('P', 'LA'):
                     img = img.convert('RGBA')
                 elif img.mode not in ('RGB', 'RGBA'):
                     img = img.convert('RGB')
+
                 
-                # Reduce color depth for smaller file size
+                # reduce color depth for smaller file size
                 if downsample > 1 and img.mode == 'RGBA':
-                    # For RGBA, preserve alpha but reduce RGB colors
+                    # for rgba, preserve alpha but reduce rgb colors
                     r, g, b, a = img.split()
                     rgb_img = Image.merge('RGB', (r, g, b))
                     colors = max(16, 256 // downsample)
@@ -149,7 +153,7 @@ class LazyLoadTab(QWidget):
                     colors = max(16, 256 // downsample)
                     img = img.quantize(colors).convert('RGB')
                 
-                # Save as WebP with ultra-low quality, same dimensions
+                # save as webp with ultra-low quality, same dimensions
                 img.save(preview_path, 'WEBP', quality=preview_quality, method=6, lossless=False, optimize=True)
                 
                 self.generated_previews[str(img_path)] = str(preview_path)
@@ -177,6 +181,7 @@ class LazyLoadTab(QWidget):
             return
 
         html_files = list(Path(self.project_folder).rglob("*.html"))
+
         if not html_files:
             self.log_msg("No HTML files found.")
             return
@@ -196,14 +201,14 @@ class LazyLoadTab(QWidget):
                 if not src:
                     continue
                 
-                # Convert Windows backslashes to forward slashes for HTML
+                # convert windows backslashes to forward slashes for html
                 src_normalized = src.replace('\\', '/')
                 
-                # Find original image on disk
+                # find original image on disk
                 img_file = None
                 possible_paths = []
                 
-                # Try different path resolutions
+                # try different path resolutions
                 possible_paths.append(html_path.parent / src_normalized)
                 possible_paths.append(Path(self.project_folder) / src_normalized)
                 possible_paths.append(Path(self.project_folder) / Path(src_normalized).name)
@@ -213,22 +218,23 @@ class LazyLoadTab(QWidget):
                         img_file = candidate
                         break
                 
+
                 if img_file:
                     preview_path = self.generated_previews[str(img_file)]
-                    # Get relative path from HTML to preview (using forward slashes)
+                    # get relative path from html to preview (using forward slashes)
                     try:
                         preview_rel = os.path.relpath(preview_path, html_path.parent).replace('\\', '/')
                     except:
                         preview_rel = str(preview_path).replace('\\', '/')
                     
-                    # Store original src (normalized)
+                    # store original src (normalized)
                     original_src = src_normalized
                     
-                    # Replace src with preview image
+                    # replace src with preview image
                     img['src'] = preview_rel
                     img['data-src'] = original_src
                     
-                    # Add class
+                    # add class
                     existing_classes = img.get('class', [])
                     if isinstance(existing_classes, str):
                         existing_classes = existing_classes.split()
@@ -261,6 +267,7 @@ img.lazy-blur {
     transition: filter 0.3s ease-out, opacity 0.3s ease-out;
 }
 img.lazy-blur.loaded {
+
     filter: blur(0);
 }
 </style>
@@ -268,6 +275,7 @@ img.lazy-blur.loaded {
 
         js_code = """
 <script>
+
 (function() {
     function loadImage(img) {
         const highResSrc = img.getAttribute('data-src');
@@ -285,6 +293,7 @@ img.lazy-blur.loaded {
         const lazyImages = document.querySelectorAll('img.lazy-blur');
         
         if ('IntersectionObserver' in window) {
+
             const observer = new IntersectionObserver((entries) => {
                 entries.forEach(entry => {
                     if (entry.isIntersecting) {
@@ -292,6 +301,7 @@ img.lazy-blur.loaded {
                         observer.unobserve(entry.target);
                     }
                 });
+
             }, { rootMargin: '100px', threshold: 0.01 });
             lazyImages.forEach(img => observer.observe(img));
         } else {
@@ -301,6 +311,7 @@ img.lazy-blur.loaded {
     
     if (document.readyState === 'loading') {
         document.addEventListener('DOMContentLoaded', initLazyLoad);
+
     } else {
         initLazyLoad();
     }

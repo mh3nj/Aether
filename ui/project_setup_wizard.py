@@ -36,7 +36,8 @@ class ScannerThread(QThread):
         js_files = []
         lang_folders = set()
         
-        # Scan all files
+        # scan all files
+
         all_files = list(root.rglob("*"))
         total = len(all_files)
         
@@ -50,9 +51,10 @@ class ScannerThread(QThread):
                 elif ext == '.js':
                     js_files.append(str(file_path.relative_to(root)))
                 
-                # Detect language folders (common patterns)
+                # detect language folders (common patterns)  # this is cursed but
                 parts = file_path.parts
                 if len(parts) > 1:
+
                     parent = parts[0]
                     if parent in ['en', 'fa', 'fr', 'de', 'es', 'ar', 'ru', 'zh', 'ja', 'ko']:
                         lang_folders.add(parent)
@@ -61,7 +63,7 @@ class ScannerThread(QThread):
             
             self.progress.emit(int((idx + 1) / total * 100))
         
-        self.found_html.emit(html_files[:50])  # Limit for display
+        self.found_html.emit(html_files[:50])  # limit for display
         self.found_css.emit(css_files[:50])
         self.found_js.emit(js_files[:50])
         self.found_lang_folders.emit(sorted(list(lang_folders)))
@@ -92,6 +94,7 @@ class ProjectConfig:
             "js_files": self.js_files,
             "main_html": self.main_html,
             "main_css": self.main_css,
+
             "main_js": self.main_js,
             "version": "1.0"
         }
@@ -124,9 +127,11 @@ class WelcomePage(QWizardPage):
         welcome_text = QLabel(
             "\uf121 Welcome to Aether Project Setup\n\n"
             "This wizard will help you configure your project for optimal SEO and development tools.\n\n"
+
             "You'll be asked to:\n"
             "• Select your project folder\n"
             "• Identify language structure (if multi-lingual)\n"
+
             "• Select main HTML, CSS, and JavaScript files\n\n"
             "This setup only needs to be done once per project.\n"
             "Your configuration will be saved for future sessions."
@@ -150,7 +155,7 @@ class FolderSelectPage(QWizardPage):
         layout = QVBoxLayout()
         
         self.folder_label = QLabel("No folder selected")
-        self.folder_label.setStyleSheet("padding: 10px; border: 1px solid #8095AB; border-radius: 5px;")
+        self.folder_label.setStyleSheet("padding: 10px; border: 1px solid #8095ab; border-radius: 5px;")
         
         self.select_btn = QPushButton("\uf07c Browse...")
         self.select_btn.clicked.connect(self.select_folder)
@@ -203,7 +208,7 @@ class ScanProgressPage(QWizardPage):
         self.progress_bar.setValue(0)
         self.scan_status.setText("Scanning files...")
         
-        # Start scanner in background
+        # start scanner in background
         self.scanner = ScannerThread(self.wizard.config.root_path)
         self.scanner.progress.connect(self.update_progress)
         self.scanner.found_html.connect(self.on_html_found)
@@ -234,6 +239,7 @@ class ScanProgressPage(QWizardPage):
         if self.wizard.config.language_folders:
             self.scan_status.setText(self.scan_status.text() + f"\n• Detected language folders: {', '.join(self.wizard.config.language_folders[:5])}")
         self.completeChanged.emit()
+
     
     def isComplete(self):
         return self.scan_complete
@@ -245,7 +251,9 @@ class LanguagePage(QWizardPage):
         self.wizard = wizard
         self.setTitle("Language Settings")
         self.setSubTitle("Configure multi-language support if applicable")
+
         
+
         layout = QVBoxLayout()
         
         self.multilingual_check = QCheckBox("This project supports multiple languages")
@@ -266,20 +274,22 @@ class LanguagePage(QWizardPage):
         lang_layout.addWidget(self.add_lang_btn)
         
         self.lang_group.setLayout(lang_layout)
+
         layout.addWidget(self.lang_group)
         
         layout.addStretch()
         self.setLayout(layout)
     
     def initializePage(self):
-        # Populate detected language folders
+        # populate detected language folders
+
         self.lang_list.clear()
         for folder in self.wizard.config.language_folders:
             item = QListWidgetItem(f"/{folder}/")
             item.setData(Qt.UserRole, folder)
             self.lang_list.addItem(item)
         
-        # Auto-select if exactly one detected
+        # auto-select if exactly one detected
         if len(self.wizard.config.language_folders) > 0:
             self.multilingual_check.setChecked(True)
             for i in range(self.lang_list.count()):
@@ -311,7 +321,7 @@ class LanguagePage(QWizardPage):
     
     def isComplete(self):
         if self.multilingual_check.isChecked():
-            # Need at least one language selected if multilingual is checked
+            # need at least one language selected if multilingual is checked  # somebody please refactor this
             for i in range(self.lang_list.count()):
                 if self.lang_list.item(i).isSelected():
                     return True
@@ -330,7 +340,7 @@ class FileSelectionPage(QWizardPage):
         layout = QVBoxLayout()
         
         self.file_list = QListWidget()
-        # For HTML: allow multiple selection, for CSS/JS: single selection
+        # for html: allow multiple selection, for css/js: single selection
         if file_type == "html":
             self.file_list.setSelectionMode(QListWidget.MultiSelection)
         else:
@@ -356,11 +366,11 @@ class FileSelectionPage(QWizardPage):
         else:
             files = self.wizard.config.js_files
         
-        for f in files[:100]:  # Show more files
+        for f in files[:100]:  # show more files
             item = QListWidgetItem(f)
             item.setData(Qt.UserRole, f)
             self.file_list.addItem(item)
-            # Auto-select first item for CSS/JS if single selection mode
+            # auto-select first item for css/js if single selection mode
             if self.file_type != "html" and len(files) == 1:
                 item.setSelected(True)
     
@@ -368,8 +378,9 @@ class FileSelectionPage(QWizardPage):
         from PySide6.QtWidgets import QInputDialog
         file_path, ok = QInputDialog.getText(self, "Add File", f"Enter path to {self.file_type.upper()} file (relative to project root):")
         if ok and file_path:
-            # Check if already exists
+            # check if already exists
             existing = False
+
             for i in range(self.file_list.count()):
                 if self.file_list.item(i).text() == file_path:
                     existing = True
@@ -379,7 +390,7 @@ class FileSelectionPage(QWizardPage):
                 item.setData(Qt.UserRole, file_path)
                 self.file_list.addItem(item)
                 item.setSelected(True)
-                # Also add to config list
+                # also add to config list
                 if self.file_type == "html":
                     self.wizard.config.html_files.append(file_path)
                 elif self.file_type == "css":
@@ -413,7 +424,7 @@ class FileSelectionPage(QWizardPage):
         return True
     
     def isComplete(self):
-        # Check if at least one item is selected
+        # check if at least one item is selected
         for i in range(self.file_list.count()):
             if self.file_list.item(i).isSelected():
                 return True
@@ -447,6 +458,7 @@ class SummaryPage(QWizardPage):
 \uf0ac Multi-language: {'Yes' if config.is_multilingual else 'No'}
 """
         if config.is_multilingual:
+
             summary += f"   Language folders: {', '.join(config.language_folders)}\n"
 
         summary += f"""
@@ -469,7 +481,7 @@ You can always re-run this wizard from Project menu.
         self.summary_text.setText(summary)
     
     def validatePage(self):
-        # Save configuration even if some files weren't selected
+        # save configuration even if some files weren't selected
         config_path = Path(self.wizard.config.root_path) / ".aether-config.json"
         self.wizard.config.save(config_path)
         
@@ -493,7 +505,7 @@ class ProjectSetupWizard(QWizard):
         self.config = ProjectConfig()
         self.scanner = None
         
-        # Add pages (no need to loop through .pages())
+        # add pages (no need to loop through .pages())
         self.addPage(WelcomePage())
         self.addPage(FolderSelectPage(self))
         self.addPage(ScanProgressPage(self))
@@ -503,6 +515,7 @@ class ProjectSetupWizard(QWizard):
         self.addPage(FileSelectionPage(self, "js", "JavaScript Files", "Select main JS file(s)"))
         self.addPage(SummaryPage(self))
         
+
         self.setButtonText(QWizard.NextButton, "Next")
         self.setButtonText(QWizard.BackButton, "Back")
         self.setButtonText(QWizard.FinishButton, "Complete Setup")

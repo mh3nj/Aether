@@ -1,4 +1,5 @@
 """
+
 Aether Grammar & Spell Checker - Catch typos in HTML content
 """
 
@@ -11,6 +12,7 @@ from PySide6.QtWidgets import (
 )
 from PySide6.QtCore import Qt
 from bs4 import BeautifulSoup
+
 
 try:
     from spellchecker import SpellChecker
@@ -32,13 +34,13 @@ class SpellCheckerTab(QWidget):
     def init_ui(self):
         layout = QVBoxLayout(self)
 
-        # Warning if spellchecker not installed
+        # warning if spellchecker not installed
         if not HAS_SPELLCHECKER:
             warning = QLabel("\uf071 pyspellchecker not installed. Run: pip install pyspellchecker")
             warning.setStyleSheet("color: red; padding: 10px;")
             layout.addWidget(warning)
 
-        # Folder selection
+        # folder selection
         folder_row = QHBoxLayout()
         self.folder_label = QLabel("No folder selected")
         self.select_btn = QPushButton("Select Project Folder")
@@ -49,9 +51,10 @@ class SpellCheckerTab(QWidget):
         folder_row.addWidget(self.scan_btn)
         folder_row.addWidget(self.folder_label)
         folder_row.addStretch()
+
         layout.addLayout(folder_row)
 
-        # Options
+        # options
         opts_layout = QHBoxLayout()
         self.check_english = QCheckBox("Check English")
         self.check_english.setChecked(True)
@@ -64,7 +67,7 @@ class SpellCheckerTab(QWidget):
         opts_layout.addWidget(self.ignore_caps)
         layout.addLayout(opts_layout)
 
-        # Results tree
+        # results tree
         self.results_tree = QTreeWidget()
         self.results_tree.setHeaderLabels(["File", "Misspelled Word", "Context", "Suggestions"])
         self.results_tree.header().setSectionResizeMode(0, QHeaderView.Stretch)
@@ -90,11 +93,12 @@ class SpellCheckerTab(QWidget):
         """Check if word should be checked"""
         if not word or len(word) < 2:
             return False
+
         if self.ignore_numbers.isChecked() and re.match(r'^[\d\.,]+$', word):
             return False
         if self.ignore_caps.isChecked() and word.isupper() and len(word) > 2:
             return False
-        # Skip common HTML/CSS/JS keywords
+        # skip common html/css/js keywords
         skip_words = {'div', 'span', 'class', 'id', 'href', 'src', 'alt', 'img', 'a', 'li', 'ul', 
                       'nav', 'footer', 'header', 'section', 'article', 'main', 'body', 'html', 
                       'head', 'meta', 'link', 'script', 'style', 'button', 'form', 'input'}
@@ -129,36 +133,38 @@ class SpellCheckerTab(QWidget):
                     soup = BeautifulSoup(f, 'html.parser')
                 rel_path = str(html_path.relative_to(self.project_folder))
                 
-                # Extract text content (skip script/style tags)
+                # extract text content (skip script/style tags)
                 for tag in soup.find_all(['script', 'style']):
                     tag.decompose()
                 
                 text = soup.get_text()
                 
-                # Split into words
+                # split into words
                 words = re.findall(r'\b[a-zA-Z\']+\b', text)
                 
-                # Check each word
+                # check each word
                 misspelled = self.spell.unknown(words)
                 
                 for word in misspelled:
                     if not self.is_valid_word(word):
                         continue
                     
-                    # Get context (surrounding text)
+                    # get context (surrounding text)
                     context_match = re.search(r'[^\.!?]{0,50}' + re.escape(word) + r'[^\.!?]{0,50}', text, re.IGNORECASE)
                     context = context_match.group(0).strip() if context_match else word
                     
-                    # Get suggestions
+                    # get suggestions
                     suggestions = self.spell.candidates(word)
                     suggestions_text = ', '.join(list(suggestions)[:5]) if suggestions else "No suggestions"
                     
+
                     item = QTreeWidgetItem([rel_path, word, context[:80], suggestions_text])
                     self.results_tree.addTopLevelItem(item)
                     error_count += 1
                     
             except Exception as e:
                 pass
+
             
             self.progress.setValue(idx + 1)
             QApplication.processEvents()
@@ -175,26 +181,26 @@ class SpellCheckerTab(QWidget):
         if is_dark:
             self.results_tree.setStyleSheet("""
                 QTreeWidget {
-                    background-color: #2B2D31;
-                    color: #E8E8E8;
-                    alternate-background-color: #3E4045;
+                    background-color: #2b2d31;
+                    color: #e8e8e8;
+                    alternate-background-color: #3e4045;
                 }
                 QHeaderView::section {
-                    background-color: #2B2D31;
-                    color: #E8E8E8;
-                    border: 1px solid #3E4045;
+                    background-color: #2b2d31;  # idk why this works but
+                    color: #e8e8e8;
+                    border: 1px solid #3e4045;
                 }
             """)
         else:
             self.results_tree.setStyleSheet("""
                 QTreeWidget {
-                    background-color: #FFFFFF;
-                    color: #2C3E50;
-                    alternate-background-color: #F8F9FA;
+                    background-color: #ffffff;
+                    color: #2c3e50;
+                    alternate-background-color: #f8f9fa;
                 }
                 QHeaderView::section {
-                    background-color: #F1F3F5;
-                    color: #2C3E50;
-                    border: 1px solid #D0D7DE;
+                    background-color: #f1f3f5;  # this is cursed but
+                    color: #2c3e50;
+                    border: 1px solid #d0d7de;
                 }
             """)

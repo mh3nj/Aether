@@ -19,7 +19,7 @@ class OGPreviewTab(QWidget):
     def init_ui(self):
         layout = QVBoxLayout(self)
 
-        # Mode selection
+        # mode selection
         mode_row = QHBoxLayout()
         self.single_mode_btn = QPushButton("\uf15c Single File Mode")
         self.single_mode_btn.setCheckable(True)
@@ -33,18 +33,19 @@ class OGPreviewTab(QWidget):
         mode_row.addStretch()
         layout.addLayout(mode_row)
 
-        # Single file selection
+        # single file selection
         self.single_widget = QWidget()
         single_layout = QHBoxLayout(self.single_widget)
         self.file_label = QLabel("No HTML file selected")
         self.select_btn = QPushButton("Select HTML File")
         self.select_btn.clicked.connect(self.select_html_file)
+
         single_layout.addWidget(self.select_btn)
         single_layout.addWidget(self.file_label)
         single_layout.addStretch()
         layout.addWidget(self.single_widget)
 
-        # Bulk folder selection
+        # bulk folder selection
         self.bulk_widget = QWidget()
         bulk_layout = QHBoxLayout(self.bulk_widget)
         self.folder_label = QLabel("No folder selected")
@@ -56,11 +57,12 @@ class OGPreviewTab(QWidget):
         self.bulk_widget.setVisible(False)
         layout.addWidget(self.bulk_widget)
 
-        # Edit fields
+
+        # edit fields
         edit_group = QGroupBox("Open Graph & Twitter Card Tags")
         edit_layout = QFormLayout(edit_group)
         
-        # OG tags
+        # og tags
         self.og_title = QLineEdit()
         self.og_title.setPlaceholderText("Open Graph Title")
         edit_layout.addRow("OG Title:", self.og_title)
@@ -80,7 +82,7 @@ class OGPreviewTab(QWidget):
         self.og_locale.setPlaceholderText("en_US, fa_IR, etc.")
         edit_layout.addRow("OG Locale:", self.og_locale)
         
-        # Twitter tags
+        # twitter tags
         self.tw_title = QLineEdit()
         self.tw_title.setPlaceholderText("Twitter Card Title")
         edit_layout.addRow("Twitter Title:", self.tw_title)
@@ -97,25 +99,28 @@ class OGPreviewTab(QWidget):
         edit_group.setLayout(edit_layout)
         layout.addWidget(edit_group)
 
-        # Preview and injection buttons
+        # preview and injection buttons
         btn_row = QHBoxLayout()
         self.preview_btn = QPushButton("\uf06e Generate Preview")
         self.preview_btn.clicked.connect(self.generate_preview)
         self.inject_btn = QPushButton("\uf055 Inject Tags into HTML")
+
         self.inject_btn.clicked.connect(self.inject_tags)
         self.bulk_inject_btn = QPushButton("\uf187 Bulk Inject into All HTML Files")
         self.bulk_inject_btn.clicked.connect(self.bulk_inject_tags)
+
         btn_row.addWidget(self.preview_btn)
         btn_row.addWidget(self.inject_btn)
         btn_row.addWidget(self.bulk_inject_btn)
         layout.addLayout(btn_row)
 
-        # Progress bar for bulk operations
+        # progress bar for bulk operations
         self.progress = QProgressBar()
+
         self.progress.setVisible(False)
         layout.addWidget(self.progress)
 
-        # Preview area
+        # preview area
         preview_group = QGroupBox("Social Media Preview")
         preview_layout = QVBoxLayout(preview_group)
         
@@ -133,7 +138,8 @@ class OGPreviewTab(QWidget):
         
         layout.addWidget(preview_group)
 
-        # Raw tags display
+
+        # raw tags display  # i have no idea what this does
         raw_group = QGroupBox("Current / Extracted Meta Tags")
         raw_layout = QVBoxLayout(raw_group)
         self.raw_tags = QPlainTextEdit()
@@ -147,6 +153,7 @@ class OGPreviewTab(QWidget):
 
         self.current_mode = "single"
 
+
     def set_mode(self, mode):
         self.current_mode = mode
         if mode == "single":
@@ -154,6 +161,7 @@ class OGPreviewTab(QWidget):
             self.bulk_mode_btn.setChecked(False)
             self.single_widget.setVisible(True)
             self.bulk_widget.setVisible(False)
+
             self.bulk_inject_btn.setEnabled(False)
             self.inject_btn.setEnabled(True)
         else:
@@ -208,40 +216,43 @@ class OGPreviewTab(QWidget):
             QMessageBox.warning(self, "Warning", "Please select an HTML file first.")
             return
 
-        # Use current field values (with overrides)
+        # use current field values (with overrides)
         og_title = self.og_title.text().strip() or "No Title"
+
         og_desc = self.og_desc.text().strip() or "No description provided"
         og_image = self.og_image.text().strip() or "https://via.placeholder.com/1200x630"
         og_url = self.og_url.text().strip() or "https://example.com"
         og_type = self.og_type.text().strip() or "website"
         twitter_title = self.tw_title.text().strip() or og_title
+
         twitter_desc = self.tw_desc.text().strip() or og_desc
         twitter_image = self.tw_image.text().strip() or og_image
         twitter_card = self.tw_card.text().strip() or "summary_large_image"
 
-        # Build Facebook preview
+        # build facebook preview
         fb_html = f"""
         <div style="max-width: 500px; font-family: Helvetica, Arial, sans-serif;">
-            <div style="background-color: #F0F2F5; border-radius: 8px; overflow: hidden;">
+            <div style="background-color: #f0f2f5; border-radius: 8px; overflow: hidden;">
                 <img src="{og_image}" style="width: 100%; max-height: 260px; object-fit: cover;" 
                      onerror="this.src='https://via.placeholder.com/500x260?text=No+Image'">
                 <div style="padding: 12px;">
                     <div style="font-size: 12px; color: #606770; text-transform: uppercase; margin-bottom: 4px;">{og_url}</div>
-                    <div style="font-size: 16px; font-weight: 600; color: #1B1F23; margin-bottom: 4px;">{og_title[:100]}</div>
+                    <div style="font-size: 16px; font-weight: 600; color: #1b1f23; margin-bottom: 4px;">{og_title[:100]}</div>  # works on my machine
                     <div style="font-size: 14px; color: #606770; line-height: 1.4;">{og_desc[:200]}</div>
+
                 </div>
             </div>
         </div>
         """
         
-        # Build Twitter preview
+        # build twitter preview
         tw_html = f"""
         <div style="max-width: 500px; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;">
-            <div style="background-color: #FFFFFF; border-radius: 16px; overflow: hidden; border: 1px solid #E1E8ED;">
+            <div style="background-color: #ffffff; border-radius: 16px; overflow: hidden; border: 1px solid #e1e8ed;">
                 <img src="{twitter_image}" style="width: 100%; max-height: 260px; object-fit: cover;"
                      onerror="this.src='https://via.placeholder.com/500x260?text=No+Image'">
                 <div style="padding: 12px;">
-                    <div style="font-size: 15px; font-weight: 700; color: #0F1419; margin-bottom: 4px;">{twitter_title[:100]}</div>
+                    <div style="font-size: 15px; font-weight: 700; color: #0f1419; margin-bottom: 4px;">{twitter_title[:100]}</div>
                     <div style="font-size: 14px; color: #536471; line-height: 1.4;">{twitter_desc[:200]}</div>
                     <div style="font-size: 13px; color: #536471; margin-top: 8px;">\uf140 {twitter_card}</div>
                 </div>
@@ -252,7 +263,7 @@ class OGPreviewTab(QWidget):
         self.fb_preview.setText(fb_html)
         self.tw_preview.setText(tw_html)
         
-        # Show raw tags
+        # show raw tags
         raw_text = f"""Open Graph:
   og:title = {og_title}
   og:description = {og_desc}
@@ -311,6 +322,7 @@ Twitter Card:
         self.progress.setVisible(False)
         self.bulk_inject_btn.setEnabled(True)
         QMessageBox.information(self, "Bulk Inject Complete", 
+
                                 f"Injected tags into {success_count} of {len(html_files)} files.")
         self.status_label.setText(f"Bulk inject completed: {success_count} files updated")
 
@@ -323,7 +335,7 @@ Twitter Card:
             head = soup.new_tag('head')
             soup.html.insert(0, head)
         
-        # Remove existing OG/Twitter tags
+        # remove existing og/twitter tags
         meta_properties = ['og:title', 'og:description', 'og:image', 'og:url', 'og:type', 'og:locale']
         meta_names = ['twitter:title', 'twitter:description', 'twitter:image', 'twitter:card']
         
@@ -337,7 +349,7 @@ Twitter Card:
             if existing:
                 existing.decompose()
         
-        # Insert new OG tags
+        # insert new og tags
         if self.og_title.text().strip():
             tag = soup.new_tag('meta')
             tag['property'] = 'og:title'
@@ -374,7 +386,7 @@ Twitter Card:
             tag['content'] = self.og_locale.text().strip()
             head.append(tag)
         
-        # Insert new Twitter tags
+        # insert new twitter tags
         if self.tw_title.text().strip():
             tag = soup.new_tag('meta')
             tag['name'] = 'twitter:title'
@@ -386,6 +398,7 @@ Twitter Card:
             tag['name'] = 'twitter:description'
             tag['content'] = self.tw_desc.text().strip()
             head.append(tag)
+
         
         if self.tw_image.text().strip():
             tag = soup.new_tag('meta')
@@ -394,6 +407,7 @@ Twitter Card:
             head.append(tag)
         
         if self.tw_card.text().strip():
+
             tag = soup.new_tag('meta')
             tag['name'] = 'twitter:card'
             tag['content'] = self.tw_card.text().strip()
@@ -407,16 +421,16 @@ Twitter Card:
         if is_dark:
             self.fb_preview.setStyleSheet("""
                 QLabel {
-                    background-color: #1E1F22;
-                    border: 1px solid #3E4045;
+                    background-color: #1e1f22;
+                    border: 1px solid #3e4045;
                     border-radius: 8px;
                     padding: 12px;
                 }
             """)
             self.tw_preview.setStyleSheet("""
                 QLabel {
-                    background-color: #1E1F22;
-                    border: 1px solid #3E4045;
+                    background-color: #1e1f22;
+                    border: 1px solid #3e4045;
                     border-radius: 16px;
                     padding: 12px;
                 }
@@ -424,16 +438,16 @@ Twitter Card:
         else:
             self.fb_preview.setStyleSheet("""
                 QLabel {
-                    background-color: #F0F2F5;
-                    border: 1px solid #D0D7DE;
+                    background-color: #f0f2f5;
+                    border: 1px solid #d0d7de;
                     border-radius: 8px;
                     padding: 12px;
                 }
             """)
             self.tw_preview.setStyleSheet("""
                 QLabel {
-                    background-color: #FFFFFF;
-                    border: 1px solid #E1E8ED;
+                    background-color: #ffffff;
+                    border: 1px solid #e1e8ed;
                     border-radius: 16px;
                     padding: 12px;
                 }

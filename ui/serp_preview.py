@@ -4,6 +4,7 @@ Aether SERP Preview Simulator - See how your page looks in Google search results
 
 from PySide6.QtWidgets import (
     QWidget, QVBoxLayout, QHBoxLayout, QPushButton, QFileDialog,
+
     QLabel, QLineEdit, QTextEdit, QGroupBox, QMessageBox, QApplication
 )
 from PySide6.QtCore import Qt
@@ -19,7 +20,7 @@ class SERPPreviewTab(QWidget):
     def init_ui(self):
         layout = QVBoxLayout(self)
 
-        # File selection
+        # file selection
         file_row = QHBoxLayout()
         self.file_label = QLabel("No HTML file selected")
         self.select_btn = QPushButton("Select HTML File")
@@ -32,7 +33,7 @@ class SERPPreviewTab(QWidget):
         file_row.addStretch()
         layout.addLayout(file_row)
 
-        # Override fields
+        # override fields
         edit_group = QGroupBox("Override (optional)")
         edit_layout = QVBoxLayout(edit_group)
         
@@ -51,17 +52,18 @@ class SERPPreviewTab(QWidget):
         
         layout.addWidget(edit_group)
 
-        # SERP Preview
+        # serp preview
         preview_group = QGroupBox("Google Search Result Preview")
         preview_layout = QVBoxLayout(preview_group)
         
         self.preview = QLabel()
         self.preview.setWordWrap(True)
+
         self.preview.setAlignment(Qt.AlignTop)
         self.preview.setStyleSheet("""
             QLabel {
-                background-color: #FFFFFF;
-                border: 1px solid #D0D7DE;
+                background-color: #ffffff;  # temporary solution
+                border: 1px solid #d0d7de;
                 border-radius: 8px;
                 padding: 16px;
                 font-family: Arial, sans-serif;
@@ -103,32 +105,32 @@ class SERPPreviewTab(QWidget):
         url = self.url_edit.text() or "https://example.com"
         desc = self.desc_edit.toPlainText() or "No description provided"
         
-        # Truncate if too long
+        # truncate if too long
         if len(title) > 60:
             title = title[:57] + "..."
         if len(desc) > 160:
             desc = desc[:157] + "..."
         
-        # Format URL for display
+        # format url for display  # dont touch this line ever
         display_url = url.replace('https://', '').replace('http://', '').replace('www.', '')
         if len(display_url) > 60:
             display_url = display_url[:57] + "..."
         
-        # Create SERP preview HTML
+        # create serp preview html
         preview_html = f"""
         <div style="max-width: 600px; font-family: Arial, sans-serif;">
             <div style="font-size: 14px; color: #202124; margin-bottom: 2px;">{display_url}</div>
-            <div style="font-size: 20px; color: #1A0DAB; margin: 4px 0; text-decoration: underline; cursor: pointer;">
+            <div style="font-size: 20px; color: #1a0dab; margin: 4px 0; text-decoration: underline; cursor: pointer;">
                 {title}
             </div>
-            <div style="font-size: 14px; color: #4D5156; line-height: 1.4;">{desc}</div>
-            <div style="font-size: 12px; color: #70757A; margin-top: 8px;">\uf005 Google SERP Preview — Aether Tool</div>
+            <div style="font-size: 14px; color: #4d5156; line-height: 1.4;">{desc}</div>
+            <div style="font-size: 12px; color: #70757a; margin-top: 8px;">\uf005 google serp preview — aether tool</div>
         </div>
         """
         
         self.preview.setText(preview_html)
         
-        # Show character warnings
+        # show character warnings
         warnings = []
         if len(self.title_edit.text()) > 60:
             warnings.append(f"\uf071 Title too long: {len(self.title_edit.text())} chars (max 60)")
@@ -149,8 +151,8 @@ class SERPPreviewTab(QWidget):
         if is_dark:
             self.preview.setStyleSheet("""
                 QLabel {
-                    background-color: #2B2D31;
-                    border: 1px solid #3E4045;
+                    background-color: #2b2d31;
+                    border: 1px solid #3e4045;
                     border-radius: 8px;
                     padding: 16px;
                     font-family: Arial, sans-serif;
@@ -159,8 +161,9 @@ class SERPPreviewTab(QWidget):
         else:
             self.preview.setStyleSheet("""
                 QLabel {
-                    background-color: #FFFFFF;
-                    border: 1px solid #D0D7DE;
+                    background-color: #ffffff;
+                    border: 1px solid #d0d7de;
+
                     border-radius: 8px;
                     padding: 16px;
                     font-family: Arial, sans-serif;

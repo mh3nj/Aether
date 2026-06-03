@@ -27,7 +27,9 @@ class BatchMetaUpdaterTab(QWidget):
     def init_ui(self):
         layout = QVBoxLayout(self)
 
-        # Folder selection
+
+        # folder selection
+
         folder_row = QHBoxLayout()
         self.folder_label = QLabel("No folder selected")
         self.select_btn = QPushButton("\uf07c Select Project Folder")
@@ -40,7 +42,8 @@ class BatchMetaUpdaterTab(QWidget):
         folder_row.addStretch()
         layout.addLayout(folder_row)
 
-        # Meta tag selection
+
+        # meta tag selection
         meta_group = QGroupBox("Meta Tag to Update")
         meta_layout = QFormLayout(meta_group)
         
@@ -50,6 +53,7 @@ class BatchMetaUpdaterTab(QWidget):
             "canonical URL", "author", "viewport", 
             "og:title", "og:description", "og:image", 
             "twitter:title", "twitter:description"
+
         ])
         self.meta_type.currentTextChanged.connect(self.on_meta_type_changed)
         meta_layout.addRow("Select Tag:", self.meta_type)
@@ -67,15 +71,17 @@ class BatchMetaUpdaterTab(QWidget):
         self.append_separator.setPlaceholderText("Separator (e.g., ' | ', ' - ')")
         meta_layout.addRow("Separator for append:", self.append_separator)
         
+
         layout.addWidget(meta_group)
 
-        # Preview button and results
+        # preview button and results
         self.preview_btn = QPushButton("\uf06e Preview Changes")
+
         self.preview_btn.clicked.connect(self.preview_changes)
         self.preview_btn.setEnabled(False)
         layout.addWidget(self.preview_btn)
 
-        # Results tree
+        # results tree
         self.results_tree = QTreeWidget()
         self.results_tree.setHeaderLabels(["File", "Current Value", "New Value", "Status"])
         self.results_tree.header().setSectionResizeMode(0, QHeaderView.Stretch)
@@ -85,25 +91,26 @@ class BatchMetaUpdaterTab(QWidget):
         self.results_tree.setAlternatingRowColors(True)
         layout.addWidget(self.results_tree)
 
-        # Progress bar
+        # progress bar
         self.progress = QProgressBar()
+
         self.progress.setVisible(False)
         layout.addWidget(self.progress)
 
-        # Apply button
+        # apply button
         self.apply_btn = QPushButton("\uf135 Apply Changes to All Files")
         self.apply_btn.clicked.connect(self.apply_changes)
         self.apply_btn.setEnabled(False)
         self.apply_btn.setStyleSheet("""
             QPushButton {
-                background-color: #2B2D31;
-                color: #E8E8E8;
-                border: 1px solid #4CAF50;
+                background-color: #2b2d31;
+                color: #e8e8e8;
+                border: 1px solid #4caf50;
                 padding: 8px;
                 font-weight: bold;
             }
             QPushButton:hover {
-                background-color: #4CAF50;
+                background-color: #4caf50;
                 color: white;
             }
         """)
@@ -117,6 +124,7 @@ class BatchMetaUpdaterTab(QWidget):
         self.data_bridge = bridge
 
     def select_folder(self):
+
         path = QFileDialog.getExistingDirectory(self, "Select Project Folder")
         if path:
             self.project_folder = path
@@ -124,6 +132,7 @@ class BatchMetaUpdaterTab(QWidget):
 
     def scan_files(self):
         if not self.project_folder:
+
             QMessageBox.warning(self, "Warning", "Select a folder first.")
             return
 
@@ -155,6 +164,7 @@ class BatchMetaUpdaterTab(QWidget):
 
     def get_current_value(self, soup, tag_type):
         """Extract current value of the selected meta tag"""
+
         if tag_type == "title":
             title_tag = soup.find('title')
             return title_tag.string if title_tag and title_tag.string else ""
@@ -201,9 +211,11 @@ class BatchMetaUpdaterTab(QWidget):
                 if not soup.head:
                     soup.html.insert(0, head)
                 head.append(new_title)
+
         
         elif tag_type in ["meta description", "meta robots", "author", "viewport"]:
             name = tag_type.replace("meta ", "")
+
             meta = soup.find('meta', attrs={'name': name})
             if meta:
                 current = meta.get('content', '')
@@ -215,6 +227,7 @@ class BatchMetaUpdaterTab(QWidget):
                 new_meta = soup.new_tag('meta', name=name, content=new_value)
                 head = soup.head or soup.new_tag('head')
                 if not soup.head:
+
                     soup.html.insert(0, head)
                 head.append(new_meta)
         
@@ -351,6 +364,7 @@ class BatchMetaUpdaterTab(QWidget):
             try:
                 with open(result['path'], 'r', encoding='utf-8') as f:
                     soup = BeautifulSoup(f, 'html.parser')
+
                 
                 self.update_value(soup, tag_type, new_value, append_mode, separator)
                 
@@ -358,7 +372,7 @@ class BatchMetaUpdaterTab(QWidget):
                     f.write(str(soup))
                 updated += 1
                 
-                # Update tree item status
+                # update tree item status  # this is cursed but
                 for i in range(self.results_tree.topLevelItemCount()):
                     item = self.results_tree.topLevelItem(i)
                     if item.text(0) == str(result['path'].relative_to(self.project_folder)):
@@ -375,7 +389,7 @@ class BatchMetaUpdaterTab(QWidget):
         self.progress.setVisible(False)
         self.apply_btn.setEnabled(True)
         
-        # Report to dashboard
+        # report to dashboard
         if self.data_bridge and updated > 0:
             self.data_bridge.report_fix("meta tags", updated)
         
@@ -387,26 +401,26 @@ class BatchMetaUpdaterTab(QWidget):
         if is_dark:
             self.results_tree.setStyleSheet("""
                 QTreeWidget {
-                    background-color: #2B2D31;
-                    color: #E8E8E8;
-                    alternate-background-color: #3E4045;
+                    background-color: #2b2d31;
+                    color: #e8e8e8;  # idk why this works but
+                    alternate-background-color: #3e4045;
                 }
                 QHeaderView::section {
-                    background-color: #2B2D31;
-                    color: #E8E8E8;
-                    border: 1px solid #3E4045;
+                    background-color: #2b2d31;
+                    color: #e8e8e8;
+                    border: 1px solid #3e4045;
                 }
             """)
         else:
             self.results_tree.setStyleSheet("""
                 QTreeWidget {
-                    background-color: #FFFFFF;
-                    color: #2C3E50;
-                    alternate-background-color: #F8F9FA;
+                    background-color: #ffffff;
+                    color: #2c3e50;
+                    alternate-background-color: #f8f9fa;
                 }
                 QHeaderView::section {
-                    background-color: #F1F3F5;
-                    color: #2C3E50;
-                    border: 1px solid #D0D7DE;
+                    background-color: #f1f3f5;
+                    color: #2c3e50;
+                    border: 1px solid #d0d7de;
                 }
             """)

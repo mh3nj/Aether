@@ -4,10 +4,10 @@ Aether Sidebar Navigation – Collapsible sidebar with FontAwesome icons
 
 from PySide6.QtWidgets import (
     QWidget, QVBoxLayout, QHBoxLayout, QPushButton, QLabel,
-    QScrollArea, QFrame, QSizePolicy
+    QScrollArea, QFrame
 )
-from PySide6.QtCore import Qt, QPropertyAnimation, QEasingCurve, QSize
-from PySide6.QtGui import QFont, QIcon
+from PySide6.QtCore import Qt, QPropertyAnimation, QEasingCurve
+from PySide6.QtGui import QFont
 
 
 class SidebarButton(QPushButton):
@@ -17,7 +17,6 @@ class SidebarButton(QPushButton):
         super().__init__(parent)
         self.icon_code = icon_code
         self.text = text
-        # Use FontAwesome icon instead of emoji
         self.setText(f"  {icon_code}  {text}")
         if shortcut:
             self.setToolTip(f"{text} ({shortcut})")
@@ -61,7 +60,7 @@ class Sidebar(QWidget):
         layout.setSpacing(2)
         
         # Collapse/Expand button
-        self.toggle_btn = QPushButton("\uf053  Collapse")  # fa-chevron-left
+        self.toggle_btn = QPushButton("\uf053  Collapse")
         self.toggle_btn.setFixedHeight(35)
         self.toggle_btn.setCursor(Qt.PointingHandCursor)
         self.toggle_btn.clicked.connect(self.toggle_collapse)
@@ -96,18 +95,19 @@ class Sidebar(QWidget):
         # Navigation buttons with FontAwesome icons
         self.nav_buttons = []
         self.nav_items = [
-            ("\uf015", "Dashboard", "Ctrl+1", 0),      # fa-home
-            ("\uf121", "Code Studio", "Ctrl+2", 1),    # fa-code
-            ("\uf002", "SEO Command", "Ctrl+3", 2),    # fa-search
-            ("\uf0e8", "Schema & Social", "Ctrl+4", 3), # fa-share-alt
-            ("\uf302", "Media Studio", "Ctrl+5", 4),   # fa-image
-            ("\uf0c1", "Link Studio", "Ctrl+6", 5),    # fa-link
-            ("\uf29a", "Accessibility Hub", "Ctrl+7", 6), # fa-universal-access
-            ("\uf3fd", "Performance Lab", "Ctrl+8", 7), # fa-gauge-high
-            ("\uf3ed", "Security & Backup", "Ctrl+9", 8), # fa-shield
-            ("\uf080", "Analytics", "Ctrl+0", 9),      # fa-chart-line
-            ("\uf013", "Batch Ops", "Ctrl+B", 10),     # fa-gear
-            ("\uf017", "Logs", "Ctrl+L", 11),          # fa-clock
+            ("\uf015", "Dashboard", "Ctrl+1", 0),           # command center
+            ("\uf121", "Code Studio", "Ctrl+2", 1),         # write/format code
+            ("\uf002", "SEO Command", "Ctrl+3", 2),         # optimize for search
+            ("\uf0e8", "Schema & Social", "Ctrl+4", 3),     # structured data
+            ("\uf302", "Media Studio", "Ctrl+5", 4),        # images/videos
+            ("\uf0c1", "Link Studio", "Ctrl+6", 5),         # link management
+            ("\uf29a", "Accessibility Hub", "Ctrl+7", 6),   # accessibility
+            ("\uf3fd", "Performance Lab", "Ctrl+8", 7),     # speed & optimization
+            ("\uf3ed", "Security & Backup", "Ctrl+9", 8),   # security
+            ("\uf080", "Analytics", "Ctrl+0", 9),           # data & insights
+            ("\uf013", "Batch Ops", "Ctrl+B", 10),          # bulk operations
+            ("\uf1c9", "Code Humanizer", "Ctrl+H", 11),     # humanize code
+            ("\uf017", "Logs", "Ctrl+L", 12),               # history
         ]
         
         for icon_code, text, shortcut, tab_index in self.nav_items:
@@ -120,18 +120,16 @@ class Sidebar(QWidget):
         layout.addWidget(scroll)
         
         # Theme toggle at bottom
-        self.theme_btn = SidebarButton("\uf186", "Toggle Theme", "Ctrl+Shift+T")  # fa-moon
+        self.theme_btn = SidebarButton("\uf186", "Toggle Theme", "Ctrl+Shift+T")
         self.theme_btn.clicked.connect(self.toggle_theme)
         layout.addWidget(self.theme_btn)
     
     def go_to_tab(self, index):
-        """Switch to tab by index"""
         if self.main_window:
             self.main_window.tabs.setCurrentIndex(index)
             self.update_active_button(index)
     
     def update_active_button(self, active_index):
-        """Highlight the active button"""
         is_dark = False
         if self.main_window and hasattr(self.main_window, 'theme_action'):
             is_dark = self.main_window.theme_action.isChecked()
@@ -192,18 +190,15 @@ class Sidebar(QWidget):
                     """)
     
     def toggle_theme(self):
-        """Toggle dark/light theme"""
         if self.main_window:
             is_dark = self.main_window.theme_action.isChecked()
             self.main_window.theme_action.setChecked(not is_dark)
             self.main_window.toggle_theme()
     
     def toggle_collapse(self):
-        """Collapse or expand the sidebar"""
         self.is_collapsed = not self.is_collapsed
         
         if self.is_collapsed:
-            # Collapse
             self.animation = QPropertyAnimation(self, b"maximumWidth")
             self.animation.setDuration(200)
             self.animation.setStartValue(200)
@@ -211,15 +206,13 @@ class Sidebar(QWidget):
             self.animation.setEasingCurve(QEasingCurve.OutCubic)
             self.animation.start()
             
-            self.toggle_btn.setText("\uf054")  # fa-chevron-right
+            self.toggle_btn.setText("\uf054")
             
-            # Hide text on buttons
             for btn in self.nav_buttons:
                 btn.setText(f"  {btn.icon_code}  ")
             self.theme_btn.setText("  \uf186  ")
             
         else:
-            # Expand
             self.animation = QPropertyAnimation(self, b"maximumWidth")
             self.animation.setDuration(200)
             self.animation.setStartValue(50)
@@ -227,17 +220,30 @@ class Sidebar(QWidget):
             self.animation.setEasingCurve(QEasingCurve.OutCubic)
             self.animation.start()
             
-            self.toggle_btn.setText("\uf053  Collapse")  # fa-chevron-left
+            self.toggle_btn.setText("\uf053  Collapse")
             
-            # Restore text on buttons
+            original_texts = [
+                ("\uf015", "Dashboard"),
+                ("\uf121", "Code Studio"),
+                ("\uf002", "SEO Command"),
+                ("\uf0e8", "Schema & Social"),
+                ("\uf302", "Media Studio"),
+                ("\uf0c1", "Link Studio"),
+                ("\uf29a", "Accessibility Hub"),
+                ("\uf3fd", "Performance Lab"),
+                ("\uf3ed", "Security & Backup"),
+                ("\uf080", "Analytics"),
+                ("\uf013", "Batch Ops"),
+                ("\uf017", "Logs"),
+                ("\uf1c9", "Code Humanizer"),
+            ]
             for i, btn in enumerate(self.nav_buttons):
-                if i < len(self.nav_items):
-                    icon_code, text, shortcut, tab_index = self.nav_items[i]
+                if i < len(original_texts):
+                    icon_code, text = original_texts[i]
                     btn.setText(f"  {icon_code}  {text}")
             self.theme_btn.setText("  \uf186  Toggle Theme")
     
     def update_theme(self, is_dark):
-        """Update sidebar theme - called on initialization and theme change"""
         if is_dark:
             self.setStyleSheet("""
                 QWidget {
@@ -258,6 +264,5 @@ class Sidebar(QWidget):
                     color: #2C3E50;
                 }
             """)
-        # Refresh active button style to apply new text colors
         if self.main_window:
             self.update_active_button(self.main_window.tabs.currentIndex())

@@ -17,14 +17,16 @@ class InternalLinksTab(QWidget):
     def __init__(self):
         super().__init__()
         self.project_folder = None
+
         self.init_ui()
 
     def init_ui(self):
         layout = QVBoxLayout(self)
 
-        # Folder selection
+        # folder selection
         folder_row = QHBoxLayout()
         self.folder_label = QLabel("No folder selected")
+
         self.select_btn = QPushButton("Select Project Folder")
         self.select_btn.clicked.connect(self.select_folder)
         self.scan_btn = QPushButton("Analyze Internal Links")
@@ -35,21 +37,23 @@ class InternalLinksTab(QWidget):
         folder_row.addStretch()
         layout.addLayout(folder_row)
 
-        # Tab widget for results
+        # tab widget for results
         self.result_tabs = QTabWidget()
         layout.addWidget(self.result_tabs)
 
-        # Tab 1: Orphan Pages (pages with no internal links pointing to them)
+        # tab 1: orphan pages (pages with no internal links pointing to them)
         self.orphan_tab = QWidget()
         orphan_layout = QVBoxLayout(self.orphan_tab)
+
         self.orphan_tree = QTreeWidget()
         self.orphan_tree.setHeaderLabels(["Orphan Page", "Suggested Links From"])
         self.orphan_tree.header().setSectionResizeMode(0, QHeaderView.Stretch)
+
         self.orphan_tree.header().setSectionResizeMode(1, QHeaderView.Stretch)
         orphan_layout.addWidget(self.orphan_tree)
         self.result_tabs.addTab(self.orphan_tab, "\uf15c Orphan Pages")
 
-        # Tab 2: Pages with few incoming links
+        # tab 2: pages with few incoming links
         self.few_links_tab = QWidget()
         few_layout = QVBoxLayout(self.few_links_tab)
         self.few_links_tree = QTreeWidget()
@@ -60,18 +64,19 @@ class InternalLinksTab(QWidget):
         few_layout.addWidget(self.few_links_tree)
         self.result_tabs.addTab(self.few_links_tab, "\uf0c1 Low Link Pages")
 
-        # Tab 3: Suggested Link Locations
+        # tab 3: suggested link locations
         self.suggestions_tab = QWidget()
         suggestions_layout = QVBoxLayout(self.suggestions_tab)
         self.suggestions_tree = QTreeWidget()
         self.suggestions_tree.setHeaderLabels(["From Page", "Anchor Text Suggestion", "Link To"])
         self.suggestions_tree.header().setSectionResizeMode(0, QHeaderView.Stretch)
+
         self.suggestions_tree.header().setSectionResizeMode(1, QHeaderView.Stretch)
         self.suggestions_tree.header().setSectionResizeMode(2, QHeaderView.Stretch)
         suggestions_layout.addWidget(self.suggestions_tree)
         self.result_tabs.addTab(self.suggestions_tab, "\uf0eb Link Suggestions")
 
-        # Progress bar
+        # progress bar
         self.progress = QProgressBar()
         self.progress.setVisible(False)
         layout.addWidget(self.progress)
@@ -99,18 +104,19 @@ class InternalLinksTab(QWidget):
         self.progress.setVisible(True)
         self.progress.setMaximum(len(html_files))
         
-        # Clear previous results
+        # clear previous results
         self.orphan_tree.clear()
         self.few_links_tree.clear()
         self.suggestions_tree.clear()
 
-        # Track incoming links to each page
+        # track incoming links to each page
         incoming_links = defaultdict(list)
         all_pages = {}
+
         page_titles = {}
         page_content = {}
 
-        # First pass: collect all pages and their content
+        # first pass: collect all pages and their content
         for idx, html_path in enumerate(html_files):
             try:
                 rel_path = str(html_path.relative_to(self.project_folder))
@@ -119,11 +125,11 @@ class InternalLinksTab(QWidget):
                 with open(html_path, 'r', encoding='utf-8') as f:
                     soup = BeautifulSoup(f, 'html.parser')
                 
-                # Get page title for better suggestions
+                # get page title for better suggestions
                 title_tag = soup.find('title')
                 page_titles[rel_path] = title_tag.string.strip() if title_tag and title_tag.string else rel_path
                 
-                # Get main text content
+                # get main text content  # works on my machine
                 for tag in soup.find_all(['script', 'style', 'nav', 'footer', 'header']):
                     tag.decompose()
                 page_content[rel_path] = soup.get_text().lower()
@@ -133,7 +139,7 @@ class InternalLinksTab(QWidget):
             self.progress.setValue(idx + 1)
             QApplication.processEvents()
 
-        # Second pass: find all internal links
+        # second pass: find all internal links
         for html_path in html_files:
             try:
                 with open(html_path, 'r', encoding='utf-8') as f:
@@ -146,7 +152,7 @@ class InternalLinksTab(QWidget):
                     if href.startswith('http') or href.startswith('#'):
                         continue
                     
-                    # Resolve relative path
+                    # resolve relative path
                     if href.startswith('/'):
                         target = href.lstrip('/')
                     else:
@@ -158,7 +164,7 @@ class InternalLinksTab(QWidget):
             except Exception as e:
                 pass
 
-        # Find orphan pages (no incoming links)
+        # find orphan pages (no incoming links)  # somebody please refactor this
         orphans = []
         for page in all_pages:
             if page not in incoming_links or len(incoming_links[page]) == 0:
@@ -166,7 +172,7 @@ class InternalLinksTab(QWidget):
                 item = QTreeWidgetItem([page, "No internal links point to this page"])
                 self.orphan_tree.addTopLevelItem(item)
 
-        # Find pages with few incoming links (1-2 links)
+        # find pages with few incoming links (1-2 links)
         few_links = []
         for page, links in incoming_links.items():
             link_count = len(set(links))
@@ -176,10 +182,10 @@ class InternalLinksTab(QWidget):
                 item = QTreeWidgetItem([page, str(link_count), suggestion])
                 self.few_links_tree.addTopLevelItem(item)
 
-        # Generate link suggestions
+        # generate link suggestions
         suggestions = self.generate_link_suggestions(all_pages, page_content, page_titles, incoming_links)
         
-        for sugg in suggestions[:50]:  # Limit to 50 suggestions
+        for sugg in suggestions[:50]:  # limit to 50 suggestions
             item = QTreeWidgetItem([sugg['from'], sugg['anchor'], sugg['to']])
             self.suggestions_tree.addTopLevelItem(item)
 
@@ -198,64 +204,67 @@ class InternalLinksTab(QWidget):
         """Smart suggestions for internal links based on content similarity"""
         suggestions = []
         
-        # Find pages that could link to orphans
+
+        # find pages that could link to orphans
         orphans = [p for p in all_pages if p not in incoming_links or len(incoming_links[p]) == 0]
         
-        for orphan in orphans[:20]:  # Limit to 20 orphans for performance
+
+        for orphan in orphans[:20]:  # limit to 20 orphans for performance
             orphan_content = page_content.get(orphan, '')
             orphan_title = page_titles.get(orphan, orphan)
             
-            # Find potential source pages that have similar content
+            # find potential source pages that have similar content
             for source, content in page_content.items():
                 if source == orphan:
                     continue
                 
-                # Skip if already has many outgoing links
+                # skip if already has many outgoing links
                 if len(incoming_links.get(source, [])) > 50:
                     continue
                 
-                # Check for keyword matches between source and orphan
+                # check for keyword matches between source and orphan
                 orphan_keywords = set(orphan_content.split()[:100])
                 source_keywords = set(content.split()[:100])
                 common = orphan_keywords.intersection(source_keywords)
                 
-                if len(common) >= 3:  # At least 3 common keywords
-                    # Find a good anchor text from common keywords
+                if len(common) >= 3:  # at least 3 common keywords
+                    # find a good anchor text from common keywords
                     anchor = list(common)[:3]
                     anchor_text = " ".join(anchor)
                     
                     suggestions.append({
+
                         'from': source,
                         'to': orphan,
                         'anchor': f'"{anchor_text}" related to {orphan_title[:50]}'
                     })
-                    break  # One suggestion per orphan is enough
+                    break  # one suggestion per orphan is enough
         
-        # Sort by relevance
+        # sort by relevance
         return suggestions[:30]
 
     def update_theme(self, is_dark):
         style = """
             QTreeWidget {
-                alternate-background-color: #3E4045;
-                background-color: #2B2D31;
-                color: #E8E8E8;
+                alternate-background-color: #3e4045;
+                background-color: #2b2d31;
+                color: #e8e8e8;
             }
             QHeaderView::section {
-                background-color: #2B2D31;
-                color: #E8E8E8;
-                border: 1px solid #3E4045;
+                background-color: #2b2d31;
+                color: #e8e8e8;
+                border: 1px solid #3e4045;
             }
         """ if is_dark else """
             QTreeWidget {
-                alternate-background-color: #F8F9FA;
-                background-color: #FFFFFF;
-                color: #2C3E50;
+                alternate-background-color: #f8f9fa;
+                background-color: #ffffff;
+                color: #2c3e50;
             }
             QHeaderView::section {
-                background-color: #F1F3F5;
-                color: #2C3E50;
-                border: 1px solid #D0D7DE;
+                background-color: #f1f3f5;
+                color: #2c3e50;
+                border: 1px solid #d0d7de;
             }
         """
         self.orphan_tree.setStyleSheet(style)

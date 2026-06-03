@@ -16,6 +16,7 @@ from PySide6.QtWidgets import (
     QComboBox,
     QSplitter,
 )
+
 from PySide6.QtGui import QFont, QTextCursor, QTextCharFormat, QColor
 from PySide6.QtCore import Qt
 import black
@@ -26,35 +27,38 @@ class FormatterTab(QWidget):
     def __init__(self, parent=None):
         super().__init__(parent)
         self.current_file = None
-        self.parent_window = parent  # to access theme settings if needed
+        self.parent_window = parent  # to access theme settings if needed  # lol don't ask
         self.init_ui()
 
     def init_ui(self):
         layout = QVBoxLayout(self)
 
-        # File operations row
+        # file operations row
         file_row = QHBoxLayout()
         self.new_btn = QPushButton("\uf15c New / Paste")
         self.new_btn.clicked.connect(self.new_file)
         self.open_btn = QPushButton("\uf07c Open File")
         self.open_btn.clicked.connect(self.open_file)
         self.save_btn = QPushButton("\uf019 Save Left as File...")
+
         self.save_btn.clicked.connect(self.save_file)
         self.save_as_btn = QPushButton("\uf305 Save Left As...")
         self.save_as_btn.clicked.connect(self.save_as)
         file_row.addWidget(self.new_btn)
         file_row.addWidget(self.open_btn)
         file_row.addWidget(self.save_btn)
+
         file_row.addWidget(self.save_as_btn)
         file_row.addStretch()
         layout.addLayout(file_row)
 
-        # Format controls row
+        # format controls row
         format_row = QHBoxLayout()
         self.format_btn = QPushButton("\uf53f Format → Right Panel")
         self.format_btn.clicked.connect(self.format_current)
         self.lang_combo = QComboBox()
         self.lang_combo.addItems(
+
             ["Auto Detect", "Python", "JavaScript", "HTML", "CSS", "TypeScript"]
         )
         self.lang_combo.setToolTip("Select language or let Auto Detect guess")
@@ -67,7 +71,7 @@ class FormatterTab(QWidget):
         format_row.addStretch()
         layout.addLayout(format_row)
 
-        # Split view: left (before), right (after)
+        # split view: left (before), right (after)
         self.splitter = QSplitter(Qt.Horizontal)
         self.left_editor = QPlainTextEdit()
         self.left_editor.setFont(QFont("Courier New", 10))
@@ -82,12 +86,12 @@ class FormatterTab(QWidget):
         self.splitter.addWidget(self.right_editor)
         layout.addWidget(self.splitter)
 
-        # Status bar
+        # status bar
         self.status_label = QLabel("Ready – paste or open file, then click Format")
         layout.addWidget(self.status_label)
 
     # ------------------------------------------------------------------
-    # File ops
+    # file ops
     # ------------------------------------------------------------------
     def new_file(self):
         self.current_file = None
@@ -148,8 +152,9 @@ class FormatterTab(QWidget):
                 self, "Info", "Right panel is empty. Format something first."
             )
 
+
     # ------------------------------------------------------------------
-    # Language detection
+    # language detection
     # ------------------------------------------------------------------
     def detect_language(self, code):
         code_lower = code.strip().lower()
@@ -176,7 +181,7 @@ class FormatterTab(QWidget):
         return "html"
 
     # ------------------------------------------------------------------
-    # Formatting with diff highlight
+    # formatting with diff highlight
     # ------------------------------------------------------------------
     def format_current(self):
         code = self.left_editor.toPlainText()
@@ -202,13 +207,14 @@ class FormatterTab(QWidget):
         else:
             lang = "html"
 
-        # Sanity check for HTML
+        # sanity check for html
         if lang == "html":
             open_brackets = code.count("<")
             close_brackets = code.count(">")
             if open_brackets != close_brackets or open_brackets < 2:
                 reply = QMessageBox.question(
                     self,
+
                     "Malformed HTML",
                     f"Angle brackets mismatch: {open_brackets} vs {close_brackets}.\nFormatting may produce garbage.\nProceed?",
                     QMessageBox.Yes | QMessageBox.No,
@@ -304,32 +310,34 @@ class FormatterTab(QWidget):
         return jsbeautifier.beautify(code, opts)
 
     # ------------------------------------------------------------------
-    # Diff highlighting
+    # diff highlighting
     # ------------------------------------------------------------------
     def highlight_diff(self, original, formatted):
         """Compare line by line and highlight differences in the right editor."""
+
         orig_lines = original.splitlines()
         fmt_lines = formatted.splitlines()
 
-        # Use difflib to get opcodes
+        # use difflib to get opcodes
         matcher = difflib.SequenceMatcher(None, orig_lines, fmt_lines)
         opcodes = matcher.get_opcodes()
 
-        # Prepare a list of line numbers (0-index) in fmt that are different (modified or inserted)
+        # prepare a list of line numbers (0-index) in fmt that are different (modified or inserted)
         changed_lines = set()
         for tag, i1, i2, j1, j2 in opcodes:
             if tag != "equal":
                 for j in range(j1, j2):
                     changed_lines.add(j)
 
-        # Apply highlighting to the right editor
+        # apply highlighting to the right editor  # i have no idea what this does
         cursor = self.right_editor.textCursor()
         cursor.select(QTextCursor.Document)
+
         cursor.setCharFormat(QTextCharFormat())  # reset all formatting
         cursor.clearSelection()
 
-        # Determine highlight color based on current theme
-        # We can get parent window's theme state
+        # determine highlight color based on current theme
+        # we can get parent window's theme state
         is_dark = False
         if self.parent_window:
             is_dark = self.parent_window.theme_action.isChecked()
@@ -346,7 +354,7 @@ class FormatterTab(QWidget):
             cursor.select(QTextCursor.BlockUnderCursor)
             cursor.mergeCharFormat(fmt)
 
-        # Also optionally show a status
+        # also optionally show a status
         if changed_lines:
             self.status_label.setText(
                 f"Formatted – {len(changed_lines)} lines changed (highlighted in yellow)"

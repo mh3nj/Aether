@@ -19,6 +19,7 @@ class MetaRefreshTab(QWidget):
         self.init_ui()
 
     def init_ui(self):
+
         layout = QVBoxLayout(self)
 
         folder_row = QHBoxLayout()
@@ -43,6 +44,7 @@ class MetaRefreshTab(QWidget):
         layout.addWidget(self.progress)
 
         self.summary_label = QLabel("Meta refresh redirects hurt SEO. This tool finds them.")
+
         layout.addWidget(self.summary_label)
 
     def select_folder(self):
@@ -68,8 +70,9 @@ class MetaRefreshTab(QWidget):
                     soup = BeautifulSoup(f, 'html.parser')
                 rel_path = str(html_path.relative_to(self.project_folder))
 
-                # Check for meta refresh
+                # check for meta refresh
                 meta_refresh = soup.find('meta', attrs={'http-equiv': 'refresh'})
+
                 if meta_refresh:
                     content = meta_refresh.get('content', '')
                     if ';' in content and 'url=' in content.lower():

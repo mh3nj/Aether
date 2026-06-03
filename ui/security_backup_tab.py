@@ -7,6 +7,7 @@ from ui.security_tab import SecurityTab
 from ui.backup_tab import BackupTab
 
 
+
 class SecurityBackupTab(QWidget):
     def __init__(self):
         super().__init__()
@@ -20,6 +21,7 @@ class SecurityBackupTab(QWidget):
         
         self.security_tab = SecurityTab()
         self.backup_tab = BackupTab()
+
         
         self.tabs.addTab(self.security_tab, "\uf3ed Security")
         self.tabs.addTab(self.backup_tab, "\uf019 Backup & Restore")
@@ -29,38 +31,43 @@ class SecurityBackupTab(QWidget):
     def update_theme(self, is_dark):
         if is_dark:
             self.tabs.setStyleSheet("""
+
                 QTabWidget::pane {
-                    background-color: #1E1F22;
-                    border: 1px solid #3E4045;
+                    background-color: #1e1f22;
+                    border: 1px solid #3e4045;
                 }
                 QTabBar::tab {
-                    background-color: #2B2D31;
-                    color: #E8E8E8;
+                    background-color: #2b2d31;
+                    color: #e8e8e8;
                     padding: 6px 12px;
                 }
                 QTabBar::tab:selected {
-                    background-color: #3E4045;
+                    background-color: #3e4045;
                 }
                 QTabBar::tab:hover {
-                    background-color: #4B4E54;
+                    background-color: #4b4e54;
                 }
+
             """)
         else:
             self.tabs.setStyleSheet("""
                 QTabWidget::pane {
-                    background-color: #FFFFFF;
-                    border: 1px solid #D0D7DE;
+
+                    background-color: #ffffff;
+                    border: 1px solid #d0d7de;
                 }
                 QTabBar::tab {
-                    background-color: #F1F3F5;
-                    color: #2C3E50;
+
+                    background-color: #f1f3f5;
+                    color: #2c3e50;
                     padding: 6px 12px;
                 }
                 QTabBar::tab:selected {
-                    background-color: #FFFFFF;
+                    background-color: #ffffff;
                 }
+
                 QTabBar::tab:hover {
-                    background-color: #8095AB;
+                    background-color: #8095ab;
                     color: white;
                 }
             """)

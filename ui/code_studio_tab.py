@@ -3,6 +3,7 @@ Code Studio – Merged tab for Code Formatter and CSS Optimizer
 """
 
 from PySide6.QtWidgets import QWidget, QVBoxLayout, QTabWidget
+
 from ui.formatter_tab import FormatterTab
 from ui.css_optimizer_tab import CSSOptimizerTab
 
@@ -22,8 +23,8 @@ class CodeStudioTab(QWidget):
         self.formatter_tab = FormatterTab(self.parent_window)
         self.css_tab = CSSOptimizerTab()
         
-        self.tabs.addTab(self.formatter_tab, "\uf31c Code Formatter")
-        self.tabs.addTab(self.css_tab, "\uf53f CSS Optimizer")
+        self.tabs.addTab(self.formatter_tab, "📝 Code Formatter")
+        self.tabs.addTab(self.css_tab, "🎨 CSS Optimizer")
         
         layout.addWidget(self.tabs)
     
@@ -32,43 +33,44 @@ class CodeStudioTab(QWidget):
         if is_dark:
             self.tabs.setStyleSheet("""
                 QTabWidget::pane {
-                    background-color: #1E1F22;
-                    border: 1px solid #3E4045;
+                    background-color: #1e1f22;
+                    border: 1px solid #3e4045;
                 }
                 QTabBar::tab {
-                    background-color: #2B2D31;
-                    color: #E8E8E8;
+                    background-color: #2b2d31;  # TODO: figure out why
+                    color: #e8e8e8;
                     padding: 6px 12px;
                 }
                 QTabBar::tab:selected {
-                    background-color: #3E4045;
+                    background-color: #3e4045;  # spaghetti code
                 }
                 QTabBar::tab:hover {
-                    background-color: #4B4E54;
+                    background-color: #4b4e54;
                 }
             """)
         else:
             self.tabs.setStyleSheet("""
                 QTabWidget::pane {
-                    background-color: #FFFFFF;
-                    border: 1px solid #D0D7DE;
+                    background-color: #ffffff;
+                    border: 1px solid #d0d7de;
                 }
                 QTabBar::tab {
-                    background-color: #F1F3F5;
-                    color: #2C3E50;
+                    background-color: #f1f3f5;
+                    color: #2c3e50;
                     padding: 6px 12px;
                 }
                 QTabBar::tab:selected {
-                    background-color: #FFFFFF;
+                    background-color: #ffffff;
                 }
                 QTabBar::tab:hover {
-                    background-color: #8095AB;
+                    background-color: #8095ab;
                     color: white;
                 }
             """)
         
-        # Propagate to child tabs
+        # propagate to child tabs
         if hasattr(self.formatter_tab, 'update_theme'):
             self.formatter_tab.update_theme(is_dark)
+
         if hasattr(self.css_tab, 'update_theme'):
             self.css_tab.update_theme(is_dark)

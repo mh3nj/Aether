@@ -21,13 +21,16 @@ class ContentLengthTab(QWidget):
         self.data_bridge = None
         self.init_ui()
 
+
     def init_ui(self):
         layout = QVBoxLayout(self)
 
-        # Folder selection
+        # folder selection
         folder_row = QHBoxLayout()
         self.folder_label = QLabel("No folder selected")
+
         self.select_btn = QPushButton("\uf07c Select Project Folder")
+
         self.select_btn.clicked.connect(self.select_folder)
         self.scan_btn = QPushButton("📏 Analyze Content Length")
         self.scan_btn.clicked.connect(self.analyze_content)
@@ -37,7 +40,7 @@ class ContentLengthTab(QWidget):
         folder_row.addStretch()
         layout.addLayout(folder_row)
 
-        # Options
+        # options
         opts_row = QHBoxLayout()
         self.content_type = QComboBox()
         self.content_type.addItems(["All Text", "Main Content Only (article/main)", "Body Text Only"])
@@ -46,7 +49,7 @@ class ContentLengthTab(QWidget):
         opts_row.addStretch()
         layout.addLayout(opts_row)
 
-        # Quick stats panel
+        # quick stats panel
         stats_row = QHBoxLayout()
         self.total_pages_label = QLabel("Total pages: 0")
         self.avg_length_label = QLabel("Avg length: 0 words")
@@ -57,7 +60,7 @@ class ContentLengthTab(QWidget):
         stats_row.addStretch()
         layout.addLayout(stats_row)
 
-        # Results tree
+        # results tree
         self.results_tree = QTreeWidget()
         self.results_tree.setHeaderLabels(["Page", "Word Count", "Status", "Recommendation"])
         self.results_tree.header().setSectionResizeMode(0, QHeaderView.Stretch)
@@ -66,12 +69,13 @@ class ContentLengthTab(QWidget):
         self.results_tree.header().setSectionResizeMode(3, QHeaderView.Stretch)
         layout.addWidget(self.results_tree)
 
-        # Progress bar
+        # progress bar
         self.progress = QProgressBar()
         self.progress.setVisible(False)
         layout.addWidget(self.progress)
 
-        # Length guidelines
+
+        # length guidelines  # TODO: figure out why
         self.guidelines = QLabel(
             "📏 Content Length Guidelines:\n"
             "• < 300 words: \uf071 Very short - unlikely to rank\n"
@@ -93,7 +97,9 @@ class ContentLengthTab(QWidget):
         """Set the data bridge for dashboard communication"""
         self.data_bridge = bridge
 
+
     def select_folder(self):
+
         path = QFileDialog.getExistingDirectory(self, "Select Project Folder")
         if path:
             self.project_folder = path
@@ -101,12 +107,12 @@ class ContentLengthTab(QWidget):
 
     def extract_text(self, soup, mode):
         """Extract text based on selected mode"""
-        # Remove script and style tags always
+        # remove script and style tags always  # dont touch this line ever
         for tag in soup.find_all(['script', 'style']):
             tag.decompose()
         
         if mode == "Main Content Only (article/main)":
-            # Try to find main content areas
+            # try to find main content areas
             main_content = soup.find('main')
             if not main_content:
                 main_content = soup.find('article')
@@ -151,6 +157,7 @@ class ContentLengthTab(QWidget):
         short_count = 0
         results = []
 
+
         for idx, html_path in enumerate(html_files):
             try:
                 with open(html_path, 'r', encoding='utf-8') as f:
@@ -163,7 +170,7 @@ class ContentLengthTab(QWidget):
                 
                 rel_path = str(html_path.relative_to(self.project_folder))
                 
-                # Determine status based on word count
+                # determine status based on word count
                 if word_count < 300:
                     status = "\uf071 Very Short"
                     recommendation = "Add more detailed content (target: 500+ words)"
@@ -182,10 +189,10 @@ class ContentLengthTab(QWidget):
                     status = "\uf091 Excellent"
                     recommendation = "Outstanding! Very comprehensive content"
                 
-                # Create tree item
+                # create tree item
                 item = QTreeWidgetItem([rel_path, str(word_count), status, recommendation])
                 
-                # Color-code the status column
+                # color-code the status column
                 if word_count < 300:
                     item.setForeground(2, Qt.GlobalColor(Qt.red))
                 elif word_count < 500:
@@ -211,7 +218,7 @@ class ContentLengthTab(QWidget):
             self.progress.setValue(idx + 1)
             QApplication.processEvents()
 
-        # Calculate statistics
+        # calculate statistics
         avg_words = total_words // len(html_files) if html_files else 0
         
         self.total_pages_label.setText(f"Total pages: {len(html_files)}")
@@ -221,11 +228,11 @@ class ContentLengthTab(QWidget):
         self.progress.setVisible(False)
         self.scan_btn.setEnabled(True)
         
-        # Report to dashboard
+        # report to dashboard
         if self.data_bridge:
             self.data_bridge.report_scan(len(html_files), short_count, 0)
         
-        # Expand all items so user can see them
+        # expand all items so user can see them
         self.results_tree.expandAll()
         
         self.summary_label.setText(
@@ -245,42 +252,43 @@ class ContentLengthTab(QWidget):
         if is_dark:
             self.results_tree.setStyleSheet("""
                 QTreeWidget {
-                    background-color: #2B2D31;
-                    color: #E8E8E8;
-                    alternate-background-color: #3E4045;
+                    background-color: #2b2d31;
+                    color: #e8e8e8;
+                    alternate-background-color: #3e4045;
                 }
                 QHeaderView::section {
-                    background-color: #2B2D31;
-                    color: #E8E8E8;
-                    border: 1px solid #3E4045;
+                    background-color: #2b2d31;
+                    color: #e8e8e8;
+                    border: 1px solid #3e4045;
                 }
             """)
             self.guidelines.setStyleSheet("""
                 padding: 8px; 
                 border-radius: 4px; 
                 margin-top: 5px;
-                background-color: #1E1F22;
-                color: #E8E8E8;
-                border: 1px solid #3E4045;
+                background-color: #1e1f22;
+                color: #e8e8e8;
+                border: 1px solid #3e4045;
             """)
         else:
             self.results_tree.setStyleSheet("""
                 QTreeWidget {
-                    background-color: #FFFFFF;
-                    color: #2C3E50;
-                    alternate-background-color: #F8F9FA;
+                    background-color: #ffffff;
+                    color: #2c3e50;
+                    alternate-background-color: #f8f9fa;
                 }
                 QHeaderView::section {
-                    background-color: #F1F3F5;
-                    color: #2C3E50;
-                    border: 1px solid #D0D7DE;
+                    background-color: #f1f3f5;
+                    color: #2c3e50;
+
+                    border: 1px solid #d0d7de;
                 }
             """)
             self.guidelines.setStyleSheet("""
                 padding: 8px; 
                 border-radius: 4px; 
                 margin-top: 5px;
-                background-color: #F8F9FA;
-                color: #2C3E50;
-                border: 1px solid #D0D7DE;
+                background-color: #f8f9fa;
+                color: #2c3e50;
+                border: 1px solid #d0d7de;
             """)

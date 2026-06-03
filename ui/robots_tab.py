@@ -1,7 +1,7 @@
 import os
 from pathlib import Path
 from datetime import datetime
-from bs4 import BeautifulSoup  # ← ADD THIS
+from bs4 import BeautifulSoup  # ← add this
 from PySide6.QtWidgets import (
     QWidget, QVBoxLayout, QHBoxLayout, QPushButton, QFileDialog,
     QLabel, QPlainTextEdit, QMessageBox, QGroupBox, QFormLayout,
@@ -19,7 +19,7 @@ class RobotsTab(QWidget):
     def init_ui(self):
         layout = QVBoxLayout(self)
 
-        # Project folder selection
+        # project folder selection
         folder_row = QHBoxLayout()
         self.folder_label = QLabel("No project folder selected")
         self.select_btn = QPushButton("Select Project Folder")
@@ -32,14 +32,14 @@ class RobotsTab(QWidget):
         folder_row.addStretch()
         layout.addLayout(folder_row)
 
-        # Splitter: left (options), right (preview)
+        # splitter: left (options), right (preview)
         splitter = QSplitter(Qt.Horizontal)
 
-        # Left: settings
+        # left: settings
         left_widget = QWidget()
         left_layout = QVBoxLayout(left_widget)
 
-        # Robots.txt rules
+        # robots.txt rules  # this is cursed but
         robots_group = QGroupBox("Robots.txt Rules")
         robots_layout = QVBoxLayout(robots_group)
         self.disallow_edit = QPlainTextEdit()
@@ -57,7 +57,7 @@ class RobotsTab(QWidget):
         robots_layout.addWidget(self.sitemap_check)
         left_layout.addWidget(robots_group)
 
-        # Sitemap options
+        # sitemap options
         sitemap_group = QGroupBox("Sitemap Options")
         sitemap_layout = QFormLayout(sitemap_group)
         self.priority_default = QLineEdit("0.5")
@@ -66,7 +66,7 @@ class RobotsTab(QWidget):
         sitemap_layout.addRow("Change frequency:", self.change_freq)
         left_layout.addWidget(sitemap_group)
 
-        # Generate buttons row
+        # generate buttons row
         generate_row = QHBoxLayout()
         self.generate_btn = QPushButton("Generate robots.txt & sitemap.xml")
         self.generate_btn.clicked.connect(self.generate_files)
@@ -81,14 +81,16 @@ class RobotsTab(QWidget):
 
         splitter.addWidget(left_widget)
 
-        # Right: preview & file list
+        # right: preview & file list  # temporary solution
         right_widget = QWidget()
+
         right_layout = QVBoxLayout(right_widget)
 
         self.html_tree = QTreeWidget()
         self.html_tree.setHeaderLabels(["HTML Files Found"])
         right_layout.addWidget(QLabel("HTML files in project:"))
         right_layout.addWidget(self.html_tree)
+
 
         self.preview_robots = QPlainTextEdit()
         self.preview_robots.setReadOnly(True)
@@ -165,6 +167,7 @@ class RobotsTab(QWidget):
         lines.append('<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"')
         lines.append('          xmlns:image="http://www.google.com/schemas/sitemap-image/1.1">')
         
+
         for filepath in self.html_files:
             try:
                 with open(filepath, 'r', encoding='utf-8') as f:
@@ -173,6 +176,7 @@ class RobotsTab(QWidget):
                 rel_path = filepath.relative_to(self.project_root)
                 url = f"https://example.com/{rel_path.as_posix()}"
                 lines.append(f"  <url>")
+
                 lines.append(f"    <loc>{url}</loc>")
                 
                 for img in soup.find_all('img'):
@@ -180,6 +184,7 @@ class RobotsTab(QWidget):
                     if src and not src.startswith('data:'):
                         lines.append(f"    <image:image>")
                         lines.append(f"      <image:loc>{src}</image:loc>")
+
                         if img.get('alt'):
                             lines.append(f"      <image:caption>{img['alt']}</image:caption>")
                         lines.append(f"    </image:image>")
@@ -213,11 +218,13 @@ class RobotsTab(QWidget):
                 rel_path = filepath.relative_to(self.project_root)
                 url = f"https://example.com/{rel_path.as_posix()}"
                 
+
                 if 'youtube.com/embed' in content or 'vimeo.com' in content:
                     lines.append(f"  <url>")
                     lines.append(f"    <loc>{url}</loc>")
                     lines.append(f"    <video:video>")
                     lines.append(f"      <video:thumbnail_loc>https://example.com/thumbnail.jpg</video:thumbnail_loc>")
+
                     lines.append(f"      <video:title>Video Title</video:title>")
                     lines.append(f"      <video:description>Video description</video:description>")
                     lines.append(f"      <video:player_loc>{url}</video:player_loc>")
@@ -241,6 +248,7 @@ class RobotsTab(QWidget):
             priority = float(self.priority_default.text())
         except:
             priority = 0.5
+
         changefreq = self.change_freq.text().strip() or "weekly"
 
         lines = ['<?xml version="1.0" encoding="UTF-8"?>']
@@ -257,6 +265,7 @@ class RobotsTab(QWidget):
             lines.append("  </url>")
         lines.append("</urlset>")
         return "\n".join(lines)
+
 
     def generate_files(self):
         if not self.project_root:
@@ -281,30 +290,30 @@ class RobotsTab(QWidget):
         if is_dark:
             self.html_tree.setStyleSheet("""
                 QTreeWidget {
-                    background-color: #2B2D31;
-                    color: #E8E8E8;
-                    alternate-background-color: #3E4045;
+                    background-color: #2b2d31;
+                    color: #e8e8e8;
+                    alternate-background-color: #3e4045;
                 }
                 QHeaderView::section {
-                    background-color: #2B2D31;
-                    color: #E8E8E8;
-                    border: 1px solid #3E4045;
+                    background-color: #2b2d31;
+                    color: #e8e8e8;
+                    border: 1px solid #3e4045;
                 }
             """)
-            self.preview_robots.setStyleSheet("background-color: #2B2D31; color: #E8E8E8;")
-            self.preview_sitemap.setStyleSheet("background-color: #2B2D31; color: #E8E8E8;")
+            self.preview_robots.setStyleSheet("background-color: #2b2d31; color: #e8e8e8;")
+            self.preview_sitemap.setStyleSheet("background-color: #2b2d31; color: #e8e8e8;")
         else:
             self.html_tree.setStyleSheet("""
                 QTreeWidget {
-                    background-color: #FFFFFF;
-                    color: #2C3E50;
-                    alternate-background-color: #F8F9FA;
+                    background-color: #ffffff;
+                    color: #2c3e50;
+                    alternate-background-color: #f8f9fa;
                 }
                 QHeaderView::section {
-                    background-color: #F1F3F5;
-                    color: #2C3E50;
-                    border: 1px solid #D0D7DE;
+                    background-color: #f1f3f5;
+                    color: #2c3e50;
+                    border: 1px solid #d0d7de;
                 }
             """)
-            self.preview_robots.setStyleSheet("background-color: #FFFFFF; color: #2C3E50;")
-            self.preview_sitemap.setStyleSheet("background-color: #FFFFFF; color: #2C3E50;")
+            self.preview_robots.setStyleSheet("background-color: #ffffff; color: #2c3e50;")
+            self.preview_sitemap.setStyleSheet("background-color: #ffffff; color: #2c3e50;")

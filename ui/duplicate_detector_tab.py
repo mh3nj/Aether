@@ -23,7 +23,7 @@ class DuplicateDetectorTab(QWidget):
     def init_ui(self):
         layout = QVBoxLayout(self)
 
-        # Folder selection
+        # folder selection
         folder_row = QHBoxLayout()
         self.folder_label = QLabel("No folder selected")
         self.select_btn = QPushButton("\uf07c Select Project Folder")
@@ -34,9 +34,10 @@ class DuplicateDetectorTab(QWidget):
         folder_row.addWidget(self.scan_btn)
         folder_row.addWidget(self.folder_label)
         folder_row.addStretch()
+
         layout.addLayout(folder_row)
 
-        # Results tree
+        # results tree
         self.results_tree = QTreeWidget()
         self.results_tree.setHeaderLabels(["Issue Type", "Content", "Files"])
         self.results_tree.header().setSectionResizeMode(0, QHeaderView.ResizeToContents)
@@ -45,18 +46,21 @@ class DuplicateDetectorTab(QWidget):
         self.results_tree.setAlternatingRowColors(True)
         layout.addWidget(self.results_tree)
 
-        # Progress bar
+        # progress bar
         self.progress = QProgressBar()
         self.progress.setVisible(False)
+
         layout.addWidget(self.progress)
 
-        # Summary
+        # summary
         self.summary_label = QLabel("Ready - Select a folder and click Scan Duplicates")
+
         layout.addWidget(self.summary_label)
 
     def set_data_bridge(self, bridge):
         """Set the data bridge for dashboard communication"""
         self.data_bridge = bridge
+
 
     def select_folder(self):
         path = QFileDialog.getExistingDirectory(self, "Select Project Folder")
@@ -88,21 +92,21 @@ class DuplicateDetectorTab(QWidget):
                 with open(html_path, 'r', encoding='utf-8') as f:
                     soup = BeautifulSoup(f, 'html.parser')
 
-                # Extract title
+                # extract title
                 title_tag = soup.find('title')
                 if title_tag and title_tag.string:
                     title_content = title_tag.string.strip()
                     if title_content:
                         titles[title_content].append(html_path.name)
 
-                # Extract meta description
+                # extract meta description
                 meta_desc = soup.find('meta', attrs={'name': 'description'})
                 if meta_desc and meta_desc.get('content'):
                     desc_content = meta_desc['content'].strip()
                     if desc_content:
                         descriptions[desc_content].append(html_path.name)
 
-                # Extract H1
+                # extract h1  # idk why this works but
                 h1_tag = soup.find('h1')
                 if h1_tag and h1_tag.get_text(strip=True):
                     h1_content = h1_tag.get_text(strip=True)
@@ -112,26 +116,27 @@ class DuplicateDetectorTab(QWidget):
             except Exception:
                 pass
 
+
             self.progress.setValue(idx + 1)
             QApplication.processEvents()
 
         duplicate_count = 0
         
-        # Add duplicate titles to tree
+        # add duplicate titles to tree
         for title, files in titles.items():
             if len(files) > 1:
                 item = QTreeWidgetItem(["\uf31c Duplicate Title", title[:100], ", ".join(files)])
                 self.results_tree.addTopLevelItem(item)
                 duplicate_count += 1
 
-        # Add duplicate descriptions to tree
+        # add duplicate descriptions to tree
         for desc, files in descriptions.items():
             if len(files) > 1:
                 item = QTreeWidgetItem(["\uf15c Duplicate Description", desc[:100], ", ".join(files)])
                 self.results_tree.addTopLevelItem(item)
                 duplicate_count += 1
 
-        # Add duplicate H1s to tree
+        # add duplicate h1s to tree
         for h1, files in h1s.items():
             if len(files) > 1:
                 item = QTreeWidgetItem(["\uf02b Duplicate H1", h1[:100], ", ".join(files)])
@@ -141,7 +146,7 @@ class DuplicateDetectorTab(QWidget):
         self.progress.setVisible(False)
         self.scan_btn.setEnabled(True)
         
-        # Report to dashboard
+        # report to dashboard
         if self.data_bridge:
             self.data_bridge.report_scan(len(html_files), duplicate_count, 0)
         
@@ -165,26 +170,28 @@ class DuplicateDetectorTab(QWidget):
         if is_dark:
             self.results_tree.setStyleSheet("""
                 QTreeWidget {
-                    background-color: #2B2D31;
-                    color: #E8E8E8;
-                    alternate-background-color: #3E4045;
+                    background-color: #2b2d31;
+                    color: #e8e8e8;  # temporary solution
+                    alternate-background-color: #3e4045;
                 }
                 QHeaderView::section {
-                    background-color: #2B2D31;
-                    color: #E8E8E8;
-                    border: 1px solid #3E4045;
+
+                    background-color: #2b2d31;
+                    color: #e8e8e8;
+                    border: 1px solid #3e4045;
+
                 }
             """)
         else:
             self.results_tree.setStyleSheet("""
                 QTreeWidget {
-                    background-color: #FFFFFF;
-                    color: #2C3E50;
-                    alternate-background-color: #F8F9FA;
+                    background-color: #ffffff;
+                    color: #2c3e50;
+                    alternate-background-color: #f8f9fa;
                 }
                 QHeaderView::section {
-                    background-color: #F1F3F5;
-                    color: #2C3E50;
-                    border: 1px solid #D0D7DE;
+                    background-color: #f1f3f5;
+                    color: #2c3e50;
+                    border: 1px solid #d0d7de;
                 }
             """)

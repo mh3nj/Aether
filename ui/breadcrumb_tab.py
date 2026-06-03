@@ -1,4 +1,5 @@
 import os
+
 import json
 from pathlib import Path
 from PySide6.QtWidgets import (
@@ -19,7 +20,7 @@ class BreadcrumbTab(QWidget):
     def init_ui(self):
         layout = QVBoxLayout(self)
 
-        # Top controls
+        # top controls  # this is why we cant have nice things
         file_row = QHBoxLayout()
         self.file_label = QLabel("No file selected")
         self.select_btn = QPushButton("Select HTML File")
@@ -32,10 +33,10 @@ class BreadcrumbTab(QWidget):
         file_row.addStretch()
         layout.addLayout(file_row)
 
-        # Splitter: left (list editor), right (preview + inject)
+        # splitter: left (list editor), right (preview + inject)
         splitter = QSplitter(Qt.Horizontal)
 
-        # Left: breadcrumb editor
+        # left: breadcrumb editor
         left_widget = QWidget()
         left_layout = QVBoxLayout(left_widget)
         left_layout.addWidget(QLabel("Breadcrumb Items (top to bottom):"))
@@ -43,7 +44,7 @@ class BreadcrumbTab(QWidget):
         self.list_widget.setDragDropMode(QListWidget.InternalMove)
         left_layout.addWidget(self.list_widget)
 
-        # Buttons to manage items
+        # buttons to manage items
         btn_row = QHBoxLayout()
         self.add_btn = QPushButton("+ Add")
         self.add_btn.clicked.connect(self.add_item)
@@ -61,7 +62,7 @@ class BreadcrumbTab(QWidget):
 
         splitter.addWidget(left_widget)
 
-        # Right: preview and injection
+        # right: preview and injection
         right_widget = QWidget()
         right_layout = QVBoxLayout(right_widget)
         preview_group = QGroupBox("Preview")
@@ -71,9 +72,10 @@ class BreadcrumbTab(QWidget):
         preview_layout.addWidget(self.preview_label)
         right_layout.addWidget(preview_group)
 
-        # JSON output
+        # json output  # works on my machine
         self.json_edit = QPlainTextEdit()
         self.json_edit.setReadOnly(True)
+
         self.json_edit.setMaximumHeight(150)
         right_layout.addWidget(QLabel("Generated JSON-LD:"))
         right_layout.addWidget(self.json_edit)
@@ -90,7 +92,7 @@ class BreadcrumbTab(QWidget):
         layout.addWidget(self.status_label)
 
     # ------------------------------------------------------------------
-    # File selection
+    # file selection
     # ------------------------------------------------------------------
     def select_html_file(self):
         path, _ = QFileDialog.getOpenFileName(self, "Select HTML File", "", "HTML Files (*.html)")
@@ -98,7 +100,7 @@ class BreadcrumbTab(QWidget):
             self.current_file = path
             self.file_label.setText(os.path.basename(path))
             self.status_label.setText(f"Loaded: {path}")
-            # Optionally load existing breadcrumb from file
+            # optionally load existing breadcrumb from file
             self.load_existing_breadcrumb()
 
     def load_existing_breadcrumb(self):
@@ -124,24 +126,25 @@ class BreadcrumbTab(QWidget):
                 pass
 
     # ------------------------------------------------------------------
-    # Auto-generate from URL
+    # auto-generate from url
     # ------------------------------------------------------------------
     def auto_from_url(self):
+
         if not self.current_file:
             QMessageBox.warning(self, "Warning", "Please select an HTML file first.")
             return
-        # Ask for base URL
+        # ask for base url
         from PySide6.QtWidgets import QInputDialog
         base_url, ok = QInputDialog.getText(self, "Base URL", "Enter site root URL (e.g., https://example.com):")
         if not ok or not base_url:
             return
-        # Get relative path of file
-        # We assume the file is somewhere under a web root; ask for relative path from root? Simpler: user provides full URL to this page
+        # get relative path of file
+        # we assume the file is somewhere under a web root; ask for relative path from root? simpler: user provides full url to this page
         page_url, ok = QInputDialog.getText(self, "Page URL", "Enter full URL of this page (including filename):")
         if not ok or not page_url:
             return
 
-        # Parse the URL path
+        # parse the url path
         from urllib.parse import urlparse
         parsed = urlparse(page_url)
         path = parsed.path.strip('/')
@@ -155,14 +158,14 @@ class BreadcrumbTab(QWidget):
         current_url = base_url.rstrip('/')
         for i, part in enumerate(parts):
             current_url += '/' + part
-            # Capitalize and replace hyphens/underscores with spaces
+            # capitalize and replace hyphens/underscores with spaces
             name = part.replace('-', ' ').replace('_', ' ').title()
             items.append({"name": name, "url": current_url})
         self.set_items(items)
         self.status_label.setText(f"Auto-generated {len(items)} breadcrumb items from URL.")
 
     # ------------------------------------------------------------------
-    # Breadcrumb item management
+    # breadcrumb item management
     # ------------------------------------------------------------------
     def set_items(self, items):
         self.breadcrumb_items = items
@@ -205,6 +208,7 @@ class BreadcrumbTab(QWidget):
 
     def move_down(self):
         row = self.list_widget.currentRow()
+
         if row >= 0 and row < len(self.breadcrumb_items)-1:
             self.breadcrumb_items[row], self.breadcrumb_items[row+1] = self.breadcrumb_items[row+1], self.breadcrumb_items[row]
             self.refresh_list()
@@ -212,7 +216,8 @@ class BreadcrumbTab(QWidget):
             self.update_preview_and_json()
 
     # ------------------------------------------------------------------
-    # JSON-LD generation & preview
+
+    # json-ld generation & preview
     # ------------------------------------------------------------------
     def generate_json_ld(self):
         if not self.breadcrumb_items:
@@ -228,11 +233,12 @@ class BreadcrumbTab(QWidget):
         return {
             "@context": "https://schema.org",
             "@type": "BreadcrumbList",
+
             "itemListElement": item_list
         }
 
     def update_preview_and_json(self):
-        # Text preview
+        # text preview
         if not self.breadcrumb_items:
             self.preview_label.setText("No items – click 'Auto from URL' or add manually.")
             self.json_edit.clear()
@@ -240,14 +246,15 @@ class BreadcrumbTab(QWidget):
         preview_text = " » ".join([item['name'] for item in self.breadcrumb_items])
         self.preview_label.setText(preview_text)
 
-        # JSON
+        # json
         data = self.generate_json_ld()
         if data:
             self.json_edit.setPlainText(json.dumps(data, indent=2, ensure_ascii=False))
 
     # ------------------------------------------------------------------
-    # Inject into HTML
+    # inject into html
     # ------------------------------------------------------------------
+
     def inject_into_html(self):
         if not self.current_file:
             QMessageBox.warning(self, "Warning", "No HTML file selected.")
@@ -257,6 +264,7 @@ class BreadcrumbTab(QWidget):
             return
 
         with open(self.current_file, 'r', encoding='utf-8') as f:
+
             soup = BeautifulSoup(f, 'html.parser')
 
         head = soup.head
@@ -264,7 +272,8 @@ class BreadcrumbTab(QWidget):
             head = soup.new_tag('head')
             soup.html.insert(0, head)
 
-        # Remove existing BreadcrumbList script tags (to avoid duplicates)
+
+        # remove existing breadcrumblist script tags (to avoid duplicates)
         for script in soup.find_all('script', type='application/ld+json'):
             try:
                 data = json.loads(script.string)
@@ -273,7 +282,7 @@ class BreadcrumbTab(QWidget):
             except:
                 pass
 
-        # Create new script tag
+        # create new script tag
         new_script = soup.new_tag('script', type='application/ld+json')
         new_script.string = json.dumps(self.generate_json_ld(), indent=2, ensure_ascii=False)
         head.append(new_script)

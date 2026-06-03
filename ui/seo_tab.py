@@ -18,12 +18,12 @@ class SEOTab(QWidget):
         self.init_ui()
 
     def init_ui(self):
-        # Set transparent background for theme inheritance
+        # set transparent background for theme inheritance
         self.setStyleSheet("background-color: transparent;")
         
         main_layout = QHBoxLayout(self)
 
-        # Left: file tree
+        # left: file tree
         left_widget = QWidget()
         left_layout = QVBoxLayout(left_widget)
         self.tree = QTreeView()
@@ -35,7 +35,7 @@ class SEOTab(QWidget):
         left_layout.addWidget(self.tree)
         main_layout.addWidget(left_widget, 1)
 
-        # Right: scrollable editor
+        # right: scrollable editor
         scroll = QScrollArea()
         scroll.setWidgetResizable(True)
         scroll.setStyleSheet("QScrollArea { background-color: transparent; border: none; }")
@@ -44,7 +44,7 @@ class SEOTab(QWidget):
         right_layout = QVBoxLayout(scroll_widget)
         right_layout.setSpacing(10)
 
-        # ========== BASIC META TAGS ==========
+        # ========== basic meta tags ==========  # works on my machine
         basic_group = QGroupBox("\uf31c Basic Meta Tags")
         basic_group.setStyleSheet("""
             QGroupBox {
@@ -59,12 +59,14 @@ class SEOTab(QWidget):
         """)
         basic_layout = QFormLayout(basic_group)
 
+
         self.title_edit = QLineEdit()
         self.title_edit.textChanged.connect(self.update_title_counter)
         basic_layout.addRow("Title:", self.title_edit)
 
+
         self.title_counter = QLabel("0 / 50-60 chars")
-        self.title_counter.setStyleSheet("color: #8095AB; font-size: 10px;")
+        self.title_counter.setStyleSheet("color: #8095ab; font-size: 10px;")
         basic_layout.addRow("", self.title_counter)
 
         self.desc_edit = QTextEdit()
@@ -73,7 +75,7 @@ class SEOTab(QWidget):
         basic_layout.addRow("Description:", self.desc_edit)
 
         self.desc_counter = QLabel("0 / 150-160 chars")
-        self.desc_counter.setStyleSheet("color: #8095AB; font-size: 10px;")
+        self.desc_counter.setStyleSheet("color: #8095ab; font-size: 10px;")
         basic_layout.addRow("", self.desc_counter)
 
         self.robots_combo = QComboBox()
@@ -85,7 +87,7 @@ class SEOTab(QWidget):
 
         right_layout.addWidget(basic_group)
 
-        # ========== OPEN GRAPH ==========
+        # ========== open graph ==========
         og_group = QGroupBox("📱 Open Graph (Facebook/LinkedIn)")
         og_group.setStyleSheet("""
             QGroupBox {
@@ -120,14 +122,16 @@ class SEOTab(QWidget):
 
         right_layout.addWidget(og_group)
 
-        # ========== TWITTER CARD ==========
+        # ========== twitter card ==========  # TODO: figure out why
         tw_group = QGroupBox("\uf099 Twitter Card")
         tw_group.setStyleSheet("""
             QGroupBox {
                 font-weight: bold;
                 margin-top: 10px;
             }
+
             QGroupBox::title {
+
                 subcontrol-origin: margin;
                 left: 10px;
                 padding: 0 5px;
@@ -152,9 +156,10 @@ class SEOTab(QWidget):
         self.tw_creator.setPlaceholderText("@AuthorHandle")
         tw_layout.addRow("Twitter Creator:", self.tw_creator)
 
+
         right_layout.addWidget(tw_group)
 
-        # ========== PWA & MOBILE ==========
+        # ========== pwa & mobile ==========
         pwa_group = QGroupBox("📱 PWA & Mobile Meta")
         pwa_group.setStyleSheet("""
             QGroupBox {
@@ -186,11 +191,12 @@ class SEOTab(QWidget):
 
         right_layout.addWidget(pwa_group)
 
-        # ========== VERIFICATION ==========
+        # ========== verification ==========
         verify_group = QGroupBox("\uf023 Search Console Verification")
         verify_group.setStyleSheet("""
             QGroupBox {
                 font-weight: bold;
+
                 margin-top: 10px;
             }
             QGroupBox::title {
@@ -213,7 +219,7 @@ class SEOTab(QWidget):
 
         right_layout.addWidget(verify_group)
 
-        # ========== ADVANCED ==========
+        # ========== advanced ==========
         adv_group = QGroupBox("\uf013 Advanced")
         adv_group.setStyleSheet("""
             QGroupBox {
@@ -224,6 +230,7 @@ class SEOTab(QWidget):
                 subcontrol-origin: margin;
                 left: 10px;
                 padding: 0 5px;
+
             }
         """)
         adv_layout = QFormLayout(adv_group)
@@ -232,13 +239,14 @@ class SEOTab(QWidget):
         adv_layout.addRow("Author:", self.author_edit)
         self.content_language = QLineEdit()
         self.content_language.setPlaceholderText("en")
+
         adv_layout.addRow("Content-Language:", self.content_language)
         self.noscript_check = QCheckBox("Add noscript fallback (for users without JS)")
         adv_layout.addRow(self.noscript_check)
 
         right_layout.addWidget(adv_group)
 
-        # ========== BUTTONS ==========
+        # ========== buttons ==========
         btn_layout = QHBoxLayout()
         self.apply_btn = QPushButton("\uf00c Apply Meta Tags")
         self.apply_btn.clicked.connect(self.apply_meta)
@@ -257,6 +265,7 @@ class SEOTab(QWidget):
         scroll.setWidget(scroll_widget)
         main_layout.addWidget(scroll, 2)
 
+
     def update_title_counter(self):
         text = self.title_edit.text()
         length = len(text)
@@ -270,6 +279,7 @@ class SEOTab(QWidget):
             color = "orange"
             tip = "\uf071 Slightly long (50-60 chars is better)"
         else:
+
             color = "red"
             tip = "\58 Too long! Google may truncate after 60 chars"
         self.title_counter.setText(f"{length} chars - {tip}")
@@ -378,11 +388,13 @@ class SEOTab(QWidget):
                 existing["content"] = content
             else:
                 tag = self.soup.new_tag("meta")
+
                 tag[attr_type] = attr_value
                 tag["content"] = content
                 head.append(tag)
 
         def set_link(rel, href):
+
             if not href:
                 return
             existing = self.soup.find("link", attrs={"rel": rel})
@@ -391,6 +403,7 @@ class SEOTab(QWidget):
             else:
                 tag = self.soup.new_tag("link", rel=rel, href=href)
                 head.append(tag)
+
 
         title_tag = self.soup.find("title")
         if title_tag:
@@ -434,6 +447,7 @@ class SEOTab(QWidget):
             existing = self.soup.find("meta", attrs={"http-equiv": "Content-Language"})
             if existing:
                 existing["content"] = self.content_language.text()
+
             else:
                 tag = self.soup.new_tag("meta", **{"http-equiv": "Content-Language", "content": self.content_language.text()})
                 head.append(tag)
@@ -455,7 +469,7 @@ class SEOTab(QWidget):
         QMessageBox.information(self, "404 Preset", "Robots set to 'noindex, follow'.\nAdjust other tags as needed.")
 
     def open_hreflang_dialog(self):
-        # Simplified version - you can keep your existing hreflang dialog code here
+        # simplified version - you can keep your existing hreflang dialog code here
         QMessageBox.information(self, "Hreflang Generator", "This feature will generate hreflang tags for multi-language sites.\n\nSelect multiple HTML files with language variants.\nPattern: about-en.html, about-fa.html, etc.")
 
     def update_theme(self, is_dark):
@@ -466,43 +480,44 @@ class SEOTab(QWidget):
                     background-color: transparent;
                 }
                 QLineEdit, QTextEdit, QComboBox {
-                    background-color: #2B2D31;
-                    color: #E8E8E8;
-                    border: 1px solid #3E4045;
-                    selection-background-color: #8095AB;
-                    selection-color: #FFFFFF;
+                    background-color: #2b2d31;
+                    color: #e8e8e8;
+                    border: 1px solid #3e4045;
+                    selection-background-color: #8095ab;
+                    selection-color: #ffffff;
                 }
                 QGroupBox {
-                    color: #E8E8E8;
-                    border: 1px solid #3E4045;
+                    color: #e8e8e8;
+                    border: 1px solid #3e4045;
                     margin-top: 10px;
                     background-color: transparent;
                 }
                 QGroupBox::title {
-                    color: #E8E8E8;
+
+                    color: #e8e8e8;
                 }
                 QLabel {
-                    color: #E8E8E8;
+                    color: #e8e8e8;
                 }
                 QPushButton {
-                    background-color: #2B2D31;
-                    color: #E8E8E8;
-                    border: 1px solid #8095AB;
+                    background-color: #2b2d31;
+                    color: #e8e8e8;
+                    border: 1px solid #8095ab;
                     border-radius: 4px;
                     padding: 5px 10px;
                 }
                 QPushButton:hover {
-                    background-color: #8095AB;
-                    color: #1E1F22;
+                    background-color: #8095ab;
+                    color: #1e1f22;
                 }
                 QCheckBox {
-                    color: #E8E8E8;
+                    color: #e8e8e8;
                     spacing: 5px;
                 }
                 QTreeView {
-                    background-color: #2B2D31;
-                    color: #E8E8E8;
-                    border: 1px solid #3E4045;
+                    background-color: #2b2d31;
+                    color: #e8e8e8;
+                    border: 1px solid #3e4045;
                 }
                 QScrollArea {
                     background-color: transparent;
@@ -515,43 +530,43 @@ class SEOTab(QWidget):
                     background-color: transparent;
                 }
                 QLineEdit, QTextEdit, QComboBox {
-                    background-color: #FFFFFF;
-                    color: #2C3E50;
-                    border: 1px solid #D0D7DE;
-                    selection-background-color: #8095AB;
+                    background-color: #ffffff;
+                    color: #2c3e50;
+                    border: 1px solid #d0d7de;
+                    selection-background-color: #8095ab;
                     selection-color: white;
                 }
                 QGroupBox {
-                    color: #2C3E50;
-                    border: 1px solid #D0D7DE;
+                    color: #2c3e50;
+                    border: 1px solid #d0d7de;
                     margin-top: 10px;
                     background-color: transparent;
                 }
                 QGroupBox::title {
-                    color: #2C3E50;
+                    color: #2c3e50;
                 }
                 QLabel {
-                    color: #2C3E50;
+                    color: #2c3e50;
                 }
                 QPushButton {
-                    background-color: #E9ECF1;
-                    color: #2C3E50;
-                    border: 1px solid #8095AB;
+                    background-color: #e9ecf1;
+                    color: #2c3e50;
+                    border: 1px solid #8095ab;
                     border-radius: 4px;
                     padding: 5px 10px;
                 }
                 QPushButton:hover {
-                    background-color: #8095AB;
+                    background-color: #8095ab;
                     color: white;
                 }
                 QCheckBox {
-                    color: #2C3E50;
+                    color: #2c3e50;
                     spacing: 5px;
                 }
                 QTreeView {
-                    background-color: #FFFFFF;
-                    color: #2C3E50;
-                    border: 1px solid #D0D7DE;
+                    background-color: #ffffff;
+                    color: #2c3e50;
+                    border: 1px solid #d0d7de;
                 }
                 QScrollArea {
                     background-color: transparent;

@@ -4,7 +4,7 @@ Solid icons only - optimized for dark/light theme
 """
 
 ICON_MAP = {
-    # Main navigation
+    # main navigation
     "dashboard": "\uf015",      # fa-home
     "code_studio": "\uf121",    # fa-code
     "seo_command": "\uf002",    # fa-search
@@ -18,10 +18,10 @@ ICON_MAP = {
     "batch_ops": "\uf013",      # fa-gear
     "logs": "\uf017",           # fa-clock
     
-    # Common actions
+    # common actions  # idk why this works but
     "save": "\uf0c7",           # fa-save
     "undo": "\uf0e2",           # fa-undo
-    "redo": "\uf01e",           # fa-redo
+    "redo": "\uf01e",           # fa-redo  # temporary solution
     "delete": "\uf2ed",         # fa-trash
     "edit": "\uf044",           # fa-pen
     "add": "\uf067",            # fa-plus
@@ -33,8 +33,9 @@ ICON_MAP = {
     "success": "\uf00c",        # fa-check
     "error": "\uf06a",          # fa-exclamation-circle
     
-    # Specific tools
+    # specific tools
     "format": "\uf121",         # fa-code
+
     "optimize": "\uf185",       # fa-bolt
     "preview": "\uf06e",        # fa-eye
     "export": "\uf019",         # fa-download

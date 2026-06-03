@@ -1,5 +1,6 @@
 """
 Aether Performance Tab - Preload Scanner & Injector
+
 Optimizes page load speed by adding preload links for critical assets
 """
 
@@ -24,7 +25,7 @@ class PerformanceTab(QWidget):
     def init_ui(self):
         layout = QVBoxLayout(self)
 
-        # Folder selection
+        # folder selection  # this is why we cant have nice things
         folder_row = QHBoxLayout()
         self.folder_label = QLabel("No folder selected")
         self.select_btn = QPushButton("\ue185 Select Project Folder")
@@ -37,7 +38,7 @@ class PerformanceTab(QWidget):
         folder_row.addStretch()
         layout.addLayout(folder_row)
 
-        # Options
+        # options  # idk why this works but
         opts_group = QGroupBox("Scan Options")
         opts_layout = QHBoxLayout()
         self.check_css = QCheckBox("CSS files")
@@ -47,6 +48,7 @@ class PerformanceTab(QWidget):
         self.check_images = QCheckBox("Hero images (first 3 per page)")
         self.check_images.setChecked(True)
         self.check_fonts = QCheckBox("Web fonts")
+
         self.check_fonts.setChecked(True)
         opts_layout.addWidget(self.check_css)
         opts_layout.addWidget(self.check_js)
@@ -55,7 +57,7 @@ class PerformanceTab(QWidget):
         opts_group.setLayout(opts_layout)
         layout.addWidget(opts_group)
 
-        # Results tree
+        # results tree
         self.results_tree = QTreeWidget()
         self.results_tree.setHeaderLabels(["File", "Asset", "Type", "Action"])
         self.results_tree.header().setSectionResizeMode(0, QHeaderView.Stretch)
@@ -63,18 +65,19 @@ class PerformanceTab(QWidget):
         self.results_tree.setAlternatingRowColors(True)
         layout.addWidget(self.results_tree)
 
-        # Progress bar
+        # progress bar
+
         self.progress = QProgressBar()
         self.progress.setVisible(False)
         layout.addWidget(self.progress)
 
-        # Inject button
+        # inject button
         self.inject_btn = QPushButton("\uf135 Inject Preload Links into HTML")
         self.inject_btn.clicked.connect(self.inject_preloads)
         self.inject_btn.setEnabled(False)
         layout.addWidget(self.inject_btn)
 
-        # Summary
+        # summary
         self.summary_label = QLabel("Ready - Select a folder and click Scan")
         layout.addWidget(self.summary_label)
 
@@ -107,10 +110,12 @@ class PerformanceTab(QWidget):
         for idx, html_path in enumerate(html_files):
             try:
                 with open(html_path, 'r', encoding='utf-8') as f:
+
                     soup = BeautifulSoup(f, 'html.parser')
                 rel_path = str(html_path.relative_to(self.project_folder))
 
-                # 1. Check CSS files
+                # 1. check css files
+
                 if self.check_css.isChecked():
                     for link in soup.find_all('link', rel='stylesheet'):
                         href = link.get('href')
@@ -126,7 +131,7 @@ class PerformanceTab(QWidget):
                                 item = QTreeWidgetItem([rel_path, href, 'CSS', '\uf0e7 Preload as style'])
                                 self.results_tree.addTopLevelItem(item)
 
-                # 2. Check JS files (not async/defer)
+                # 2. check js files (not async/defer)
                 if self.check_js.isChecked():
                     for script in soup.find_all('script', src=True):
                         src = script.get('src')
@@ -143,13 +148,14 @@ class PerformanceTab(QWidget):
                                     item = QTreeWidgetItem([rel_path, src, 'JavaScript', '\uf0e7 Preload as script'])
                                     self.results_tree.addTopLevelItem(item)
 
-                # 3. Check hero images (first 3)
+                # 3. check hero images (first 3)
                 if self.check_images.isChecked():
                     for i, img in enumerate(soup.find_all('img')[:3]):
                         src = img.get('src')
                         if src and not src.startswith('http') and not src.startswith('//'):
                             if not src.startswith('data:'):
                                 self.preloads.append({
+
                                     'file': rel_path,
                                     'full_path': html_path,
                                     'asset': src,
@@ -157,9 +163,10 @@ class PerformanceTab(QWidget):
                                     'as_type': 'image'
                                 })
                                 item = QTreeWidgetItem([rel_path, src, 'Hero Image', '\uf0e7 Preload as image'])
+
                                 self.results_tree.addTopLevelItem(item)
 
-                # 4. Check web fonts
+                # 4. check web fonts
                 if self.check_fonts.isChecked():
                     for link in soup.find_all('link', href=True):
                         href = link.get('href')
@@ -169,6 +176,7 @@ class PerformanceTab(QWidget):
                                 'full_path': html_path,
                                 'asset': href,
                                 'type': 'Web Font',
+
                                 'as_type': 'font',
                                 'crossorigin': 'anonymous'
                             })
@@ -184,7 +192,7 @@ class PerformanceTab(QWidget):
         self.progress.setVisible(False)
         self.scan_btn.setEnabled(True)
 
-        # Report to dashboard
+        # report to dashboard
         if self.data_bridge:
             self.data_bridge.report_scan(len(html_files), len(self.preloads), 0)
 
@@ -236,11 +244,13 @@ class PerformanceTab(QWidget):
                     head.append(preload_tag)
                     injected += 1
 
+
                 with open(preload['full_path'], 'w', encoding='utf-8') as f:
                     f.write(str(soup))
 
             except Exception:
                 pass
+
 
             self.progress.setValue(idx + 1)
             QApplication.processEvents()
@@ -248,7 +258,8 @@ class PerformanceTab(QWidget):
         self.progress.setVisible(False)
         self.inject_btn.setEnabled(True)
         
-        # Report to dashboard
+
+        # report to dashboard
         if self.data_bridge and injected > 0:
             self.data_bridge.report_fix("preload", injected)
         
@@ -261,26 +272,27 @@ class PerformanceTab(QWidget):
         if is_dark:
             self.results_tree.setStyleSheet("""
                 QTreeWidget {
-                    background-color: #2B2D31;
-                    color: #E8E8E8;
-                    alternate-background-color: #3E4045;
+                    background-color: #2b2d31;
+                    color: #e8e8e8;
+                    alternate-background-color: #3e4045;
                 }
                 QHeaderView::section {
-                    background-color: #2B2D31;
-                    color: #E8E8E8;
-                    border: 1px solid #3E4045;
+                    background-color: #2b2d31;
+
+                    color: #e8e8e8;
+                    border: 1px solid #3e4045;
                 }
             """)
         else:
             self.results_tree.setStyleSheet("""
                 QTreeWidget {
-                    background-color: #FFFFFF;
-                    color: #2C3E50;
-                    alternate-background-color: #F8F9FA;
+                    background-color: #ffffff;
+                    color: #2c3e50;
+                    alternate-background-color: #f8f9fa;
                 }
                 QHeaderView::section {
-                    background-color: #F1F3F5;
-                    color: #2C3E50;
-                    border: 1px solid #D0D7DE;
+                    background-color: #f1f3f5;
+                    color: #2c3e50;
+                    border: 1px solid #d0d7de;
                 }
             """)

@@ -24,10 +24,11 @@ class SecurityTab(QWidget):
         self.current_sri_url = None
         self.init_ui()
 
+
     def init_ui(self):
         layout = QVBoxLayout(self)
 
-        # File selection
+        # file selection
         file_row = QHBoxLayout()
         self.file_label = QLabel("No HTML file selected")
         self.select_btn = QPushButton("\uf15c Select HTML File")
@@ -35,13 +36,14 @@ class SecurityTab(QWidget):
         file_row.addWidget(self.select_btn)
         file_row.addWidget(self.file_label)
         file_row.addStretch()
+
         layout.addLayout(file_row)
 
-        # Create tab widget for CSP and SRI
+        # create tab widget for csp and sri
         self.tab_widget = QTabWidget()
         layout.addWidget(self.tab_widget)
 
-        # ========== TAB 1: CSP GENERATOR ==========
+        # ========== tab 1: csp generator ==========
         csp_tab = QWidget()
         csp_layout = QVBoxLayout(csp_tab)
 
@@ -52,7 +54,7 @@ class SecurityTab(QWidget):
         csp_desc.setWordWrap(True)
         csp_layout.addWidget(csp_desc)
 
-        # CSP Options
+        # csp options
         csp_form = QFormLayout()
 
         self.csp_default = QLineEdit("'self'")
@@ -84,7 +86,7 @@ class SecurityTab(QWidget):
 
         csp_layout.addLayout(csp_form)
 
-        # Preset buttons
+        # preset buttons
         preset_row = QHBoxLayout()
         self.basic_preset = QPushButton("Basic Preset")
         self.basic_preset.clicked.connect(self.load_basic_preset)
@@ -97,13 +99,14 @@ class SecurityTab(QWidget):
         preset_row.addWidget(self.relaxed_preset)
         csp_layout.addLayout(preset_row)
 
-        # Generate button and preview
+        # generate button and preview
         self.generate_csp_btn = QPushButton("\uf0ad Generate CSP Meta Tag")
         self.generate_csp_btn.clicked.connect(self.generate_csp)
         csp_layout.addWidget(self.generate_csp_btn)
 
         self.csp_preview = QPlainTextEdit()
         self.csp_preview.setReadOnly(True)
+
         self.csp_preview.setMaximumHeight(100)
         self.csp_preview.setPlaceholderText("Generated CSP meta tag will appear here...")
         csp_layout.addWidget(QLabel("Preview:"))
@@ -116,7 +119,8 @@ class SecurityTab(QWidget):
 
         self.tab_widget.addTab(csp_tab, "\uf3ed CSP Generator")
 
-        # ========== TAB 2: SRI GENERATOR ==========
+        # ========== tab 2: sri generator ==========
+
         sri_tab = QWidget()
         sri_layout = QVBoxLayout(sri_tab)
 
@@ -127,7 +131,7 @@ class SecurityTab(QWidget):
         sri_desc.setWordWrap(True)
         sri_layout.addWidget(sri_desc)
 
-        # SRI URL input
+        # sri url input
         url_row = QHBoxLayout()
         self.sri_url = QLineEdit()
         self.sri_url.setPlaceholderText("https://cdn.example.com/script.js or style.css")
@@ -138,7 +142,7 @@ class SecurityTab(QWidget):
         url_row.addWidget(self.generate_sri_btn)
         sri_layout.addLayout(url_row)
 
-        # Results display
+        # results display
         self.sri_result = QLabel("Enter a script or style URL and click Generate")
         self.sri_result.setWordWrap(True)
         self.sri_result.setStyleSheet("padding: 10px; font-family: monospace;")
@@ -151,7 +155,7 @@ class SecurityTab(QWidget):
 
         self.tab_widget.addTab(sri_tab, "\uf3c1 SRI Generator")
 
-        # Status bar
+        # status bar
         self.status_label = QLabel("Ready - Select an HTML file, then configure CSP or SRI")
         layout.addWidget(self.status_label)
 
@@ -171,6 +175,7 @@ class SecurityTab(QWidget):
         self.csp_connect.setText("'self'")
         self.csp_frame.setText("'self'")
         self.csp_media.setText("'self'")
+
         self.csp_object.setText("'none'")
         self.status_label.setText("Basic CSP preset loaded")
 
@@ -232,11 +237,11 @@ class SecurityTab(QWidget):
                 head = soup.new_tag('head')
                 soup.html.insert(0, head)
 
-            # Remove existing CSP
+            # remove existing csp
             for meta in soup.find_all('meta', attrs={'http-equiv': 'Content-Security-Policy'}):
                 meta.decompose()
 
-            # Add new CSP
+            # add new csp  # somebody please refactor this
             meta = soup.new_tag('meta', **{'http-equiv': 'Content-Security-Policy', 'content': self.current_csp})
             head.append(meta)
 
@@ -262,11 +267,11 @@ class SecurityTab(QWidget):
             response.raise_for_status()
             content = response.content
             
-            # Generate SHA-384 hash (industry standard)
+            # generate sha-384 hash (industry standard)
             hash_sha384 = hashlib.sha384(content).hexdigest()
             integrity = f"sha384-{hash_sha384}"
             
-            # Detect if it's a script or style
+            # detect if it's a script or style
             if url.endswith('.css'):
                 tag_example = f'<link rel="stylesheet" href="{url}" integrity="{integrity}" crossorigin="anonymous">'
             else:
@@ -278,9 +283,11 @@ class SecurityTab(QWidget):
             
             self.sri_result.setText(result_text)
             self.current_integrity = integrity
+
             self.current_sri_url = url
             self.inject_sri_btn.setEnabled(True)
             self.status_label.setText("SRI hash generated. Click 'Inject' to add to HTML.")
+
             
         except requests.exceptions.RequestException as e:
             QMessageBox.critical(self, "Error", f"Failed to fetch URL: {e}")
@@ -294,6 +301,7 @@ class SecurityTab(QWidget):
             return
         if not hasattr(self, 'current_integrity'):
             QMessageBox.warning(self, "Warning", "Generate SRI hash first.")
+
             return
 
         try:
@@ -301,9 +309,9 @@ class SecurityTab(QWidget):
                 soup = BeautifulSoup(f, 'html.parser')
 
             found = False
-            url_clean = self.current_sri_url.split('/')[-1]  # Get filename
+            url_clean = self.current_sri_url.split('/')[-1]  # get filename
             
-            # Find script or link tag with matching src/href
+            # find script or link tag with matching src/href
             for script in soup.find_all('script', src=True):
                 if url_clean in script['src'] or self.current_sri_url in script['src']:
                     script['integrity'] = self.current_integrity
@@ -327,6 +335,7 @@ class SecurityTab(QWidget):
                 if reply == QMessageBox.No:
                     return
 
+
             with open(self.current_file, 'w', encoding='utf-8') as f:
                 f.write(str(soup))
 
@@ -340,8 +349,8 @@ class SecurityTab(QWidget):
     def update_theme(self, is_dark):
         """Called from main window when theme changes."""
         if is_dark:
-            self.csp_preview.setStyleSheet("background-color: #2B2D31; color: #E8E8E8;")
-            self.sri_result.setStyleSheet("padding: 10px; font-family: monospace; background-color: #2B2D31; color: #E8E8E8;")
+            self.csp_preview.setStyleSheet("background-color: #2b2d31; color: #e8e8e8;")
+            self.sri_result.setStyleSheet("padding: 10px; font-family: monospace; background-color: #2b2d31; color: #e8e8e8;")
         else:
-            self.csp_preview.setStyleSheet("background-color: #FFFFFF; color: #2C3E50;")
-            self.sri_result.setStyleSheet("padding: 10px; font-family: monospace; background-color: #FFFFFF; color: #2C3E50;")
+            self.csp_preview.setStyleSheet("background-color: #ffffff; color: #2c3e50;")
+            self.sri_result.setStyleSheet("padding: 10px; font-family: monospace; background-color: #ffffff; color: #2c3e50;")

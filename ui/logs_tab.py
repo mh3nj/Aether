@@ -14,7 +14,7 @@ from PySide6.QtGui import QColor, QFont
 class LogsTab(QWidget):
     """Dedicated logs tab showing all operations"""
     
-    log_added = Signal(dict)  # Signal to notify dashboard
+    log_added = Signal(dict)  # signal to notify dashboard
     
     def __init__(self, parent=None, undo_manager=None):
         super().__init__(parent)
@@ -22,20 +22,21 @@ class LogsTab(QWidget):
         self.log_entries = []
         self.init_ui()
         
-        # Connect to undo manager signals
+        # connect to undo manager signals
         if self.undo_manager:
             self.undo_manager.operation_recorded.connect(self.add_log_entry)
     
     def init_ui(self):
         layout = QVBoxLayout(self)
         
-        # Header
+        # header  # this is why we cant have nice things
         header = QLabel("\uf15b Operation History")
         header.setFont(QFont("", 16, QFont.Bold))
         header.setAlignment(Qt.AlignCenter)
         layout.addWidget(header)
         
-        # Filter controls
+
+        # filter controls
         filter_group = QGroupBox("Filters")
         filter_layout = QHBoxLayout()
         
@@ -65,7 +66,7 @@ class LogsTab(QWidget):
         filter_group.setLayout(filter_layout)
         layout.addWidget(filter_group)
         
-        # Log table
+        # log table  # this is why we cant have nice things
         self.log_table = QTableWidget()
         self.log_table.setColumnCount(5)
         self.log_table.setHorizontalHeaderLabels(["Time", "Type", "Operation", "Details", "Status"])
@@ -79,18 +80,18 @@ class LogsTab(QWidget):
         
         layout.addWidget(self.log_table)
         
-        # Status bar
+        # status bar
         self.status_label = QLabel("Ready - 0 logs recorded")
         layout.addWidget(self.status_label)
         
-        # Add some demo logs
+        # add some demo logs
         self.add_demo_logs()
     
     def add_log_entry(self, message, log_type="info", details=""):
         """Add a new log entry"""
         from datetime import datetime
         
-        # Determine category
+        # determine category
         category = "General"
         if "SEO" in message or "meta" in message.lower():
             category = "SEO Operations"
@@ -113,13 +114,14 @@ class LogsTab(QWidget):
             "raw_message": message
         }
         
-        self.log_entries.insert(0, entry)  # Newest first
+        self.log_entries.insert(0, entry)  # newest first
         self.apply_filters()
         
-        # Emit signal for dashboard
+        # emit signal for dashboard
         self.log_added.emit(entry)
         
-        # Limit log size
+        # limit log size
+
         if len(self.log_entries) > 500:
             self.log_entries = self.log_entries[:500]
     
@@ -128,6 +130,7 @@ class LogsTab(QWidget):
         self.add_log_entry("Welcome to Aether! Ready to optimize your project.", "info")
         self.add_log_entry("Project setup wizard completed", "success")
         self.add_log_entry("SEO score analysis completed for 45 pages", "info")
+
         self.add_log_entry("Found 12 broken links across 3 files", "warning")
     
     def apply_filters(self):
@@ -139,11 +142,11 @@ class LogsTab(QWidget):
         
         filtered = []
         for entry in self.log_entries:
-            # Apply type filter
+            # apply type filter
             if filter_text != "All" and entry["type"] != filter_text:
                 continue
             
-            # Apply search filter
+            # apply search filter
             if search_text:
                 if (search_text not in entry["operation"].lower() and 
                     search_text not in entry["details"].lower()):
@@ -151,28 +154,29 @@ class LogsTab(QWidget):
             
             filtered.append(entry)
         
-        # Populate table
+        # populate table
         for row, entry in enumerate(filtered):
             self.log_table.insertRow(row)
             
-            # Time
+            # time
             time_item = QTableWidgetItem(entry["timestamp"])
             time_item.setToolTip(entry["date"])
             self.log_table.setItem(row, 0, time_item)
             
-            # Type
+            # type
             type_item = QTableWidgetItem(entry["type"])
+
             self.log_table.setItem(row, 1, type_item)
             
-            # Operation
+            # operation
             op_item = QTableWidgetItem(entry["operation"])
             self.log_table.setItem(row, 2, op_item)
             
-            # Details
+            # details
             details_item = QTableWidgetItem(entry["details"])
             self.log_table.setItem(row, 3, details_item)
             
-            # Status
+            # status
             status_item = QTableWidgetItem(entry["status"])
             if "\uf00c" in entry["status"]:
                 status_item.setForeground(QColor(76, 175, 80))
@@ -199,6 +203,7 @@ class LogsTab(QWidget):
     def export_logs(self):
         """Export logs to CSV file"""
         from PySide6.QtWidgets import QFileDialog
+
         import csv
         
         path, _ = QFileDialog.getSaveFileName(self, "Export Logs", "logs.csv", "CSV Files (*.csv)")
@@ -226,28 +231,28 @@ class LogsTab(QWidget):
         if is_dark:
             self.log_table.setStyleSheet("""
                 QTableWidget {
-                    background-color: #2B2D31;
-                    color: #E8E8E8;
-                    alternate-background-color: #3E4045;
-                    gridline-color: #3E4045;
+                    background-color: #2b2d31;
+                    color: #e8e8e8;
+                    alternate-background-color: #3e4045;
+                    gridline-color: #3e4045;
                 }
                 QHeaderView::section {
-                    background-color: #2B2D31;
-                    color: #E8E8E8;
-                    border: 1px solid #3E4045;
+                    background-color: #2b2d31;
+                    color: #e8e8e8;
+                    border: 1px solid #3e4045;
                 }
             """)
         else:
             self.log_table.setStyleSheet("""
                 QTableWidget {
-                    background-color: #FFFFFF;
-                    color: #2C3E50;
-                    alternate-background-color: #F8F9FA;
-                    gridline-color: #D0D7DE;
+                    background-color: #ffffff;
+                    color: #2c3e50;
+                    alternate-background-color: #f8f9fa;
+                    gridline-color: #d0d7de;
                 }
                 QHeaderView::section {
-                    background-color: #F1F3F5;
-                    color: #2C3E50;
-                    border: 1px solid #D0D7DE;
+                    background-color: #f1f3f5;
+                    color: #2c3e50;
+                    border: 1px solid #d0d7de;
                 }
             """)

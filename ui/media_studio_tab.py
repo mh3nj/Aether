@@ -1,5 +1,6 @@
 """
-Media Studio – Merged image/media tools
+Media Studio – Merged image/video/media tools
+Includes: Favicon, WebP, Smart Image Lazy Load, Smart Video Lazy Load, Native Lazy Load
 """
 
 from PySide6.QtWidgets import QWidget, QVBoxLayout, QTabWidget
@@ -7,6 +8,8 @@ from ui.favicon_tab import FaviconTab
 from ui.webp_tab import WebPTab
 from ui.lazy_load_tab import LazyLoadTab
 from ui.image_hints_tab import ImageHintsTab
+from ui.smart_video_lazy_load_tab import SmartVideoLazyLoadTab
+from ui.native_lazy_load_tab import NativeLazyLoadTab
 
 
 class MediaStudioTab(QWidget):
@@ -20,19 +23,26 @@ class MediaStudioTab(QWidget):
         
         self.tabs = QTabWidget()
         
+        # Create all media-related tabs
         self.favicon_tab = FaviconTab()
         self.webp_tab = WebPTab()
-        self.lazy_tab = LazyLoadTab()
+        self.smart_image_tab = LazyLoadTab()
+        self.smart_video_tab = SmartVideoLazyLoadTab()
+        self.native_lazy_tab = NativeLazyLoadTab()
         self.image_hints_tab = ImageHintsTab()
         
-        self.tabs.addTab(self.favicon_tab, "\uf53f Favicon Generator")
-        self.tabs.addTab(self.webp_tab, "\uf565 WebP Converter")
-        self.tabs.addTab(self.lazy_tab, "\uf584 Smart Lazy Load")
-        self.tabs.addTab(self.image_hints_tab, "\uf545 Image Hints")
+        # Add as subtabs
+        self.tabs.addTab(self.favicon_tab, "🎨 Favicon Generator")
+        self.tabs.addTab(self.webp_tab, "🖼️ WebP Converter")
+        self.tabs.addTab(self.smart_image_tab, "🌸 Smart Image Lazy Load")
+        self.tabs.addTab(self.smart_video_tab, "🎬 Smart Video Lazy Load")
+        self.tabs.addTab(self.native_lazy_tab, "⚡ Native Lazy Load")
+        self.tabs.addTab(self.image_hints_tab, "📐 Image Hints")
         
         layout.addWidget(self.tabs)
     
     def update_theme(self, is_dark):
+        """Called from main window when theme changes."""
         if is_dark:
             self.tabs.setStyleSheet("""
                 QTabWidget::pane {
@@ -71,6 +81,8 @@ class MediaStudioTab(QWidget):
                 }
             """)
         
-        for tab in [self.favicon_tab, self.webp_tab, self.lazy_tab, self.image_hints_tab]:
+        # Propagate to child tabs
+        for tab in [self.favicon_tab, self.webp_tab, self.smart_image_tab, 
+                    self.smart_video_tab, self.native_lazy_tab, self.image_hints_tab]:
             if hasattr(tab, 'update_theme'):
                 tab.update_theme(is_dark)

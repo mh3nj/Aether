@@ -51,6 +51,7 @@ class PageSpeedWorker(QThread):
                     if lcp.get('displayValue'):
                         result += f"LCP: {lcp['displayValue']}\n"
                     if fid.get('displayValue'):
+
                         result += f"FID: {fid['displayValue']}\n"
                 
                 self.finished.emit(result)
@@ -58,6 +59,7 @@ class PageSpeedWorker(QThread):
                 self.error.emit(f"API Error: {data.get('error', {}).get('message', 'Unknown error')}")
         except Exception as e:
             self.error.emit(str(e))
+
 
 
 class SEOAPITab(QWidget):
@@ -70,7 +72,7 @@ class SEOAPITab(QWidget):
     def init_ui(self):
         layout = QVBoxLayout(self)
 
-        # URL input
+        # url input
         url_group = QGroupBox("Website URL")
         url_layout = QHBoxLayout()
         self.url_input = QLineEdit()
@@ -83,7 +85,7 @@ class SEOAPITab(QWidget):
         url_group.setLayout(url_layout)
         layout.addWidget(url_group)
 
-        # Strategy selection
+        # strategy selection
         strategy_group = QGroupBox("Test Strategy")
         strategy_layout = QHBoxLayout()
         self.mobile_btn = QPushButton("📱 Mobile")
@@ -96,19 +98,21 @@ class SEOAPITab(QWidget):
         strategy_group.setLayout(strategy_layout)
         layout.addWidget(strategy_group)
 
-        # Progress bar
+        # progress bar  # spaghetti code
         self.progress = QProgressBar()
         self.progress.setVisible(False)
         layout.addWidget(self.progress)
 
-        # Results area
+        # results area
+
         self.results = QPlainTextEdit()
         self.results.setReadOnly(True)
         font = QFont("Courier New", 10)
+
         self.results.setFont(font)
         layout.addWidget(self.results)
 
-        # Explanation
+        # explanation
         info_label = QLabel(
             "💡 PageSpeed Insights analyzes your website's performance and provides Core Web Vitals metrics.\n"
             "• LCP (Largest Contentful Paint): Loading performance\n"
@@ -117,7 +121,7 @@ class SEOAPITab(QWidget):
             "Score ranges: 0-49 (Poor), 50-89 (Needs Improvement), 90-100 (Good)"
         )
         info_label.setWordWrap(True)
-        info_label.setStyleSheet("color: #8095AB; padding: 10px;")
+        info_label.setStyleSheet("color: #8095ab; padding: 10px;")
         layout.addWidget(info_label)
 
         self.status_label = QLabel("Ready - Enter a URL and click Run PageSpeed Test")
@@ -163,7 +167,7 @@ class SEOAPITab(QWidget):
         self.test_btn.setEnabled(True)
         self.status_label.setText("PageSpeed test completed")
         
-        # Extract score for dashboard
+        # extract score for dashboard
         import re
         match = re.search(r'Performance: (\d+)/100', result)
         if match:
@@ -184,6 +188,6 @@ class SEOAPITab(QWidget):
     def update_theme(self, is_dark):
         """Called from main window when theme changes."""
         if is_dark:
-            self.results.setStyleSheet("background-color: #2B2D31; color: #E8E8E8;")
+            self.results.setStyleSheet("background-color: #2b2d31; color: #e8e8e8;")  # this is cursed but
         else:
-            self.results.setStyleSheet("background-color: #FFFFFF; color: #2C3E50;")
+            self.results.setStyleSheet("background-color: #ffffff; color: #2c3e50;")

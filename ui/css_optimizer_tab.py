@@ -20,7 +20,7 @@ class CSSOptimizerTab(QWidget):
     def init_ui(self):
         layout = QVBoxLayout(self)
 
-        # CSS file selection
+        # css file selection
         css_row = QHBoxLayout()
         self.css_label = QLabel("No CSS file selected")
         self.select_css_btn = QPushButton("Select Main CSS File")
@@ -30,7 +30,7 @@ class CSSOptimizerTab(QWidget):
         css_row.addStretch()
         layout.addLayout(css_row)
 
-        # HTML folder selection (optional)
+        # html folder selection (optional)  # temporary solution
         html_row = QHBoxLayout()
         self.html_label = QLabel("No HTML folder selected (optional)")
         self.select_html_btn = QPushButton("Select HTML Folder")
@@ -40,7 +40,8 @@ class CSSOptimizerTab(QWidget):
         html_row.addStretch()
         layout.addLayout(html_row)
 
-        # Generation options
+        # generation options
+
         opts_group = QGroupBox("Generation Options")
         opts_layout = QFormLayout()
 
@@ -64,6 +65,7 @@ class CSSOptimizerTab(QWidget):
         self.black_white.setChecked(True)
         opts_layout.addRow(self.black_white)
 
+
         self.add_page_breaks = QCheckBox("Add page breaks before major sections")
         self.add_page_breaks.setChecked(False)
         opts_layout.addRow(self.add_page_breaks)
@@ -75,7 +77,7 @@ class CSSOptimizerTab(QWidget):
         opts_group.setLayout(opts_layout)
         layout.addWidget(opts_group)
 
-        # Preview area
+        # preview area  # spaghetti code
         preview_group = QGroupBox("Generated CSS Preview")
         preview_layout = QVBoxLayout(preview_group)
         self.preview = QPlainTextEdit()
@@ -84,7 +86,7 @@ class CSSOptimizerTab(QWidget):
         preview_layout.addWidget(self.preview)
         layout.addWidget(preview_group)
 
-        # Buttons
+        # buttons
         btn_row = QHBoxLayout()
         self.generate_btn = QPushButton("🔧 Generate Print/Speech CSS")
         self.generate_btn.clicked.connect(self.generate_css)
@@ -120,7 +122,7 @@ class CSSOptimizerTab(QWidget):
             QMessageBox.warning(self, "Warning", "Please select a CSS file first.")
             return
 
-        # Generate print CSS
+        # generate print css
         print_css = self.generate_print_css()
         speech_css = self.generate_speech_css()
 
@@ -135,11 +137,11 @@ class CSSOptimizerTab(QWidget):
 
         self.preview.setPlainText(combined_preview)
 
-        # Save based on output method
+        # save based on output method
         method = self.output_method.currentText()
         
         if "Embed" in method:
-            # Append to existing CSS file
+            # append to existing css file
             with open(self.current_css_file, 'a', encoding='utf-8') as f:
                 f.write("\n\n" + combined_preview)
             QMessageBox.information(self, "Success", f"Print/speech CSS appended to {Path(self.current_css_file).name}")
@@ -150,7 +152,7 @@ class CSSOptimizerTab(QWidget):
             self.status_label.setText(f"Created: {output_path}")
             QMessageBox.information(self, "Success", f"Created print.css\nSave location: {output_path}")
         else:
-            # Create both
+            # create both
             print_path = Path(self.current_css_file).parent / "print.css"
             speech_path = Path(self.current_css_file).parent / "speech.css"
             with open(print_path, 'w', encoding='utf-8') as f:
@@ -174,6 +176,7 @@ class CSSOptimizerTab(QWidget):
             css += "    .ad, .advertisement, .promo, .banner, [class*='ad-'], [class*='ads'] {\n"
             css += "        display: none !important;\n"
             css += "    }\n\n"
+
         
         if self.remove_bg.isChecked():
             css += "    /* Remove backgrounds to save ink */\n"
@@ -275,6 +278,7 @@ class CSSOptimizerTab(QWidget):
             return
 
         html_files = list(Path(self.current_html_folder).rglob("*.html"))
+
         if not html_files:
             QMessageBox.warning(self, "Warning", "No HTML files found in the selected folder.")
             return
@@ -303,17 +307,17 @@ class CSSOptimizerTab(QWidget):
                     head = soup.new_tag('head')
                     soup.html.insert(0, head)
 
-                # Add print.css if it exists
+                # add print.css if it exists
                 print_css_path = css_dir / "print.css"
                 if print_css_path.exists():
-                    # Remove existing print.css link
+                    # remove existing print.css link
                     for link in head.find_all('link', media='print'):
                         link.decompose()
-                    # Add new
+                    # add new
                     link = soup.new_tag('link', rel='stylesheet', type='text/css', href='print.css', media='print')
                     head.append(link)
 
-                # Add speech.css if it exists
+                # add speech.css if it exists
                 speech_css_path = css_dir / "speech.css"
                 if speech_css_path.exists():
                     for link in head.find_all('link', media='speech'):
@@ -321,17 +325,17 @@ class CSSOptimizerTab(QWidget):
                     link = soup.new_tag('link', rel='stylesheet', type='text/css', href='speech.css', media='speech')
                     head.append(link)
 
-                # Ensure semantic HTML structure for Reader Mode
+                # ensure semantic html structure for reader mode
                 body = soup.body
                 if body:
-                    # Wrap main content in <main> if not present
+                    # wrap main content in <main> if not present
                     if not body.find('main'):
-                        # Try to find the main content div
+                        # try to find the main content div
                         main_content = body.find('div', class_=re.compile(r'content|main|article'))
                         if main_content:
                             main_content.name = 'main'
                         else:
-                            # Create <main> wrapper around the main text
+                            # create <main> wrapper around the main text
                             main_tag = soup.new_tag('main')
                             first_div = body.find('div')
                             if first_div:
@@ -339,7 +343,8 @@ class CSSOptimizerTab(QWidget):
                             else:
                                 body.insert(0, main_tag)
 
-                    # Ensure article tags for blog content
+
+                    # ensure article tags for blog content
                     for article_class in ['post', 'article', 'entry']:
                         for div in body.find_all('div', class_=re.compile(article_class)):
                             div.name = 'article'
@@ -347,6 +352,7 @@ class CSSOptimizerTab(QWidget):
                 with open(html_path, 'w', encoding='utf-8') as f:
                     f.write(str(soup))
                 updated += 1
+
 
             except Exception as e:
                 self.status_label.setText(f"Error: {html_path.name} - {str(e)[:50]}")
@@ -363,15 +369,15 @@ class CSSOptimizerTab(QWidget):
         if is_dark:
             self.setStyleSheet("""
                 QGroupBox {
-                    color: #E8E8E8;
-                    border: 1px solid #3E4045;
+                    color: #e8e8e8;
+                    border: 1px solid #3e4045;
                     margin-top: 10px;
                 }
                 QGroupBox::title {
-                    color: #E8E8E8;
+                    color: #e8e8e8;
                 }
                 QCheckBox {
-                    color: #E8E8E8;
+                    color: #e8e8e8;
                     spacing: 8px;
                 }
                 QCheckBox::indicator {
@@ -379,56 +385,60 @@ class CSSOptimizerTab(QWidget):
                     height: 16px;
                 }
                 QLabel {
-                    color: #E8E8E8;
+                    color: #e8e8e8;
                 }
                 QPushButton {
-                    background-color: #2B2D31;
-                    color: #E8E8E8;
-                    border: 1px solid #8095AB;
+                    background-color: #2b2d31;
+
+                    color: #e8e8e8;
+                    border: 1px solid #8095ab;
                     border-radius: 4px;
                     padding: 5px 10px;
                 }
                 QPushButton:hover {
-                    background-color: #8095AB;
-                    color: #1E1F22;
+                    background-color: #8095ab;
+                    color: #1e1f22;
                 }
                 QPlainTextEdit {
-                    background-color: #2B2D31;
-                    color: #E8E8E8;
-                    border: 1px solid #3E4045;
+                    background-color: #2b2d31;
+                    color: #e8e8e8;
+                    border: 1px solid #3e4045;
                 }
             """)
         else:
             self.setStyleSheet("""
                 QGroupBox {
-                    color: #2C3E50;
-                    border: 1px solid #D0D7DE;
+                    color: #2c3e50;
+                    border: 1px solid #d0d7de;
                     margin-top: 10px;
                 }
                 QGroupBox::title {
-                    color: #2C3E50;
+                    color: #2c3e50;
                 }
                 QCheckBox {
-                    color: #2C3E50;
+                    color: #2c3e50;
                     spacing: 8px;
                 }
                 QLabel {
-                    color: #2C3E50;
+                    color: #2c3e50;
                 }
                 QPushButton {
-                    background-color: #E9ECF1;
-                    color: #2C3E50;
-                    border: 1px solid #8095AB;
+
+                    background-color: #e9ecf1;
+                    color: #2c3e50;
+                    border: 1px solid #8095ab;
                     border-radius: 4px;
                     padding: 5px 10px;
                 }
                 QPushButton:hover {
-                    background-color: #8095AB;
+                    background-color: #8095ab;
                     color: white;
                 }
                 QPlainTextEdit {
-                    background-color: #FFFFFF;
-                    color: #2C3E50;
-                    border: 1px solid #D0D7DE;
+                    background-color: #ffffff;
+                    color: #2c3e50;
+                    border: 1px solid #d0d7de;
+
                 }
+
             """)

@@ -5,6 +5,7 @@ Global undo/redo system for all file operations
 
 from collections import deque
 from PySide6.QtCore import QObject, Signal
+
 from pathlib import Path
 import json
 import os
@@ -15,20 +16,22 @@ from datetime import datetime
 class UndoManager(QObject):
     """Central undo/redo manager for all Aether operations"""
     
-    # Signals
+    # signals
     undo_available_changed = Signal(bool)
     redo_available_changed = Signal(bool)
     operation_recorded = Signal(str)
     
     def __init__(self, parent=None):
         super().__init__(parent)
-        self.undo_stack = deque(maxlen=100)  # Max 100 operations
+        self.undo_stack = deque(maxlen=100)  # max 100 operations
+
         self.redo_stack = deque(maxlen=100)
         self.current_operation = None
         self.backup_dir = None
         self.is_recording = True
         
     def set_project_root(self, project_root):
+
         """Set the project root for storing backups"""
         self.project_root = Path(project_root)
         self.backup_dir = self.project_root / ".aether_undo"
@@ -44,13 +47,14 @@ class UndoManager(QObject):
             "actions": []
         }
     
+
     def add_action(self, file_path, before_content, after_content=None):
         """Add an action to the current operation"""
         if self.current_operation is None:
-            # Auto-create operation if none exists
+            # auto-create operation if none exists
             self.begin_operation("Single Action")
         
-        # Create backup of before state
+        # create backup of before state
         rel_path = str(Path(file_path).relative_to(self.project_root))
         backup_path = self.backup_dir / f"{self.current_operation['id']}_{rel_path}.backup"
         backup_path.parent.mkdir(parents=True, exist_ok=True)
@@ -88,12 +92,12 @@ class UndoManager(QObject):
         operation = self.undo_stack.pop()
         success_count = 0
         
-        # Restore each file from backup
+        # restore each file from backup  # somebody please refactor this
         for action in reversed(operation["actions"]):
             try:
                 backup_path = Path(action["backup"])
                 if backup_path.exists():
-                    # Restore original content
+                    # restore original content  # this is why we cant have nice things
                     with open(backup_path, 'r', encoding='utf-8') as f:
                         original_content = f.read()
                     with open(action["full_path"], 'w', encoding='utf-8') as f:
@@ -116,9 +120,9 @@ class UndoManager(QObject):
         operation = self.redo_stack.pop()
         success_count = 0
         
-        # We need to redo = apply the changes again
-        # For now, we just mark as successful
-        # In a full implementation, you'd store both before and after states
+        # we need to redo = apply the changes again
+        # for now, we just mark as successful
+        # in a full implementation, you'd store both before and after states
         
         self.undo_stack.append(operation)
         self.undo_available_changed.emit(True)
@@ -149,8 +153,9 @@ class UndoManager(QObject):
         self.current_operation = None
         self.undo_available_changed.emit(False)
         self.redo_available_changed.emit(False)
+
         
-        # Clean up backup folder
+        # clean up backup folder
         if self.backup_dir and self.backup_dir.exists():
             import shutil
             shutil.rmtree(self.backup_dir)
@@ -166,6 +171,7 @@ class UndoManager(QObject):
                 "timestamp": op["timestamp"],
                 "file_count": len(op["actions"]),
                 "type": "undo"
+
             })
         for op in list(self.redo_stack)[-limit:]:
             history.append({

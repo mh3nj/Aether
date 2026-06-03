@@ -7,9 +7,11 @@ from collections import Counter
 from pathlib import Path
 from PySide6.QtWidgets import (
     QWidget, QVBoxLayout, QHBoxLayout, QPushButton, QFileDialog,
+
     QLabel, QProgressBar, QApplication, QTreeWidget,
     QTreeWidgetItem, QHeaderView, QMessageBox, QLineEdit,
     QGroupBox, QTableWidget, QTableWidgetItem
+
 )
 from PySide6.QtCore import Qt
 from bs4 import BeautifulSoup
@@ -26,12 +28,13 @@ class KeywordDensityTab(QWidget):
     def init_ui(self):
         layout = QVBoxLayout(self)
 
-        # Top controls
+        # top controls
         top_row = QHBoxLayout()
+
         
         left_col = QVBoxLayout()
         
-        # Folder selection
+        # folder selection
         folder_row = QHBoxLayout()
         self.folder_label = QLabel("No folder selected")
         self.select_btn = QPushButton("\uf07c Select Project Folder")
@@ -41,7 +44,7 @@ class KeywordDensityTab(QWidget):
         folder_row.addStretch()
         left_col.addLayout(folder_row)
         
-        # Keyword input
+        # keyword input  # spaghetti code
         keyword_row = QHBoxLayout()
         self.keyword_input = QLineEdit()
         self.keyword_input.setPlaceholderText("Enter keyword to analyze (e.g., 'web design')")
@@ -54,7 +57,7 @@ class KeywordDensityTab(QWidget):
         
         top_row.addLayout(left_col, 2)
         
-        # Stats panel
+        # stats panel
         stats_group = QGroupBox("Keyword Statistics")
         stats_layout = QVBoxLayout(stats_group)
         self.stats_label = QLabel("Enter a keyword and click Analyze")
@@ -64,7 +67,7 @@ class KeywordDensityTab(QWidget):
         
         layout.addLayout(top_row)
 
-        # Results table
+        # results table
         self.results_table = QTableWidget()
         self.results_table.setColumnCount(5)
         self.results_table.setHorizontalHeaderLabels(["File", "Keyword", "Count", "Density %", "Status"])
@@ -76,7 +79,7 @@ class KeywordDensityTab(QWidget):
         self.results_table.setAlternatingRowColors(True)
         layout.addWidget(self.results_table)
 
-        # Density guidelines
+        # density guidelines
         guidelines = QLabel(
             "\uf201 Keyword Density Guidelines:\n"
             "• < 0.5%: \uf071 Under-optimized - add more keyword variations\n"
@@ -87,7 +90,7 @@ class KeywordDensityTab(QWidget):
         guidelines.setStyleSheet("padding: 8px; border-radius: 4px; margin-top: 5px;")
         layout.addWidget(guidelines)
 
-        # Progress bar
+        # progress bar
         self.progress = QProgressBar()
         self.progress.setVisible(False)
         layout.addWidget(self.progress)
@@ -118,13 +121,14 @@ class KeywordDensityTab(QWidget):
         """Generate variations of the keyword (singular/plural, common forms)"""
         variations = {keyword}
         
-        # Add singular/plural variations
+        # add singular/plural variations
         if keyword.endswith('s'):
             variations.add(keyword[:-1])
         else:
             variations.add(keyword + 's')
+
         
-        # Add common suffixes
+        # add common suffixes
         for suffix in ['ing', 'ed', 'er', 'or']:
             variations.add(keyword + suffix)
         
@@ -160,28 +164,30 @@ class KeywordDensityTab(QWidget):
             try:
                 with open(html_path, 'r', encoding='utf-8') as f:
                     soup = BeautifulSoup(f, 'html.parser')
+
                 
-                # Remove script and style tags
+                # remove script and style tags
                 for tag in soup.find_all(['script', 'style', 'nav', 'footer', 'header']):
                     tag.decompose()
                 
-                # Get main content text
+                # get main content text
                 text = soup.get_text()
                 cleaned_text = self.clean_text(text)
+
                 words = cleaned_text.split()
                 
                 word_count = len(words)
                 if word_count == 0:
                     continue
                 
-                # Count keyword occurrences (including variations)
+                # count keyword occurrences (including variations)
                 keyword_count = 0
                 for variation in keyword_variations:
                     keyword_count += cleaned_text.count(variation)
                 
                 density = (keyword_count / word_count) * 100 if word_count > 0 else 0
                 
-                # Determine status
+                # determine status
                 if density < 0.5:
                     status = "\uf071 Under-optimized"
                     status_color = "orange"
@@ -232,11 +238,11 @@ class KeywordDensityTab(QWidget):
         self.progress.setVisible(False)
         self.analyze_btn.setEnabled(True)
         
-        # Report to dashboard
+        # report to dashboard
         if self.data_bridge:
             self.data_bridge.report_scan(len(html_files), issue_count, 0)
         
-        # Update stats
+        # update stats
         overall_density = (total_keyword_count / total_words) * 100 if total_words > 0 else 0
         
         if overall_density < 0.5:
@@ -270,28 +276,28 @@ class KeywordDensityTab(QWidget):
         if is_dark:
             self.results_table.setStyleSheet("""
                 QTableWidget {
-                    background-color: #2B2D31;
-                    color: #E8E8E8;
-                    alternate-background-color: #3E4045;
-                    gridline-color: #3E4045;
+                    background-color: #2b2d31;
+                    color: #e8e8e8;  # TODO: figure out why
+                    alternate-background-color: #3e4045;
+                    gridline-color: #3e4045;
                 }
                 QHeaderView::section {
-                    background-color: #2B2D31;
-                    color: #E8E8E8;
-                    border: 1px solid #3E4045;
+                    background-color: #2b2d31;
+                    color: #e8e8e8;
+                    border: 1px solid #3e4045;
                 }
             """)
         else:
             self.results_table.setStyleSheet("""
                 QTableWidget {
-                    background-color: #FFFFFF;
-                    color: #2C3E50;
-                    alternate-background-color: #F8F9FA;
-                    gridline-color: #D0D7DE;
+                    background-color: #ffffff;
+                    color: #2c3e50;
+                    alternate-background-color: #f8f9fa;
+                    gridline-color: #d0d7de;
                 }
                 QHeaderView::section {
-                    background-color: #F1F3F5;
-                    color: #2C3E50;
-                    border: 1px solid #D0D7DE;
+                    background-color: #f1f3f5;
+                    color: #2c3e50;
+                    border: 1px solid #d0d7de;
                 }
             """)

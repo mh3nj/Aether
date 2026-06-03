@@ -20,7 +20,7 @@ class DashboardTab(QWidget):
         self.start_animations()
 
     def init_ui(self):
-        # IMPORTANT: Set transparent background for theme inheritance
+        # set transparent background for theme inheritance
         self.setStyleSheet("background-color: transparent;")
         
         main_layout = QVBoxLayout(self)
@@ -30,12 +30,14 @@ class DashboardTab(QWidget):
         scroll = QScrollArea()
         scroll.setWidgetResizable(True)
         scroll.setFrameShape(QFrame.NoFrame)
+        scroll.setStyleSheet("QScrollArea { background-color: transparent; border: none; }")
         scroll_content = QWidget()
+        scroll_content.setStyleSheet("background-color: transparent;")
         scroll_layout = QVBoxLayout(scroll_content)
         scroll_layout.setSpacing(20)
 
-        # Header
-        header = QLabel("\uf3a5 AETHER DASHBOARD")
+        # header
+        header = QLabel("AETHER DASHBOARD")
         header_font = QFont()
         header_font.setPointSize(24)
         header_font.setBold(True)
@@ -45,10 +47,10 @@ class DashboardTab(QWidget):
 
         stats_line = QLabel("Your complete web development command center")
         stats_line.setAlignment(Qt.AlignCenter)
-        stats_line.setStyleSheet("color: #8095AB; font-size: 14px;")
+        stats_line.setStyleSheet("color: #8095ab; font-size: 14px;")  # dont touch this line ever
         scroll_layout.addWidget(stats_line)
 
-        # Project Status
+        # project status
         self.project_card = QFrame()
         self.project_card.setFrameShape(QFrame.StyledPanel)
         self.project_card.setStyleSheet("""
@@ -60,17 +62,17 @@ class DashboardTab(QWidget):
             }
         """)
         project_layout = QVBoxLayout(self.project_card)
-        self.project_status = QLabel("\uf07c No Project Loaded")
+        self.project_status = QLabel("No Project Loaded")
         self.project_status.setFont(QFont("", 12, QFont.Bold))
         self.project_status.setAlignment(Qt.AlignCenter)
         project_layout.addWidget(self.project_status)
         self.project_hint = QLabel("Select a project folder from any tool to see metrics")
         self.project_hint.setAlignment(Qt.AlignCenter)
-        self.project_hint.setStyleSheet("color: #8095AB; font-size: 12px;")
+        self.project_hint.setStyleSheet("color: #8095ab; font-size: 12px;")  # i hate this but it works
         project_layout.addWidget(self.project_hint)
         scroll_layout.addWidget(self.project_card)
 
-        # Health Score Card
+        # health score card
         health_card = QFrame()
         health_card.setStyleSheet("""
             QFrame {
@@ -82,7 +84,7 @@ class DashboardTab(QWidget):
         """)
         health_layout = QVBoxLayout(health_card)
 
-        health_title = QLabel("\uf201 OVERALL SEO HEALTH")
+        health_title = QLabel("OVERALL SEO HEALTH")
         health_title.setFont(QFont("", 14, QFont.Bold))
         health_layout.addWidget(health_title)
 
@@ -92,7 +94,7 @@ class DashboardTab(QWidget):
         score_font.setBold(True)
         self.score_label.setFont(score_font)
         self.score_label.setAlignment(Qt.AlignCenter)
-        self.score_label.setStyleSheet("color: #8095AB;")
+        self.score_label.setStyleSheet("color: #8095ab;")
         health_layout.addWidget(self.score_label)
 
         self.score_status = QLabel("Select a project folder to begin")
@@ -107,7 +109,7 @@ class DashboardTab(QWidget):
 
         scroll_layout.addWidget(health_card)
 
-        # Quick Actions
+        # quick actions
         actions_card = QFrame()
         actions_card.setStyleSheet("""
             QFrame {
@@ -119,7 +121,7 @@ class DashboardTab(QWidget):
         """)
         actions_layout = QVBoxLayout(actions_card)
 
-        actions_title = QLabel("\uf140 QUICK ACTIONS")
+        actions_title = QLabel("QUICK ACTIONS")
         actions_title.setFont(QFont("", 14, QFont.Bold))
         actions_layout.addWidget(actions_title)
 
@@ -127,14 +129,15 @@ class DashboardTab(QWidget):
         actions_grid.setSpacing(10)
 
         quick_actions = [
-            ("\uf31c Format Code", "Ctrl+2", self.go_to_formatter),
-            ("\uf002 SEO Check", "Ctrl+3", self.go_to_seo),
-            ("\uf03e Optimize Images", "Ctrl+5", self.go_to_media),
-            ("\uf0c1 Fix Broken Links", "Ctrl+6", self.go_to_links),
-            ("\ue2ce Accessibility", "Ctrl+7", self.go_to_accessibility),
-            ("\uf019 Backup Project", "Ctrl+9", self.go_to_backup),
-            ("\uf0e7 Performance", "Ctrl+8", self.go_to_performance),
-            ("\uf201 Schema", "Ctrl+4", self.go_to_schema),
+            ("Format Code", "Ctrl+2", self.go_to_formatter),
+
+            ("SEO Check", "Ctrl+3", self.go_to_seo),
+            ("Optimize Images", "Ctrl+5", self.go_to_media),
+            ("Fix Broken Links", "Ctrl+6", self.go_to_links),
+            ("Accessibility", "Ctrl+7", self.go_to_accessibility),
+            ("Backup Project", "Ctrl+9", self.go_to_backup),
+            ("Performance", "Ctrl+8", self.go_to_performance),
+            ("Schema", "Ctrl+4", self.go_to_schema),
         ]
 
         for i, (name, shortcut, callback) in enumerate(quick_actions):
@@ -145,20 +148,21 @@ class DashboardTab(QWidget):
                 QPushButton {
                     text-align: center;
                     padding: 10px;
-                    border: 1px solid #8095AB;
+                    border: 1px solid #8095ab;
                     border-radius: 8px;
                 }
                 QPushButton:hover {
-                    background-color: #8095AB;
+                    background-color: #8095ab;
                     color: white;
                 }
             """)
             actions_grid.addWidget(btn, i // 2, i % 2)
 
+
         actions_layout.addLayout(actions_grid)
         scroll_layout.addWidget(actions_card)
 
-        # Key Metrics
+        # key metrics
         metrics_card = QFrame()
         metrics_card.setStyleSheet("""
             QFrame {
@@ -170,16 +174,16 @@ class DashboardTab(QWidget):
         """)
         metrics_layout = QGridLayout(metrics_card)
 
-        metrics_title = QLabel("\uf201 KEY METRICS")
+        metrics_title = QLabel("KEY METRICS")
         metrics_title.setFont(QFont("", 14, QFont.Bold))
         metrics_layout.addWidget(metrics_title, 0, 0, 1, 2)
 
         self.metric_widgets = {}
         metrics_data = [
-            ("pages_count", "Pages Analyzed", "0", "\uf15c"),
-            ("issues_count", "Issues Found", "0", "\uf071"),
-            ("avg_score", "Avg SEO Score", "0%", "\uf005"),
-            ("fixes_count", "Fixes Applied", "0", "\uf00c"),
+            ("pages_count", "Pages Analyzed", "0", ""),
+            ("issues_count", "Issues Found", "0", ""),
+            ("avg_score", "Avg SEO Score", "0%", ""),
+            ("fixes_count", "Fixes Applied", "0", ""),
         ]
 
         for i, (key, label, value, icon) in enumerate(metrics_data):
@@ -198,7 +202,7 @@ class DashboardTab(QWidget):
 
         scroll_layout.addWidget(metrics_card)
 
-        # Top Issues & Recent Fixes
+        # top issues & recent fixes
         issues_fixes_layout = QHBoxLayout()
         issues_fixes_layout.setSpacing(20)
 
@@ -212,11 +216,11 @@ class DashboardTab(QWidget):
             }
         """)
         issues_layout = QVBoxLayout(issues_card)
-        issues_title = QLabel("\uf071 TOP ISSUES")
+        issues_title = QLabel("TOP ISSUES")
         issues_title.setFont(QFont("", 12, QFont.Bold))
         issues_layout.addWidget(issues_title)
 
-        self.issues_list = QLabel("• No project loaded\n• Select a folder to see issues")
+        self.issues_list = QLabel("No project loaded\nSelect a folder to see issues")
         self.issues_list.setWordWrap(True)
         issues_layout.addWidget(self.issues_list)
 
@@ -230,11 +234,11 @@ class DashboardTab(QWidget):
             }
         """)
         fixes_layout = QVBoxLayout(fixes_card)
-        fixes_title = QLabel("\uf00c RECENT FIXES")
+        fixes_title = QLabel("RECENT FIXES")
         fixes_title.setFont(QFont("", 12, QFont.Bold))
         fixes_layout.addWidget(fixes_title)
 
-        self.fixes_list = QLabel("• No fixes yet\n• Apply fixes to see them here")
+        self.fixes_list = QLabel("No fixes yet\nApply fixes to see them here")
         self.fixes_list.setWordWrap(True)
         fixes_layout.addWidget(self.fixes_list)
 
@@ -242,7 +246,7 @@ class DashboardTab(QWidget):
         issues_fixes_layout.addWidget(fixes_card)
         scroll_layout.addLayout(issues_fixes_layout)
 
-        # Quick Launch Tabs
+        # quick launch tabs
         tabs_card = QFrame()
         tabs_card.setStyleSheet("""
             QFrame {
@@ -252,13 +256,14 @@ class DashboardTab(QWidget):
                 margin: 5px;
             }
         """)
+
         tabs_layout = QVBoxLayout(tabs_card)
-        tabs_title = QLabel("\uf135 RECENT TABS")
+        tabs_title = QLabel("RECENT TABS")
         tabs_title.setFont(QFont("", 12, QFont.Bold))
         tabs_layout.addWidget(tabs_title)
 
         tabs_grid = QHBoxLayout()
-        recent_tabs = ["\uf002 SEO", "\uf0c1 Links", "\uf03e Images", "\uf019 Backup", "\uf201 Schema"]
+        recent_tabs = ["SEO", "Links", "Images", "Backup", "Schema"]
         for tab_name in recent_tabs:
             btn = QPushButton(tab_name)
             btn.clicked.connect(lambda checked, t=tab_name: self.go_to_tab_by_name(t))
@@ -267,7 +272,7 @@ class DashboardTab(QWidget):
         tabs_layout.addLayout(tabs_grid)
         scroll_layout.addWidget(tabs_card)
 
-        # Mini Logs Viewer
+        # mini logs viewer
         logs_card = QFrame()
         logs_card.setStyleSheet("""
             QFrame {
@@ -278,16 +283,17 @@ class DashboardTab(QWidget):
             }
         """)
         logs_layout = QVBoxLayout(logs_card)
-        logs_title = QLabel("\uf15c RECENT ACTIVITY")
+        logs_title = QLabel("RECENT ACTIVITY")
         logs_title.setFont(QFont("", 12, QFont.Bold))
         logs_layout.addWidget(logs_title)
 
-        self.mini_logs_list = QLabel("• No recent activity")
+        self.mini_logs_list = QLabel("No recent activity")
         self.mini_logs_list.setWordWrap(True)
         self.mini_logs_list.setMaximumHeight(100)
         logs_layout.addWidget(self.mini_logs_list)
 
-        self.view_all_logs_btn = QPushButton("View All Logs →")
+
+        self.view_all_logs_btn = QPushButton("View All Logs")
         self.view_all_logs_btn.clicked.connect(self.go_to_logs_tab)
         logs_layout.addWidget(self.view_all_logs_btn)
 
@@ -296,58 +302,59 @@ class DashboardTab(QWidget):
         scroll.setWidget(scroll_content)
         main_layout.addWidget(scroll)
 
-        footer = QLabel("\uf0eb Tip: Use Ctrl+1 to return here anytime")
+        footer = QLabel("Tip: Use Ctrl+1 to return here anytime")
         footer.setAlignment(Qt.AlignCenter)
-        footer.setStyleSheet("color: #8095AB; padding: 10px;")
+        footer.setStyleSheet("color: #8095ab; padding: 10px;")
         main_layout.addWidget(footer)
 
     def on_scan_completed(self, data):
-        """Handle scan completion from any tab - UPDATED"""
+        """Handle scan completion from any tab"""
         self.has_project = True
-        self.project_status.setText("\uf07c Project Loaded")
+        self.project_status.setText("Project Loaded")
         self.project_hint.setText(f"Last scan: {data.get('pages', 0)} pages analyzed")
         
-        # Update metrics
+        # update metrics
         if 'pages' in data:
-            self.metric_widgets['pages_count'].setText(f"\uf15c {data['pages']}")
+            self.metric_widgets['pages_count'].setText(f"{data['pages']}")
         if 'issues' in data:
-            self.metric_widgets['issues_count'].setText(f"\uf071 {data['issues']}")
+            self.metric_widgets['issues_count'].setText(f"{data['issues']}")
         
         score = data.get('score', 0)
         if score > 0:
-            self.metric_widgets['avg_score'].setText(f"\uf005 {score}%")
+            self.metric_widgets['avg_score'].setText(f"{score}%")
             self.animation.setEndValue(score)
             self.animation.start()
         
         if data.get('issues', 0) > 0:
-            self.issues_list.setText(f"• Found {data.get('issues', 0)} issues to fix")
+            self.issues_list.setText(f"Found {data.get('issues', 0)} issues to fix")
         else:
-            self.issues_list.setText("• No issues found! Great job!")
+            self.issues_list.setText("No issues found! Great job!")
 
     def on_issue_fixed(self, fix_type, count):
-        """Handle issue fixes from any tab - UPDATED"""
-        # Update fixes count
+        """Handle issue fixes from any tab"""
+        # update fixes count
         current_text = self.metric_widgets['fixes_count'].text()
-        current_fixes = int(current_text.replace("\uf00c ", "").split()[0]) if "\uf00c" in current_text else 0
+        current_fixes = int(current_text.split()[0]) if current_text and current_text != "0" else 0
         new_fixes = current_fixes + count
-        self.metric_widgets['fixes_count'].setText(f"\uf00c {new_fixes}")
+        self.metric_widgets['fixes_count'].setText(f"{new_fixes}")
         
-        # Update recent fixes list
+
+        # update recent fixes list
         current_fixes_text = self.fixes_list.text()
         if "No fixes yet" in current_fixes_text:
-            self.fixes_list.setText(f"• Fixed {count} {fix_type}(s)")
+            self.fixes_list.setText(f"Fixed {count} {fix_type}(s)")
         else:
-            self.fixes_list.setText(f"{current_fixes_text}\n• Fixed {count} {fix_type}(s)")
+            self.fixes_list.setText(f"{current_fixes_text}\nFixed {count} {fix_type}(s)")
 
     def add_log_entry(self, log_entry):
         """Add a log entry to the mini viewer"""
         if hasattr(self, 'mini_logs_list'):
             current_text = self.mini_logs_list.text()
-            if current_text == "• No recent activity":
+            if current_text == "No recent activity":
                 current_text = ""
             time = log_entry.get('timestamp', '')
             operation = log_entry.get('operation', '')[:60]
-            new_entry = f"• {time} - {operation}"
+            new_entry = f"{time} - {operation}"
             lines = current_text.split('\n')
             lines.insert(0, new_entry)
             if len(lines) > 5:
@@ -385,13 +392,14 @@ class DashboardTab(QWidget):
             return
         self.score_label.setText(f"{int(value)}%")
         if value < 50:
-            self.score_label.setStyleSheet("color: #F44336;")
+            self.score_label.setStyleSheet("color: #f44336;")
             self.score_status.setText("Poor! Needs immediate attention.")
+
         elif value < 70:
-            self.score_label.setStyleSheet("color: #FFC107;")
+            self.score_label.setStyleSheet("color: #ffc107;")
             self.score_status.setText("Fair. Room for improvement.")
         else:
-            self.score_label.setStyleSheet("color: #4CAF50;")
+            self.score_label.setStyleSheet("color: #4caf50;")
             self.score_status.setText("Good! Keep optimizing.")
 
     def update_theme(self, is_dark):
@@ -399,38 +407,40 @@ class DashboardTab(QWidget):
         if is_dark:
             self.setStyleSheet("""
                 QLabel { 
-                    color: #E8E8E8; 
+                    color: #e8e8e8; 
                 }
                 QProgressBar::chunk { 
-                    background-color: #8095AB; 
+                    background-color: #8095ab; 
+
                 }
                 QFrame { 
                     background-color: rgba(128, 149, 171, 0.1);
                     border-radius: 12px;
                     padding: 15px;
                     margin: 5px;
-                    border: 1px solid #3E4045;
+                    border: 1px solid #3e4045;
                 }
                 QPushButton {
-                    background-color: #2B2D31;
-                    color: #E8E8E8;
-                    border: 1px solid #8095AB;
+                    background-color: #2b2d31;
+                    color: #e8e8e8;
+                    border: 1px solid #8095ab;
                     border-radius: 8px;
                     padding: 8px;
                 }
                 QPushButton:hover {
-                    background-color: #8095AB;
-                    color: #1E1F22;
+
+                    background-color: #8095ab;
+                    color: #1e1f22;
                 }
                 QScrollArea {
-                    background-color: #1E1F22;
+                    background-color: #1e1f22;
                     border: none;
                 }
                 QWidget {
-                    background-color: #1E1F22;
+                    background-color: #1e1f22;
                 }
             """)
-            # Update card backgrounds
+            # update card backgrounds
             for card in self.findChildren(QFrame):
                 card.setStyleSheet("""
                     QFrame {
@@ -438,55 +448,57 @@ class DashboardTab(QWidget):
                         border-radius: 12px;
                         padding: 15px;
                         margin: 5px;
-                        border: 1px solid #3E4045;
+                        border: 1px solid #3e4045;
+
                     }
                 """)
         else:
             self.setStyleSheet("""
                 QLabel { 
-                    color: #2C3E50; 
+                    color: #2c3e50; 
                 }
                 QProgressBar::chunk { 
-                    background-color: #8095AB; 
+                    background-color: #8095ab; 
                 }
                 QFrame { 
                     background-color: rgba(128, 149, 171, 0.05);
                     border-radius: 12px;
                     padding: 15px;
                     margin: 5px;
-                    border: 1px solid #D0D7DE;
+                    border: 1px solid #d0d7de;
                 }
                 QPushButton {
-                    background-color: #E9ECF1;
-                    color: #2C3E50;
-                    border: 1px solid #8095AB;
+                    background-color: #e9ecf1;
+                    color: #2c3e50;
+                    border: 1px solid #8095ab;
                     border-radius: 8px;
                     padding: 8px;
                 }
                 QPushButton:hover {
-                    background-color: #8095AB;
+                    background-color: #8095ab;
                     color: white;
                 }
                 QScrollArea {
-                    background-color: #F8F9FA;
+                    background-color: #f8f9fa;
                     border: none;
                 }
                 QWidget {
-                    background-color: #F8F9FA;
+                    background-color: #f8f9fa;
                 }
             """)
             for card in self.findChildren(QFrame):
                 card.setStyleSheet("""
                     QFrame {
+
                         background-color: rgba(128, 149, 171, 0.05);
                         border-radius: 12px;
                         padding: 15px;
                         margin: 5px;
-                        border: 1px solid #D0D7DE;
+                        border: 1px solid #d0d7de;
                     }
                 """)
 
-    # Navigation methods
+    # navigation methods
     def go_to_formatter(self):
         if self.main_window:
             self.main_window.tabs.setCurrentIndex(1)
@@ -502,6 +514,7 @@ class DashboardTab(QWidget):
     def go_to_links(self):
         if self.main_window:
             self.main_window.tabs.setCurrentIndex(5)
+
 
     def go_to_accessibility(self):
         if self.main_window:
@@ -523,11 +536,12 @@ class DashboardTab(QWidget):
         if not self.main_window:
             return
         tab_indexes = {
-            "\uf002 SEO": 2,
-            "\uf0c1 Links": 5,
-            "\uf03e Images": 4,
-            "\uf019 Backup": 8,
-            "\uf201 Schema": 3,
+            "SEO": 2,
+            "Links": 5,
+            "Images": 4,
+            "Backup": 8,
+            "Schema": 3,
         }
         if name in tab_indexes:
+
             self.main_window.tabs.setCurrentIndex(tab_indexes[name])

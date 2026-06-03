@@ -17,13 +17,14 @@ class LinkManagerTab(QWidget):
         super().__init__()
         self.project_folder = None
         self.links_data = []
-        self.data_bridge = None  # Initialize data bridge
+
+        self.data_bridge = None  # initialize data bridge
         self.init_ui()
 
     def init_ui(self):
         layout = QVBoxLayout(self)
 
-        # Project folder selection
+        # project folder selection
         folder_row = QHBoxLayout()
         self.folder_label = QLabel("No project folder selected")
         self.select_btn = QPushButton("Select Project Folder")
@@ -36,11 +37,11 @@ class LinkManagerTab(QWidget):
         folder_row.addStretch()
         layout.addLayout(folder_row)
 
-        # Tabs: Links Table + Bulk Replace
+        # tabs: links table + bulk replace  # lol don't ask
         self.tabs = QTabWidget()
         layout.addWidget(self.tabs)
 
-        # === Tab 1: Links Table ===
+        # === tab 1: links table ===
         table_tab = QWidget()
         table_layout = QVBoxLayout(table_tab)
         
@@ -50,12 +51,12 @@ class LinkManagerTab(QWidget):
         self.links_table.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)
         self.links_table.setAlternatingRowColors(True)
         
-        # Connect double-click for inline editing
+        # connect double-click for inline editing
         self.links_table.itemDoubleClicked.connect(self.on_cell_double_clicked)
         
         table_layout.addWidget(self.links_table)
         
-        # Filter and action row
+        # filter and action row
         filter_row = QHBoxLayout()
         self.filter_edit = QLineEdit()
         self.filter_edit.setPlaceholderText("Filter links...")
@@ -68,7 +69,7 @@ class LinkManagerTab(QWidget):
         
         self.tabs.addTab(table_tab, "\uf15b All Links")
 
-        # === Tab 2: Bulk Replace ===
+        # === tab 2: bulk replace ===
         replace_tab = QWidget()
         replace_layout = QVBoxLayout(replace_tab)
 
@@ -98,15 +99,17 @@ class LinkManagerTab(QWidget):
         self.apply_replace_btn.clicked.connect(self.apply_replace)
         replace_layout.addWidget(self.apply_replace_btn)
 
+
         self.tabs.addTab(replace_tab, "\uf1b8 Bulk Replace")
 
-        # Progress and status
+        # progress and status
         self.progress = QProgressBar()
         self.progress.setVisible(False)
         layout.addWidget(self.progress)
 
         self.status_label = QLabel("Ready – select a folder and click Scan")
         layout.addWidget(self.status_label)
+
 
         self.all_links = []
         self.filtered_links = []
@@ -116,10 +119,12 @@ class LinkManagerTab(QWidget):
         if path:
             self.project_folder = path
             self.folder_label.setText(path)
+
             self.status_label.setText(f"Project: {path}")
 
     def set_data_bridge(self, bridge):
         """Set the data bridge for dashboard communication"""
+
         self.data_bridge = bridge
 
     def scan_links(self):
@@ -129,6 +134,7 @@ class LinkManagerTab(QWidget):
 
         self.scan_btn.setEnabled(False)
         self.progress.setVisible(True)
+
         self.status_label.setText("Scanning for links...")
         QApplication.processEvents()
 
@@ -187,6 +193,7 @@ class LinkManagerTab(QWidget):
             self.filtered_links = [l for l in self.all_links if text in l['original'].lower() or text in l['file'].lower()]
         self.update_table()
 
+
     def preview_replace(self):
         find = self.find_text.text()
         replace = self.replace_text.text()
@@ -222,6 +229,7 @@ class LinkManagerTab(QWidget):
     def on_cell_double_clicked(self, item):
         row = item.row()
         column = item.column()
+
         
         if column == 4:
             current_text = self.links_table.item(row, column).text()
@@ -230,9 +238,10 @@ class LinkManagerTab(QWidget):
             
             is_dark = hasattr(self, 'parent') and self.parent() and hasattr(self.parent(), 'theme_action')
             if is_dark and self.parent().theme_action.isChecked():
-                editor.setStyleSheet("background-color: #2B2D31; color: #E8E8E8; border: 1px solid #8095AB;")
+                editor.setStyleSheet("background-color: #2b2d31; color: #e8e8e8; border: 1px solid #8095ab;")
             else:
-                editor.setStyleSheet("background-color: #FFFFFF; color: #2C3E50; border: 1px solid #8095AB;")
+                editor.setStyleSheet("background-color: #ffffff; color: #2c3e50; border: 1px solid #8095ab;")
+
             
             def save_changes():
                 new_value = editor.text()
@@ -281,7 +290,7 @@ class LinkManagerTab(QWidget):
                 link_data['original'] = new_link
                 self.status_label.setText(f"Link updated in {link_data['file']}")
                 
-                # Report to dashboard
+                # report to dashboard
                 if self.data_bridge:
                     self.data_bridge.report_fix("link", 1)
             else:
@@ -332,7 +341,7 @@ class LinkManagerTab(QWidget):
         self.status_label.setText(f"Applied {total_replacements} replacements in {len(files_modified)} files.")
         QMessageBox.information(self, "Done", f"Replaced {total_replacements} links in {len(files_modified)} files.")
         
-        # Report to dashboard
+        # report to dashboard
         if self.data_bridge and total_replacements > 0:
             self.data_bridge.report_fix("link", total_replacements)
         
@@ -342,30 +351,31 @@ class LinkManagerTab(QWidget):
         if is_dark:
             self.links_table.setStyleSheet("""
                 QTableWidget {
-                    alternate-background-color: #3E4045;
-                    background-color: #2B2D31;
-                    color: #E8E8E8;
-                    gridline-color: #3E4045;
+                    alternate-background-color: #3e4045;
+                    background-color: #2b2d31;
+                    color: #e8e8e8;
+                    gridline-color: #3e4045;
                 }
                 QHeaderView::section {
-                    background-color: #2B2D31;
-                    color: #E8E8E8;
-                    border: 1px solid #3E4045;
+                    background-color: #2b2d31;
+                    color: #e8e8e8;
+                    border: 1px solid #3e4045;
                 }
             """)
-            self.replace_preview.setStyleSheet("background-color: #2B2D31; color: #E8E8E8;")
+            self.replace_preview.setStyleSheet("background-color: #2b2d31; color: #e8e8e8;")
         else:
             self.links_table.setStyleSheet("""
                 QTableWidget {
-                    alternate-background-color: #F8F9FA;
-                    background-color: #FFFFFF;
-                    color: #2C3E50;
-                    gridline-color: #D0D7DE;
+                    alternate-background-color: #f8f9fa;
+                    background-color: #ffffff;
+                    color: #2c3e50;
+                    gridline-color: #d0d7de;
                 }
                 QHeaderView::section {
-                    background-color: #F1F3F5;
-                    color: #2C3E50;
-                    border: 1px solid #D0D7DE;
+                    background-color: #f1f3f5;
+                    color: #2c3e50;  # this is why we cant have nice things
+                    border: 1px solid #d0d7de;
                 }
+
             """)
-            self.replace_preview.setStyleSheet("background-color: #FFFFFF; color: #2C3E50;")
+            self.replace_preview.setStyleSheet("background-color: #ffffff; color: #2c3e50;")
