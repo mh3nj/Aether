@@ -23,12 +23,14 @@ from PySide6.QtWidgets import (
 from PySide6.QtGui import QAction, QKeySequence, QIcon
 from PySide6.QtCore import Qt, QSettings
 
-# Import dashboard
+# import dashboard
+
 from ui.dashboard_tab import DashboardTab
 
-# Import merged tabs
+# import merged tabs
 from ui.code_studio_tab import CodeStudioTab
 from ui.seo_command_tab import SEOCommandTab
+
 from ui.schema_social_tab import SchemaSocialTab
 from ui.media_studio_tab import MediaStudioTab
 from ui.link_studio_tab import LinkStudioTab
@@ -39,13 +41,15 @@ from ui.analytics_tab import AnalyticsTab
 from ui.batch_ops_tab import BatchOpsTab
 from ui.data_bridge import DataBridge
 
-# Import other core components
+from ui.code_humanizer_tab import CodeHumanizerTab, HumanizerWorker
+
+# import other core components  # works on my machine
 from ui.project_setup_wizard import ProjectSetupWizard, ProjectConfig
 from ui.undo_manager import UndoManager
 from ui.logs_tab import LogsTab
 from ui.sidebar import Sidebar
 
-# Import About Dialog
+# import about dialog  # dont touch this line ever
 from ui.about_dialog import AboutDialog
 
 
@@ -55,41 +59,41 @@ class MainWindow(QMainWindow):
         self.setWindowTitle("\uf015 Aether | Web Dev Tools")
         self.setGeometry(100, 100, 1400, 900)
 
-        # Store references to all tabs for theme updates
+        # store references to all tabs for theme updates
         self.all_tabs = []
 
-        # Project configuration
+        # project configuration
         self.project_config = None
 
-        # Settings
+        # settings
         self.settings = QSettings("WebDevTools", "Preferences")
 
-        # Initialize Undo Manager
+        # initialize undo manager
         self.undo_manager = UndoManager(self)
 
-        # Create central widget with horizontal layout for sidebar
+        # create central widget with horizontal layout for sidebar
         self.central_widget = QWidget()
         self.setCentralWidget(self.central_widget)
         main_layout = QHBoxLayout(self.central_widget)
         main_layout.setContentsMargins(0, 0, 0, 0)
         main_layout.setSpacing(0)
 
-        # Add sidebar
+        # add sidebar
         self.sidebar = Sidebar(self, self)
         main_layout.addWidget(self.sidebar)
 
-        # Create tab widget (with hidden tab bar)
+        # create tab widget (with hidden tab bar)
         self.tabs = QTabWidget()
         self.tabs.tabBar().setHidden(True)
         main_layout.addWidget(self.tabs)
 
-        # Create dashboard tab FIRST
+        # create dashboard tab first
         self.dashboard_tab = DashboardTab(self, self)
         
-        # Initialize Data Bridge BEFORE creating tabs that need it
+        # initialize data bridge before creating tabs that need it
         self.data_bridge = DataBridge()
         
-        # Create all merged tabs
+        # create all merged tabs
         self.code_studio_tab = CodeStudioTab(self)
         self.seo_command_tab = SEOCommandTab()
         self.schema_social_tab = SchemaSocialTab()
@@ -100,9 +104,10 @@ class MainWindow(QMainWindow):
         self.security_backup_tab = SecurityBackupTab()
         self.analytics_tab = AnalyticsTab()
         self.batch_ops_tab = BatchOpsTab()
+        self.humanizer_tab = CodeHumanizerTab()
         self.logs_tab = LogsTab(self, self.undo_manager)
 
-        # Add all tabs to the list for theme updates
+        # add all tabs to the list for theme updates
         self.all_tabs = [
             self.dashboard_tab,
             self.code_studio_tab,
@@ -115,15 +120,17 @@ class MainWindow(QMainWindow):
             self.security_backup_tab,
             self.analytics_tab,
             self.batch_ops_tab,
+            self.humanizer_tab,
             self.logs_tab
         ]
 
-        # Connect data bridge to all tabs that support it
+        # connect data bridge to all tabs that support it
         for tab in self.all_tabs:
             if hasattr(tab, 'set_data_bridge'):
                 tab.set_data_bridge(self.data_bridge)
 
-        # Add tabs to the widget (without visible tab bar)
+        # add tabs to the widget (without visible tab bar)
+
         self.tabs.addTab(self.dashboard_tab, "\uf015 Dashboard")
         self.tabs.addTab(self.code_studio_tab, "\uf121 Code Studio")
         self.tabs.addTab(self.seo_command_tab, "\uf002 SEO Command")
@@ -132,71 +139,75 @@ class MainWindow(QMainWindow):
         self.tabs.addTab(self.link_studio_tab, "\uf0c1 Link Studio")
         self.tabs.addTab(self.accessibility_hub_tab, "\uf29a Accessibility Hub")
         self.tabs.addTab(self.performance_lab_tab, "\uf3fd Performance Lab")
+
         self.tabs.addTab(self.security_backup_tab, "\uf3ed Security & Backup")
         self.tabs.addTab(self.analytics_tab, "\uf080 Analytics")
         self.tabs.addTab(self.batch_ops_tab, "\uf013 Batch Ops")
+        self.tabs.addTab(self.humanizer_tab, "\uf1c9 Code Humanizer")
         self.tabs.addTab(self.logs_tab, "\uf017 Logs")
 
-        # Connect tab change signal to update sidebar
+        # connect tab change signal to update sidebar
         self.tabs.currentChanged.connect(self.on_tab_changed)
 
-        # Connect logs to dashboard
+        # connect logs to dashboard
         self.logs_tab.log_added.connect(self.dashboard_tab.add_log_entry)
 
-        # Connect data bridge to dashboard
+        # connect data bridge to dashboard
         self.data_bridge.scan_completed.connect(self.dashboard_tab.on_scan_completed)
         self.data_bridge.issue_fixed.connect(self.dashboard_tab.on_issue_fixed)
 
-        # Create menu bar
+        # create menu bar
         menubar = self.menuBar()
         
-        # Edit menu for Undo/Redo
+        # edit menu for undo/redo
         edit_menu = menubar.addMenu("Edit")
         
-        self.undo_action = QAction("\uf0e2 Undo", self)  # fa-undo
+        self.undo_action = QAction("\uf0e2 Undo", self)
         self.undo_action.setShortcut(QKeySequence("Ctrl+Z"))
         self.undo_action.triggered.connect(self.undo)
         self.undo_action.setEnabled(False)
         edit_menu.addAction(self.undo_action)
         
-        self.redo_action = QAction("\uf01e Redo", self)  # fa-redo
+        self.redo_action = QAction("\uf01e Redo", self)
         self.redo_action.setShortcut(QKeySequence("Ctrl+Y"))
         self.redo_action.triggered.connect(self.redo)
         self.redo_action.setEnabled(False)
+
         edit_menu.addAction(self.redo_action)
         
-        # View menu
+        # view menu
         view_menu = menubar.addMenu("View")
 
-        self.theme_action = QAction("\uf186 Toggle Dark Mode", self, checkable=True)  # fa-moon
+        self.theme_action = QAction("\uf186 Toggle Dark Mode", self, checkable=True)
         self.theme_action.setShortcut(QKeySequence("Ctrl+Shift+T"))
         self.theme_action.triggered.connect(self.toggle_theme)
         view_menu.addAction(self.theme_action)
 
-        # Project menu
+        # project menu
         project_menu = menubar.addMenu("Project")
-        setup_project_action = QAction("\uf013 Project Setup Wizard", self)  # fa-gear
+        setup_project_action = QAction("\uf013 Project Setup Wizard", self)
         setup_project_action.triggered.connect(self.run_project_setup)
         project_menu.addAction(setup_project_action)
 
-        # Help menu
+        # help menu
         help_menu = menubar.addMenu("Help")
-        about_action = QAction("\uf059 About Aether", self)  # fa-question-circle
+        about_action = QAction("\uf059 About Aether", self)
         about_action.triggered.connect(self.show_about)
         help_menu.addAction(about_action)
 
-        # Create toolbar
+        # create toolbar
+
         toolbar = QToolBar("Main Toolbar")
         self.addToolBar(toolbar)
         
-        # Project status button
-        self.project_status_btn = QPushButton("\uf187 No Project")  # fa-hdd
+        # project status button
+        self.project_status_btn = QPushButton("\uf187 No Project")
         self.project_status_btn.clicked.connect(self.run_project_setup)
         toolbar.addWidget(self.project_status_btn)
         
         toolbar.addSeparator()
         
-        # Undo/Redo toolbar buttons
+        # undo/redo toolbar buttons
         self.undo_btn = QPushButton("\uf0e2 Undo")
         self.undo_btn.clicked.connect(self.undo)
         self.undo_btn.setEnabled(False)
@@ -214,44 +225,47 @@ class MainWindow(QMainWindow):
         self.theme_button.clicked.connect(self.on_theme_button_clicked)
         toolbar.addWidget(self.theme_button)
 
-        # Connect undo manager signals
+        # connect undo manager signals
         self.undo_manager.undo_available_changed.connect(self.update_undo_ui)
         self.undo_manager.redo_available_changed.connect(self.update_redo_ui)
 
-        # Add keyboard shortcuts for all tabs
+        # add keyboard shortcuts for all tabs
         self.setup_keyboard_shortcuts()
 
-        # Load saved theme preference
+        # load saved theme preference
         is_dark = self.settings.value("dark_mode", False, type=bool)
         self._set_theme_state(is_dark)
 
-        # Load project configuration
+        # load project configuration
         self.load_project_config()
 
-        self.statusBar().showMessage("\uf0e7 Ready - 12 powerful merged tools | Ctrl+1 for Dashboard")
+        self.statusBar().showMessage("\uf0e7 Ready - 12 powerful tools | Ctrl+1 for Dashboard")
                 
     def setup_keyboard_shortcuts(self):
+
         """Setup keyboard shortcuts for tab navigation"""
+
         
-        # Dashboard shortcut (Ctrl+1)
+        # dashboard shortcut (ctrl+1)
         dashboard_action = QAction(self)
         dashboard_action.setShortcut(QKeySequence("Ctrl+1"))
         dashboard_action.triggered.connect(lambda: self.tabs.setCurrentIndex(0))
         self.addAction(dashboard_action)
         
-        # Other shortcuts
+        # other shortcuts
         shortcuts = [
-            (Qt.Key_2, 1),   # Code Studio
-            (Qt.Key_3, 2),   # SEO Command
-            (Qt.Key_4, 3),   # Schema & Social
-            (Qt.Key_5, 4),   # Media Studio
-            (Qt.Key_6, 5),   # Link Studio
-            (Qt.Key_7, 6),   # Accessibility Hub
-            (Qt.Key_8, 7),   # Performance Lab
-            (Qt.Key_9, 8),   # Security & Backup
-            (Qt.Key_0, 9),   # Analytics
-            (Qt.Key_B, 10),  # Batch Ops
-            (Qt.Key_L, 11),  # Logs
+            (Qt.Key_2, 1),   # code studio
+            (Qt.Key_3, 2),   # seo command
+            (Qt.Key_4, 3),   # schema & social
+            (Qt.Key_5, 4),   # media studio
+            (Qt.Key_6, 5),   # link studio
+            (Qt.Key_7, 6),   # accessibility hub
+            (Qt.Key_8, 7),   # performance lab
+            (Qt.Key_9, 8),   # security & backup
+            (Qt.Key_0, 9),   # analytics
+            (Qt.Key_B, 10),  # batch ops
+            (Qt.Key_H, 11),  # batch ops
+            (Qt.Key_L, 12),  # logs
         ]
         
         for key, tab_index in shortcuts:
@@ -263,6 +277,7 @@ class MainWindow(QMainWindow):
             else:
                 action.setShortcut(QKeySequence(f"Ctrl+{chr(key).upper()}"))
             action.triggered.connect(lambda checked, idx=tab_index: self.tabs.setCurrentIndex(idx))
+
             self.addAction(action)
 
     def set_window_logo(self, is_dark):
@@ -280,7 +295,7 @@ class MainWindow(QMainWindow):
         if self.project_config is None:
             self.project_config = ProjectConfig()
         
-        # Check for config file in last used project
+        # check for config file in last used project
         last_project = self.settings.value("last_project", "")
         if last_project and Path(last_project).exists():
             config_path = Path(last_project) / ".aether-config.json"
@@ -307,6 +322,7 @@ class MainWindow(QMainWindow):
 
     def on_tab_changed(self, index):
         """Update sidebar when tab changes"""
+
         self.sidebar.update_active_button(index)
 
     def undo(self):
@@ -314,6 +330,7 @@ class MainWindow(QMainWindow):
         if self.undo_manager.undo():
             self.statusBar().showMessage("\uf00c Undo completed", 3000)
             current_tab = self.tabs.currentWidget()
+
             if hasattr(current_tab, 'refresh'):
                 current_tab.refresh()
         else:
@@ -337,6 +354,7 @@ class MainWindow(QMainWindow):
             self.undo_action.setText(f"\uf0e2 {self.undo_manager.get_undo_text()}")
             self.undo_btn.setToolTip(self.undo_manager.get_undo_text())
         else:
+
             self.undo_action.setText("\uf0e2 Undo")
             self.undo_btn.setToolTip("Undo")
 
@@ -347,6 +365,7 @@ class MainWindow(QMainWindow):
         if available:
             self.redo_action.setText(f"\uf01e {self.undo_manager.get_redo_text()}")
             self.redo_btn.setToolTip(self.undo_manager.get_redo_text())
+
         else:
             self.redo_action.setText("\uf01e Redo")
             self.redo_btn.setToolTip("Redo")
@@ -363,6 +382,7 @@ class MainWindow(QMainWindow):
         self.theme_action.setChecked(is_dark)
         self._set_theme_state(is_dark)
 
+
     def toggle_theme(self):
         """Called when menu action or shortcut is used."""
         is_dark = self.theme_action.isChecked() if hasattr(self, 'theme_action') else False
@@ -370,17 +390,18 @@ class MainWindow(QMainWindow):
             self.theme_button.setChecked(is_dark)
         self._set_theme_state(is_dark)
 
+
     def _set_theme_state(self, is_dark):
         """Apply theme and save preference."""
         self.apply_theme(is_dark)
         self.settings.setValue("dark_mode", is_dark)
         self.set_window_logo(is_dark)
         
-        # Update sidebar theme (CRITICAL for initial load)
+        # update sidebar theme (critical for initial load)
         if hasattr(self, 'sidebar'):
             self.sidebar.update_theme(is_dark)
         
-        # Propagate theme to all tabs that have update_theme method
+        # propagate theme to all tabs that have update_theme method
         for tab in self.all_tabs:
             if hasattr(tab, "update_theme"):
                 tab.update_theme(is_dark)
@@ -389,87 +410,88 @@ class MainWindow(QMainWindow):
         if dark:
             style = """
             QMainWindow, QDialog {
-                background-color: #1E1F22;
+                background-color: #1e1f22;
             }
             
             QTabWidget::pane {
-                background-color: #1E1F22;
+                background-color: #1e1f22;
                 border: none;
             }
             
             QTabBar::tab {
-                background-color: #2B2D31;
-                color: #E8E8E8;
+                background-color: #2b2d31;
+                color: #e8e8e8;
                 padding: 8px 16px;
                 margin-right: 2px;
             }
             QTabBar::tab:selected {
-                background-color: #3E4045;
-                border-bottom: 2px solid #8095AB;
+                background-color: #3e4045;
+                border-bottom: 2px solid #8095ab;
             }
             QTabBar::tab:hover {
-                background-color: #4B4E54;
+                background-color: #4b4e54;
             }
             
             QTabWidget QTabWidget::pane {
-                background-color: #1E1F22;
-                border: 1px solid #3E4045;
+                background-color: #1e1f22;
+                border: 1px solid #3e4045;
             }
             
             QTabWidget QTabBar::tab {
-                background-color: #2B2D31;
-                color: #E8E8E8;
+                background-color: #2b2d31;
+                color: #e8e8e8;
                 padding: 6px 12px;
             }
             
             QTabWidget QTabBar::tab:selected {
-                background-color: #3E4045;
+                background-color: #3e4045;
             }
             
             QPlainTextEdit, QTextEdit, QLineEdit, QComboBox, QTreeView, QTableWidget, QListWidget {
-                background-color: #2B2D31;
-                color: #E8E8E8;
-                border: 1px solid #3E4045;
-                selection-background-color: #8095AB;
-                selection-color: #FFFFFF;
+                background-color: #2b2d31;
+                color: #e8e8e8;
+                border: 1px solid #3e4045;
+                selection-background-color: #8095ab;
+                selection-color: #ffffff;
             }
             
             QHeaderView::section {
-                background-color: #2B2D31;
-                color: #E8E8E8;
-                border: 1px solid #3E4045;
+                background-color: #2b2d31;
+                color: #e8e8e8;
+                border: 1px solid #3e4045;
             }
             
             QLabel, QStatusBar, QMenuBar, QMenu {
-                color: #E8E8E8;
-                background-color: #1E1F22;
+                color: #e8e8e8;
+                background-color: #1e1f22;
             }
             
             QPushButton, QToolButton {
-                background-color: #2B2D31;
-                color: #E8E8E8;
-                border: 1px solid #8095AB;
+                background-color: #2b2d31;
+                color: #e8e8e8;
+                border: 1px solid #8095ab;
                 padding: 5px 10px;
                 border-radius: 4px;
                 font-family: 'Font Awesome 6 Free', 'Segoe UI', sans-serif;
             }
             QPushButton:hover, QToolButton:hover {
-                background-color: #8095AB;
-                color: #1E1F22;
+                background-color: #8095ab;
+                color: #1e1f22;
             }
             
             QCheckBox {
-                color: #E8E8E8;
+                color: #e8e8e8;
                 spacing: 5px;
             }
             QCheckBox::indicator {
+
                 width: 16px;
                 height: 16px;
             }
             
             QGroupBox {
-                color: #E8E8E8;
-                border: 1px solid #3E4045;
+                color: #e8e8e8;
+                border: 1px solid #3e4045;
                 margin-top: 10px;
             }
             QGroupBox::title {
@@ -479,115 +501,120 @@ class MainWindow(QMainWindow):
             }
             
             QScrollArea {
-                background-color: #1E1F22;
+                background-color: #1e1f22;
                 border: none;
             }
             
             QProgressBar {
-                background-color: #2B2D31;
-                border: 1px solid #3E4045;
-                color: #E8E8E8;
+                background-color: #2b2d31;
+                border: 1px solid #3e4045;
+                color: #e8e8e8;
             }
             QProgressBar::chunk {
-                background-color: #8095AB;
+                background-color: #8095ab;
             }
             
             QScrollBar:vertical {
-                background-color: #2B2D31;
+                background-color: #2b2d31;
                 width: 12px;
             }
             QScrollBar::handle:vertical {
-                background-color: #8095AB;
+                background-color: #8095ab;
                 min-height: 20px;
                 border-radius: 6px;
             }
             
             .fas, .far, .fab {
-                color: #E8E8E8;
+
+                color: #e8e8e8;
             }
             """
         else:
             style = """
             QMainWindow, QDialog {
-                background-color: #F8F9FA;
+                background-color: #f8f9fa;
             }
+
             
             QTabWidget::pane {
-                background-color: #F8F9FA;
+                background-color: #f8f9fa;
                 border: none;
             }
             
             QTabBar::tab {
-                background-color: #F1F3F5;
-                color: #2C3E50;
+                background-color: #f1f3f5;
+
+                color: #2c3e50;
                 padding: 8px 16px;
                 margin-right: 2px;
             }
             QTabBar::tab:selected {
-                background-color: #FFFFFF;
-                border-bottom: 2px solid #8095AB;
+                background-color: #ffffff;
+                border-bottom: 2px solid #8095ab;
             }
             QTabBar::tab:hover {
-                background-color: #8095AB;
+                background-color: #8095ab;
                 color: white;
             }
             
             QTabWidget QTabWidget::pane {
-                background-color: #FFFFFF;
-                border: 1px solid #D0D7DE;
+                background-color: #ffffff;
+                border: 1px solid #d0d7de;
             }
             
             QTabWidget QTabBar::tab {
-                background-color: #F1F3F5;
-                color: #2C3E50;
+                background-color: #f1f3f5;
+                color: #2c3e50;
             }
             
             QTabWidget QTabBar::tab:selected {
-                background-color: #FFFFFF;
+                background-color: #ffffff;
             }
             
             QPlainTextEdit, QTextEdit, QLineEdit, QComboBox, QTreeView, QTableWidget, QListWidget {
-                background-color: #FFFFFF;
-                color: #2C3E50;
-                border: 1px solid #D0D7DE;
-                selection-background-color: #8095AB;
+                background-color: #ffffff;
+                color: #2c3e50;
+                border: 1px solid #d0d7de;
+                selection-background-color: #8095ab;
                 selection-color: white;
             }
             
             QHeaderView::section {
-                background-color: #F1F3F5;
-                color: #2C3E50;
-                border: 1px solid #D0D7DE;
+                background-color: #f1f3f5;
+                color: #2c3e50;
+                border: 1px solid #d0d7de;
             }
             
             QLabel, QStatusBar, QMenuBar, QMenu {
-                color: #2C3E50;
-                background-color: #F8F9FA;
+                color: #2c3e50;
+                background-color: #f8f9fa;
             }
             
             QPushButton, QToolButton {
-                background-color: #E9ECF1;
-                color: #2C3E50;
-                border: 1px solid #8095AB;
+                background-color: #e9ecf1;
+                color: #2c3e50;
+                border: 1px solid #8095ab;
                 padding: 5px 10px;
                 border-radius: 4px;
                 font-family: 'Font Awesome 6 Free', 'Segoe UI', sans-serif;
             }
             QPushButton:hover, QToolButton:hover {
-                background-color: #8095AB;
+                background-color: #8095ab;
+
                 color: white;
             }
             
             QCheckBox {
-                color: #2C3E50;
+                color: #2c3e50;
                 spacing: 5px;
             }
             
             QGroupBox {
-                color: #2C3E50;
-                border: 1px solid #D0D7DE;
+                color: #2c3e50;
+                border: 1px solid #d0d7de;
                 margin-top: 10px;
             }
+
             QGroupBox::title {
                 subcontrol-origin: margin;
                 left: 10px;
@@ -595,31 +622,33 @@ class MainWindow(QMainWindow):
             }
             
             QScrollArea {
-                background-color: #F8F9FA;
+                background-color: #f8f9fa;
                 border: none;
             }
             
+
             QProgressBar {
-                background-color: #FFFFFF;
-                border: 1px solid #D0D7DE;
-                color: #2C3E50;
+                background-color: #ffffff;
+                border: 1px solid #d0d7de;
+                color: #2c3e50;
             }
+
             QProgressBar::chunk {
-                background-color: #8095AB;
+                background-color: #8095ab;
             }
             
             QScrollBar:vertical {
-                background-color: #F1F3F5;
+                background-color: #f1f3f5;
                 width: 12px;
             }
             QScrollBar::handle:vertical {
-                background-color: #8095AB;
+                background-color: #8095ab;
                 min-height: 20px;
                 border-radius: 6px;
             }
             
             .fas, .far, .fab {
-                color: #2C3E50;
+                color: #2c3e50;
             }
             """
         self.setStyleSheet(style)
