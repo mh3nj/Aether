@@ -26,6 +26,7 @@
   font-weight: 400;
 }
 
+
 .fas {
   font-family: "Font Awesome 6 Free";
   font-weight: 900;
@@ -46,6 +47,7 @@
 /* Specific icon sizes for sidebar */
 .sidebar-icon {
   width: 24px;
+
   text-align: center;
   margin-right: 12px;
 }
@@ -82,6 +84,11 @@
   content: "\f473";
 } /* fa-chart-simple */
 .icon-gear:before {
+<<<<<<< HEAD
+
+
+=======
+>>>>>>> b31a27c329fd60a8d9841f698397eeb438ee1cc7
   content: "\f013";
 } /* fa-gear */
 .icon-clock:before {
