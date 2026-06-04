@@ -1,77 +1,165 @@
-# Aether – Complete Web Development Toolkit
+# Aether v2.2
 
-**Status:** Stable Release v2.0  
-**Build Date:** May 8, 2026
+![Version](https://img.shields.io/badge/version-2)
+![License](https://img.shields.io/badge/license-MIT-green)
+![Python](https://img.shields.io/badge/python-3.9+-yellow)
+![Platform](https://img.shields.io/badge/platform-windows%20%7C%20mac%20%7C%20linux-lightgrey)
+![Offline](https://img.shields.io/badge/works-offline-brightgreen)
+![Size](https://img.shields.io/badge/size-10MB-blue)
+![Built in Iran](https://img.shields.io/badge/built%20in-iran-red)
+![GitHub Stars](https://img.shields.io/github/stars/mh3nj/Aether?style=social)
 
-A professional desktop application with **12 powerful merged tools** (originally 29 standalone features) for web developers, SEO specialists, and content creators – all in one offline, privacy-focused application.
+<img src="/assets/banner.webp" alt="Aether banner" />
 
-<img src="/assets/banner.webp" alt="Aether's banner" />
-
----
-
-## About Aether
-
-Aether (pronounced "ee-ther") is a complete web development command center named after the classical element believed to fill the universe. Just as aether carries light across the cosmos, Aether carries your code to perfection through formatting, optimization, and validation.
-
-### What Aether Helps You Do
-
-- Format code – Python, JS, HTML, CSS, TypeScript with diff view
-- Optimize SEO – Meta tags, Open Graph, Twitter Cards, hreflang
-- Generate Schema – FAQ, Product, Article, Event, Recipe, HowTo, LocalBusiness, Video
-- Optimize images – WebP conversion, smart lazy loading with blur-up previews
-- Manage links – Bulk find/replace, broken link detection, internal link suggestions
-- Improve accessibility – Alt text checker, WCAG compliance scans
-- Boost performance – Preload scanner, PageSpeed Insights (Core Web Vitals)
-- Secure your site – CSP & SRI security headers
-- Backup & restore – Never lose work during bulk operations
-
-**12 integrated tools** | **Dark/Light theme** | **100% offline** | **Zero telemetry**
+> **12 tools. one app. fully offline. built solo in one month.**  
+> everything a web developer or SEO specialist needs; without switching between 12 different tabs, services, or subscriptions.
 
 ---
 
-## The 12 Tools (Merged from 29 Original Features)
+## the problem this solves
 
-| Tab | Description |
-|-----|-------------|
-| Dashboard | Command center with real-time metrics and quick actions |
-| Code Studio | Code Formatter + CSS Optimizer (print + speech CSS) |
-| SEO Command | SEO Optimizer + SEO Score + Duplicate Detector + Meta Refresh |
-| Schema & Social | Schema Library + OG Preview + Breadcrumb Builder |
-| Media Studio | Favicon Generator + WebP Converter + Lazy Load + Image Hints |
-| Link Studio | Link Manager + Link Checker + Internal Links |
-| Accessibility Hub | Accessibility Checker + Alt Checker + Spell Checker + Content Length |
-| Performance Lab | Preload Scanner + PageSpeed Insights |
-| Security & Backup | CSP Generator + SRI Hash + Backup & Restore |
-| Analytics | Keyword Density + SEO Score History |
-| Batch Ops | Batch Meta Updater + Robots & Sitemap |
-| Logs | Complete operation history with filters and export |
+if you've ever finished building a website and then spent hours on SEO setup, meta tags, schema generation, image optimization, broken link checks, accessibility scans;you know how much time that eats.
+
+aether does all of it in one place. automatic injection into your HTML. batch operations across hundreds of files. no cloud. no subscription. no data leaving your machine.
+
+built by a full-time web developer who got tired of the same painful post-launch workflow.
 
 ---
 
-## Getting Started
+## what's new in v2.2
 
-### Option 1: From Source (Python required)
+two real features. not just a readme update.
+
+### smart video lazy loader
+
+the standard way to load videos on a page is to load all of them at once. this is a bad idea when you have more than two or three;your page slows down, RAM spikes, and users on mobile or limited data plans suffer.
+
+aether's smart video lazy loader works differently. when a video is off-screen, it shows a low-resolution crystalline placeholder. when the user scrolls to it, aether starts downloading the video in **5 parallel chunks simultaneously**;similar to how advanced download managers work;then assembles them seamlessly and displays the video as one piece. faster start, smoother playback, no wasted bandwidth on videos the user never reaches.
+
+for users in countries where internet costs money per megabyte, this matters a lot.
+
+| | v2.0 | v2.2 |
+|--|------|------|
+| load time (20 videos) | 4–6 seconds | ~1 second |
+| RAM usage | 400–600MB | 80–120MB |
+| videos loaded before scrolling | all of them | zero |
+
+### smart image lazy loader (upgraded)
+
+same philosophy for images. when a high-resolution image is off-screen, aether generates a tiny WebP preview;same dimensions, same format, but compressed down to roughly 2KB regardless of the original file size. that preview loads almost instantly and is displayed as a soft blur placeholder.
+
+while the user sees the preview, the full-quality image downloads silently in the background. the moment it's ready, it replaces the placeholder seamlessly;no layout shift, no pop-in.
+
+every original image, regardless of format, is automatically converted to lossless WebP during this process. smaller file, better quality, faster load. the compression is tuned automatically to find the best lossless result.
+
+### code humanizer
+
+early stage, but functional. lowercases all comments across your codebase, removes the obvious AI-generated phrasing that makes code feel like it was written by a documentation bot. batch operation across files. the roadmap for this one goes much further;this is just the foundation.
+
+`Ctrl+H` to open it.
+
+---
+
+## the 12 tools (31 features)
+
+| tab | what's inside |
+|-----|--------------|
+| Dashboard | real-time SEO health score, key metrics, recent activity, quick actions |
+| Code Studio | python/js/ts/html/css formatter with split before/after diff view, print CSS, speech CSS |
+| SEO Command | meta tag editor, hreflang generator, 0–100 page scorer, duplicate detector, meta refresh checker |
+| Schema & Social | JSON-LD for 8 schema types, OG preview, Twitter card preview, breadcrumb builder |
+| Media Studio | favicon generator, WebP converter, smart image lazy loader, smart video lazy loader |
+| Link Studio | bulk find/replace (regex), broken link checker, orphan page detection, internal link suggestions |
+| Accessibility Hub | WCAG compliance, alt text fixer, spell checker, heading hierarchy checker |
+| Performance Lab | preload scanner, PageSpeed Insights, Core Web Vitals (LCP, CLS, FID) |
+| Security & Backup | CSP generator, SRI hash generator, timestamped backups, one-click restore |
+| Analytics | keyword density analysis, SEO score history tracking |
+| Batch Ops | bulk meta updates across hundreds of files, robots.txt, sitemap.xml, image & video sitemaps |
+| Code Humanizer | lowercases comments, strips AI phrasing;more coming |
+| Logs | full operation history, type filters, search, CSV export |
+
+everything has automatic HTML injection. you point aether at your project folder and it handles the rest.
+
+---
+
+## screenshots
+
+<div align="center">
+  <table>
+    <tr>
+      <td align="center"><img src="/screenshots/screenshot01.png" width="100%" alt="Dashboard"><br/><sub>dashboard</sub></td>
+      <td align="center"><img src="/screenshots/screenshot02.png" width="100%" alt="Code Studio"><br/><sub>code studio</sub></td>
+    </tr>
+    <tr>
+      <td align="center"><img src="/screenshots/screenshot03.png" width="100%" alt="Media Studio"><br/><sub>media studio</sub></td>
+      <td align="center"><img src="/screenshots/screenshot04.png" width="100%" alt="Code Humanizer"><br/><sub>code humanizer (new)</sub></td>
+    </tr>
+    <tr>
+      <td align="center"><img src="/screenshots/screenshot05.png" width="100%" alt="Media Studio"><br/><sub>media studio</sub></td>
+      <td align="center"><img src="/screenshots/screenshot06.png" width="100%" alt="Code Humanizer"><br/><sub>code humanizer (new)</sub></td>
+    </tr>
+    <tr>
+      <td align="center"><img src="/screenshots/screenshot7.png" width="100%" alt="Dark Mode"><br/><sub>dark mode</sub></td>
+      <td align="center"><img src="/screenshots/screenshot8.png" width="100%" alt="Light Mode"><br/><sub>light mode</sub></td>
+    </tr>
+  </table>
+</div>
+
+---
+
+## getting started
+
+### windows
+
+download `aether-launcher.bat` and run it. that's it.
+
+it will check your python version, clone the repo, set up a virtual environment, install dependencies, and launch aether;automatically. if something is missing it tells you exactly what and where to get it.
 
 ```
+aether-launcher.bat
+```
+
+if Windows Defender flags it, click "more info" → "run anyway". it's a setup script, not malware;you can read every line of it before running.
+
+### mac / linux
+
+download `aether-launcher.sh`, make it executable, and run it:
+
+```bash
+chmod +x aether-launcher.sh
+./aether-launcher.sh
+```
+
+same as the windows version;checks python, clones the repo, sets up the environment, launches aether.
+
+### manual setup (if you prefer)
+
+```bash
 git clone https://github.com/mh3nj/Aether.git
 cd Aether
-python -m venv venv
-venv\Scripts\activate  (Windows)
-# source venv/bin/activate  (Mac/Linux)
+python -m venv .venv
+
+# windows:
+.venv\Scripts\activate
+# mac/linux:
+source .venv/bin/activate
+
 pip install -r requirements.txt
 python main.py
 ```
 
-### Option 2: Standalone Executable
+### requirements
 
-Download from GitHub Releases. No Python installation required. Just unzip and run Aether.exe.
+- python 3.9+
+- 4GB RAM (8GB recommended if you tend to have a lot open)
+- internet only for PageSpeed Insights;everything else is fully offline
 
 ---
 
-## Keyboard Shortcuts
+## keyboard shortcuts
 
-| Shortcut | Action |
-|----------|--------|
+| shortcut | tab |
+|----------|-----|
 | Ctrl+1 | Dashboard |
 | Ctrl+2 | Code Studio |
 | Ctrl+3 | SEO Command |
@@ -83,91 +171,19 @@ Download from GitHub Releases. No Python installation required. Just unzip and r
 | Ctrl+9 | Security & Backup |
 | Ctrl+0 | Analytics |
 | Ctrl+B | Batch Ops |
+| Ctrl+H | Code Humanizer |
 | Ctrl+L | Logs |
 | Ctrl+Z | Undo |
 | Ctrl+Y / Ctrl+Shift+Z | Redo |
-| Ctrl+Shift+T | Toggle Dark/Light Theme |
+| Ctrl+Shift+T | toggle dark/light theme |
 
 ---
 
-## Features In Detail
-
-### Code Studio
-- Format Python (Black), JavaScript/TypeScript/HTML/CSS (Prettier or jsbeautifier)
-- Split-view before/after with diff highlighting
-- Generate print-optimized CSS and speech-optimized CSS for screen readers
-
-### SEO Command
-- Edit all meta tags with real-time character counters (title: 50-60, description: 150-160)
-- Generate hreflang tags for multi-language sites
-- Score each page 0-100 with actionable recommendations
-- Find duplicate titles, descriptions, and H1 tags
-- Detect harmful meta refresh redirects
-
-### Schema & Social
-- Generate JSON-LD for 8 schema types (FAQ, Product, Article, Event, Recipe, HowTo, LocalBusiness, Video)
-- Validate schema against Google's requirements
-- Preview Open Graph and Twitter Card appearance
-- Inject JSON-LD directly into any HTML file
-
-### Media Studio
-- Generate all favicon sizes (ICO + PNGs) from a single source image
-- Bulk convert JPG/PNG to WebP with adjustable quality
-- Smart lazy loading with blur-up WebP previews (no layout shift)
-- Detect missing width/height attributes and oversized images
-
-### Link Studio
-- Bulk find/replace links across all HTML files (regex support)
-- Check for broken internal and external links
-- Find orphan pages and get internal link suggestions
-- Preview changes before applying
-
-### Accessibility Hub
-- Check for missing alt text, html lang attribute, empty links, heading hierarchy, iframe titles, form labels
-- Bulk fix missing alt attributes (with smart suggestions from filename or surrounding text)
-- Spell checker for English content
-- Analyze content length with word count guidelines
-
-### Performance Lab
-- Scan for preload opportunities (CSS, JS, fonts, hero images)
-- Inject preload links into HTML files
-- Run PageSpeed Insights tests (Mobile/Desktop)
-- Get Core Web Vitals metrics (LCP, CLS, FID)
-
-### Security & Backup
-- Generate Content Security Policy (CSP) meta tags with presets
-- Generate Subresource Integrity (SRI) hashes for CDN resources
-- Create timestamped backups of entire projects
-- Restore any previous backup with one click
-
-### Analytics
-- Analyze keyword density (detect under-optimization and keyword stuffing)
-- Track SEO score history across pages
-
-### Batch Ops
-- Update meta tags across hundreds of files at once
-- Generate robots.txt and sitemap.xml
-- Generate image sitemaps and video sitemaps
-
-### Logs
-- Complete operation history with filters (by type, search)
-- Export logs as CSV
-- Mini-logs viewer in Dashboard shows recent activity
-
-### Dashboard
-- Real-time SEO health score
-- Key metrics (pages analyzed, issues found, average score, fixes applied)
-- Top issues and recent fixes
-- Quick actions panel
-- Recent activity log
-
----
-
-## Project Structure
+## project structure
 
 ```
 Aether/
-├── main.py                 # Entry point
+├── main.py                      # run this
 ├── ui/
 │   ├── dashboard_tab.py
 │   ├── code_studio_tab.py
@@ -180,6 +196,7 @@ Aether/
 │   ├── security_backup_tab.py
 │   ├── analytics_tab.py
 │   ├── batch_ops_tab.py
+│   ├── code_humanizer_tab.py
 │   ├── logs_tab.py
 │   ├── sidebar.py
 │   ├── undo_manager.py
@@ -195,60 +212,95 @@ Aether/
 
 ---
 
-## Requirements
+## dependencies
 
-- Python 3.11+
-- PySide6 (Qt6 for Python)
-- BeautifulSoup4
-- Pillow
-- requests
-- black (optional)
-- jsbeautifier
-- pyspellchecker (optional)
-
----
-
-## Development Timeline
-
-| Phase | Duration | Key Achievements |
-|-------|----------|------------------|
-| Day 1 (May 4) | ~10 hours | Foundation: Formatter, SEO, Favicon, WebP, Link Manager, Robots |
-| Day 2 (May 5) | ~10 hours | Expansion: Schema, Lazy Load, OG, Image Hints, Link Checker, SEO Score |
-| Day 3 (May 6) | ~10 hours | Advanced: Alt Checker, CSS Optimizer, Keyword Density, Security, Performance |
-| Day 4 (May 7) | ~10 hours | Integration: PageSpeed, Backup, Undo/Redo, Logs, Tab merging, Sidebar |
-| Day 5 (May 8) | ~8 hours | Polish: Dark/Light theme fixes, Documentation, Release |
-
-**Total:** ~48 hours | **Lines of code:** 18,000+ | **Tabs:** 12 merged (from 29 original)
+```
+PySide6          # UI framework (Qt6)
+BeautifulSoup4   # HTML parsing
+Pillow           # image processing
+requests         # PageSpeed Insights API calls
+black            # python code formatting (optional)
+jsbeautifier     # js/html/css formatting
+pyspellchecker   # spell checking (optional)
+```
 
 ---
 
-## Author
+## known issues
 
-**Mohsen Jafari** - Creator, Developer, Designer
-
-- GitHub: [mh3nj](https://github.com/mh3nj)
-- LinkedIn: [mh3nj](https://linkedin.com/in/mh3nj)
-- Websites: [Parsegan.com](https://parsegan.com) (logo design), [Dahgan.com](https://dahgan.com) (land surveying/portfolio)
-
----
-
-## License
-
-MIT License – Free for personal and commercial use with attribution. Because web development tools should be accessible to everyone.
+- windows defender may flag the .bat launcher;it's a setup script, every line is readable before you run it
+- first launch takes ~30 seconds while pip installs dependencies;only happens once
+- PageSpeed Insights requires internet;all other features work fully offline
+- the .sh script opens nano to edit your .env on first run;if you don't have an API key yet, just close it and it'll continue
+- the fontawesome icons dont load properly which i'll fix it in next versions <3
 
 ---
 
-## Acknowledgments
+## development timeline
 
-- PySide6 team (Qt for Python)
-- BeautifulSoup4, Pillow, Black, Prettier, jsbeautifier
-- Google PageSpeed Insights API
-- The open-source community
+this project was built over one month, solo, from scratch.
+
+| date | hours | what got built |
+|------|-------|----------------|
+| may 4 | ~4h | formatter, SEO tools, favicon generator, WebP converter, link manager, robots.txt |
+| may 5 | ~3h | schema generator, image lazy load, OG preview, image hints, link checker, SEO scorer |
+| may 6 | ~2.5h | alt text checker, CSS optimizer, keyword density, security headers, performance scanner |
+| may 7 | ~6h | PageSpeed integration, backup system, undo/redo, logs, tab merging, sidebar |
+| may 8 | ~10h | smarter image lazy loading with WebP preview pipeline, v2.0 stable release |
+| may 12 | ~1h | bug fixes |
+| may 15 | ~1.5h | real-world testing, more bugs found |
+| may 19 | ~3h | researching code humanization strategies, drawing the roadmap |
+| may 21 | ~4h | planning the smart video lazy loader architecture |
+| may 26 | ~2h | finding the right python approach for parallel chunk downloading |
+| may 30 | ~6h | building and shipping the smart video lazy loader |
+| june 1 | ~1h | edge case testing on video lazy load |
+| june 2 | ~3h | standard video lazy load injection |
+| june 3 | ~5h | code humanizer v1, final testing pass |
+| june 4 | ~2h | repo cleanup, v2.2 stable release |
+| june 10 | ~1h | planning next features |
+
+**total: ~55 hours. one month. solo. 18,000+ lines of code. 31 features across 12 tabs.**
 
 ---
 
-*This project was created during internet restrictions in Iran – proof that creativity and persistence know no boundaries.*
+## acknowledgments
 
-**Aether – The breathing light of code.**
+- [PySide6](https://doc.qt.io/qtforpython/);Qt for Python
+- [BeautifulSoup4](https://www.crummy.com/software/BeautifulSoup/);HTML parsing
+- [Pillow](https://python-pillow.org/);image processing
+- [Black](https://black.readthedocs.io/);python formatter
+- [jsbeautifier](https://beautifier.io/);js/html/css formatter
+- [Google PageSpeed Insights API](https://developers.google.com/speed/docs/insights/v5/get-started)
+- the open source community that made all of this possible
 
 ---
+
+## author
+
+**Mohsen Jafari**;designed, built, and shipped this. every line.
+
+- github: [mh3nj](https://github.com/mh3nj)
+- xing: [Mohsen Jafari](https://www.xing.com/profile/Mohsen_Jafari093223/)
+- [parsegan.com](https://parsegan.com);logo design work
+- [dahgan.com](https://dahgan.com);land surveying / portfolio
+
+---
+
+## license
+
+MIT. use it, fork it, ship it, build on it. just don't blame us if something breaks.
+
+---
+
+## the story behind this
+
+this project was built during a period of severe internet restrictions in iran.
+
+no stack overflow. no access to npm documentation. no youtube tutorials. no reliable connection to the tools most developers take for granted. just whatever was cached locally, whatever could be reasoned through from first principles, and the determination to ship something real anyway.
+
+55 hours of focused work. 18,000+ lines of code. 31 features. 12 tools. one month. one developer.
+
+it works. it's useful. and it was built under conditions that would have stopped most projects before they started.
+
+**Aether;the breathing light of code.**  
+*— mh3nj*
