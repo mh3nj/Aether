@@ -20,7 +20,7 @@
 
 if you've ever finished building a website and then spent hours on SEO setup, meta tags, schema generation, image optimization, broken link checks, accessibility scans;you know how much time that eats.
 
-aether does all of it in one place. automatic injection into your HTML. batch operations across hundreds of files. no cloud. no subscription. no data leaving your machine.
+aether does all of it in one place. injection into your HTML. batch operations across hundreds of files. no cloud. no subscription. no data leaving your machine.
 
 built by a full-time web developer who got tired of the same painful post-launch workflow.
 
@@ -242,11 +242,11 @@ this project was built over one month, solo, from scratch.
 
 | date | hours | what got built |
 |------|-------|----------------|
-| may 4 | ~4h | formatter, SEO tools, favicon generator, WebP converter, link manager, robots.txt |
-| may 5 | ~3h | schema generator, image lazy load, OG preview, image hints, link checker, SEO scorer |
-| may 6 | ~2.5h | alt text checker, CSS optimizer, keyword density, security headers, performance scanner |
-| may 7 | ~6h | PageSpeed integration, backup system, undo/redo, logs, tab merging, sidebar |
-| may 8 | ~10h | smarter image lazy loading with WebP preview pipeline, v2.0 stable release |
+| may 4 | ~10h | project architecture, formatter, SEO tools, favicon generator, WebP converter, link manager, robots.txt |
+| may 5 | ~10h | schema generator, image lazy load, OG preview, image hints, link checker, SEO scorer, dark/light theme |
+| may 6 | ~10h | alt text checker, CSS optimizer, keyword density, spell checker, security headers, performance scanner, batch meta updater |
+| may 7 | ~10h | PageSpeed API integration, backup system, undo/redo, logs tab, tab merging (29 → 12), sidebar navigation |
+| may 8 | ~8h | theme propagation fixes, cross-platform testing, documentation, v2.0 stable release |
 | may 12 | ~1h | bug fixes |
 | may 15 | ~1.5h | real-world testing, more bugs found |
 | may 19 | ~3h | researching code humanization strategies, drawing the roadmap |
@@ -259,7 +259,7 @@ this project was built over one month, solo, from scratch.
 | june 4 | ~2h | repo cleanup, v2.2 stable release |
 | june 10 | ~1h | planning next features |
 
-**total: ~55 hours. one month. solo. 18,000+ lines of code. 31 features across 12 tabs.**
+**total: ~77 hours. one month. solo. 18,000+ lines of code. 31 features across 12 tabs.**
 
 ---
 
