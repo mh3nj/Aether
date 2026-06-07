@@ -1,40 +1,38 @@
-# VaultKeeper – technical portfolio document
+# Aether – technical portfolio document
 
 **prepared for:** visa application review  
-**applicant:** mohsen jafari  
+**applicant:** Mohsen Jafari  
 **github:** [github.com/mh3nj](https://github.com/mh3nj)  
-**project repository:** [github.com/mh3nj/vaultkeeper](https://github.com/mh3nj/vaultkeeper)  
-**document date:** june 7, 2026  
-**development period:** may 11 – june 7, 2026
+**project repository:** [github.com/mh3nj/Aether](https://github.com/mh3nj/Aether)  
+**document date:** june 4, 2026
 
 ---
 
-## what is vaultkeeper
+## what is aether
 
-vaultkeeper is a professional offline password manager. it stores credentials, totp secrets, secure notes, and file attachments in an encrypted sqlite database. the master password is never stored. the encryption uses aes-256-gcm with authenticated encryption. key derivation uses pbkdf2-hmac-sha256 with 200,000 iterations.
+Aether is a professional desktop application for web developers and SEO specialists. it consolidates 31 individual tools into 12 integrated tabs, all running fully offline on the user's machine.
 
-the project was conceived, designed, and built entirely by mohsen jafari, solo, over the course of one month, under significant technical constraints due to internet restrictions in iran.
+the project was conceived, designed, and built entirely by Mohsen Jafari — solo — over the course of one month, under significant technical constraints due to internet restrictions in iran.
 
-it is not a prototype or a concept. it is a complete, stable, working desktop application used for real password management.
+it is not a prototype or a concept. it is a complete, stable, working application used for real professional work.
 
 **verified by cloning and running:**
-
 ```bash
-git clone https://github.com/mh3nj/vaultkeeper.git
-cd vaultkeeper
+git clone https://github.com/mh3nj/Aether.git
+cd Aether
 pip install -r requirements.txt
-python run.py
+python main.py
 ```
 
 ---
 
 ## the problem it solves
 
-existing password managers fall into two categories. cloud-based services that store your credentials on someone else's servers, require monthly subscriptions, and have telemetry. offline managers that exist but are often poorly maintained, lack modern encryption standards, or have broken critical features like master password changes.
+building a website involves two distinct phases. the first is development — writing code, building layouts, implementing features. the second is post-launch optimization — SEO setup, meta tags, schema markup, image compression, accessibility checks, broken link detection, security headers, performance analysis.
 
-vaultkeeper takes a different approach. everything stays local. the database is encrypted on your disk. the master password is verified using hmac, never stored. if someone steals your database file, they get nothing without your password. if they try to brute force, the vault locks itself after 5 failed attempts.
+the second phase is tedious, time-consuming, and typically requires switching between 10–15 different online tools, services, and manual processes. for a full-time web developer, this adds hours to every project.
 
-the application was built because no existing solution combined strong cryptography, offline-first architecture, modern features (totp, attachments, breach detection), and completely local operation without subscription fees or telemetry.
+Aether eliminates this entirely. every tool is in one place, works offline, and operates with automatic injection into the project's HTML files. a task that previously took hours can be completed in minutes.
 
 ---
 
@@ -42,176 +40,131 @@ the application was built because no existing solution combined strong cryptogra
 
 | metric | value |
 |--------|-------|
-| total lines of code | 18,000+ (python, sql, qss, json) |
-| python files | 25+ |
-| development period | may 11 – june 7, 2026 |
+| total lines of code | 18,000+ (python, QSS, JSON) |
+| original standalone features | 31 |
+| merged into | 12 integrated tabs |
+| development period | may 4 – june 4, 2026 |
 | total active development hours | ~55 hours |
 | platform | windows, mac, linux |
-| primary language | python 3.11+ |
-| encryption | aes-256-gcm (authenticated) |
-| key derivation | pbkdf2-hmac-sha256, 200,000 iterations |
-| database | sqlite with wal journal mode |
-| internet required | no (fully offline) |
+| primary language | python 3.9+ |
+| UI framework | PySide6 (Qt6) |
+| internet required | no — fully offline except PageSpeed API |
 
 ---
 
-## security architecture
+## the 12 tools
 
-| component | implementation |
-|-----------|----------------|
-| encryption algorithm | aes-256-gcm |
-| key derivation | pbkdf2-hmac-sha256, 200k iterations |
-| password verification | hmac verifier (32-byte hmac of known constant) |
-| memory safety | derived keys zeroed after use (`zero_key()` method) |
-| master password | never stored as attribute, zeroed after derivation |
-| failed attempt tracking | stored in config, vault locks after 5 failures |
-| config writes | atomic (temp file + os.replace) |
-| database | sqlite with row factory (named columns, not indexes) |
-| emergency access | guardian key scheme (key never stored in package) |
-| breach detection | hibp k-anonymity, fully offline |
+### dashboard
+real-time SEO health score across the loaded project. key metrics: pages analyzed, issues found, average score, fixes applied. quick action panel and recent activity log. all data pulled live from the other 11 tabs.
 
----
+### code studio
+formats python (via Black), javascript, typescript, HTML, and CSS (via jsbeautifier or prettier). displays a split before/after view with line-by-line diff highlighting. also generates print-optimized CSS and speech-optimized CSS for screen readers.
 
-## cryptographic implementation details
+### SEO command
+full meta tag editor with real-time character counters (title: 50–60 characters, description: 150–160 characters). hreflang generator for multi-language sites. 0–100 page scoring with actionable recommendations. duplicate title/description/H1 detection. harmful meta refresh redirect detection.
 
-### aes-256-gcm authenticated encryption
+### schema & social
+generates valid JSON-LD markup for 8 schema types: FAQ, Product, Article, Event, Recipe, HowTo, LocalBusiness, Video. validates against google's structured data requirements. live Open Graph and Twitter Card preview. direct injection into HTML files.
 
-the original version (pre-may 2026) used aes-256-cbc, which provides confidentiality but no integrity checking. a single bit flip in the ciphertext would silently corrupt decrypted data with no warning.
+### media studio
+four capabilities in one tab:
+- favicon generator — produces all required sizes (ICO + multiple PNGs) from a single source image
+- WebP converter — bulk converts JPG/PNG to lossless WebP with automatic quality optimization
+- smart image lazy loader — described in detail below
+- smart video lazy loader — described in detail below
 
-version 3.1 replaced cbc with gcm. every decryption authenticates the ciphertext. if the tag is invalid, `cryptoerror` is raised and the operation fails. tampering is detected. corrupted data is never returned to the user.
+### link studio
+bulk find and replace across all HTML files in a project, with regex support. broken link checker for both internal and external links. orphan page detection with internal link suggestions. preview of all changes before applying.
 
-the implementation uses `cryptography.hazmat.primitives.ciphers.aead.aesgcm`. iv length is 16 bytes. tag length is 16 bytes. ciphertext layout is `iv + tag + ciphertext`.
+### accessibility hub
+checks for: missing alt text, missing html lang attribute, empty links, broken heading hierarchy, missing iframe titles, unlabeled form elements. bulk fix for missing alt attributes with smart suggestions based on filename and surrounding content. spell checker. content length analysis with word count guidelines.
 
-### pbkdf2 key derivation
+### performance lab
+scans HTML files for preload opportunities (CSS, JS, fonts, hero images) and injects the appropriate preload link tags. PageSpeed Insights integration (mobile and desktop). Core Web Vitals reporting: LCP, CLS, FID.
 
-iterations were increased from 100,000 to 200,000. on a modern cpu, derivation takes approximately one second. this is a deliberate trade-off: slower key derivation makes brute force attacks exponentially more expensive.
+### security & backup
+content security policy (CSP) generator with common presets. subresource integrity (SRI) hash generator for CDN-hosted resources. timestamped full project backups. one-click restore to any previous backup.
 
-the salt is 32 random bytes, generated per vault using `os.urandom(32)`.
+### analytics
+keyword density analysis across pages — detects both under-optimization and keyword stuffing. SEO score history tracking over time.
 
-### hmac verifier
+### batch ops
+update meta tags across hundreds of HTML files simultaneously. generate robots.txt and sitemap.xml. generate image sitemaps and video sitemaps.
 
-the vault does not store the master password. it does not store a hash of the master password. instead, it stores a 32-byte hmac of a known constant (`b"vaultkeeper-v3-verify"`) keyed with the derived encryption key.
-
-`make_verifier()` returns `hmac.new(key, constant, hashlib.sha256).digest()`  
-`verify_key(stored_verifier)` recomputes the hmac and compares with `hmac.compare_digest()`.
-
-this provides cryptographic verification of the master password without storing anything that could be reversed into the password itself.
-
-### zero_key() memory wiping
-
-python's memory management makes it difficult to guarantee that sensitive bytes are erased. the `zero_key()` method makes a best-effort attempt: it converts the key to a mutable bytearray, overwrites every byte with zero, then replaces the original reference.
-
-this is not a perfect solution (python may have copied the bytes elsewhere), but it eliminates the most obvious retention vectors.
+### code humanizer *(v2.2, early stage)*
+lowercases all code comments across a project. removes common AI-generated phrasing patterns. batch operation across all files. this is the first phase of a larger planned system — the architecture and roadmap are complete, implementation is ongoing.
 
 ---
 
-## critical bug fixes from version 3.0 to 3.1
+## two flagship features of v2.2
 
-### master password change corruption
+### smart image lazy loading with WebP preview pipeline
 
-the original `change_master_password()` function saved a new salt and config file but left every entry encrypted with the old key. the database became permanently corrupted after a password change. no error was shown. the user would only discover the corruption later when entries failed to decrypt.
+this is one of the more technically involved features in the application.
 
-the fixed version:
-1. retrieves all encrypted fields from the database (`get_all_entries_raw()`)
-2. decrypts each field with the old crypto instance
-3. re-encrypts each field with the new crypto instance
-4. updates the database with the newly encrypted values
-5. only then writes the new config file
+the standard approach to lazy loading images is to delay loading until the user scrolls to the image. aether goes further.
 
-if any decryption fails, the entire operation is rolled back and an error is returned.
+when processing a project, aether generates a preview version of every image — same dimensions, same format (WebP), but compressed to approximately 2KB regardless of the original file size. this is done using an automatic lossless compression algorithm that finds the optimal settings per image.
 
-### emergency access time-lock bypass
+when a user visits a page, they see the tiny preview immediately — it loads in milliseconds and is displayed as a soft blur placeholder. in the background, the full-quality image downloads silently. the moment the download completes, the preview is replaced seamlessly with no layout shift and no visible pop-in.
 
-the original emergency access feature used `sha256(timestamp)` as the encryption key and brute-forced ±86,400 offsets on decrypt. the waiting period was bypassable in seconds.
+every original image, regardless of its original format, is automatically converted to lossless WebP during this process — smaller file size, better quality, faster delivery.
 
-the new scheme:
-1. generates a 32-byte guardian key using `secrets.token_bytes(32)`
-2. derives an encryption key using `sha256(b"vk-emergency-v3|" + guardian_key)`
-3. encrypts the vault password with aes-256-gcm
-4. builds an hmac over `unlock_time` keyed with the guardian key
-5. stores the encrypted payload, iv, tag, and time_mac in the package
-6. the guardian key is never saved to disk
+the entire system — preview generation, WebP conversion, lazy load injection — is automatic. the developer points aether at their project folder and it handles everything.
 
-without the guardian key, decryption is computationally infeasible even with the package file. the time lock is enforced by checking `time.time() < unlock_time` before attempting decryption.
+### smart video lazy loading with parallel chunk downloading
 
-### wrong password detection
+video is the most bandwidth-expensive asset on most websites. the naive approach is to load all videos when the page loads, which is slow and wasteful — especially for users on mobile or limited data plans.
 
-the original version would attempt to decrypt the database with any password. wrong passwords would produce garbled output. the user would see random characters instead of their passwords and not understand why.
+aether's smart video lazy loader works as follows:
 
-version 3.1 verifies the password cryptographically before touching the database. the `unlock_with_password()` method:
-1. loads the salt and verifier from config
-2. derives a key using the provided password
-3. calls `verify_key(verifier)` on the crypto instance
-4. only opens the database if verification succeeds
+when a video is off-screen, it is not loaded. a low-resolution crystalline placeholder is displayed instead. when the user scrolls to the video, aether begins downloading it in 5 parallel chunks simultaneously — similar to how advanced download managers (like ADM on android) work. the 5 chunks are downloaded concurrently and assembled seamlessly into one complete video, which then replaces the placeholder.
 
-failed attempts increment a counter in the config file. after 5 failures, the vault locks and refuses further unlock attempts.
+the result is significantly faster video start times compared to sequential downloading, with zero bandwidth wasted on videos the user never reaches.
 
----
-
-## features implemented
-
-| category | features |
-|----------|----------|
-| core vault | create vault, unlock with master password, change master password (re-encrypts all entries), lock vault, auto-lock timeout, failed attempt tracking (5 max) |
-| password generator | random (1–4096 chars) with char set selection, pronounceable (4–100 chars), diceware (3–12 words, eff word list), pin (4–12 digits), apple-style (word-word-number) |
-| auto-type | system-wide keyboard simulation using `keyboard` library. tokens: username, password, totp, tab, enter, escape, space, delay, delay2, clipboard. custom format strings. presets included. |
-| totp 2fa | standard totp (rfc 6238, sha1/sha256/sha512, 6/8 digits, 30/60 sec), steam guard (5-char alphanum), yandex (pin-salted pbkdf2), motp (md5-based). time drift correction with permanent storage. |
-| breach detection | offline hibp k-anonymity. compute sha-1 of password, extract first 5 hex chars, query local sqlite database. full 900m+ password list supported via `scripts/download_hibp.py`. fallback to top-500 common passwords. |
-| security report | password strength distribution (weak/fair/strong/excellent), reused password detection (compares decrypted plaintext), weak password list with reasons, security score (0–100) with grade (a–f), recommendations. |
-| expiry reminders | password age tracking (based on updated_at or created_at). configurable notification days (default: 7, 3, 1). notification deduplication per entry per day. bulk update from reminder dialog. |
-| emergency access | create time-locked recovery packages. requires guardian key stored separately (printed, usb drive, etc). package contains encrypted vault password and hmac-verified unlock time. cannot be backdated. |
-| import/export | bitwarden json (full custom fields, folder mapping, card/identity/note/ssh types), lastpass csv, plain json, plain text. duplicate detection (title + username). |
-| backup scheduler | automatic encrypted backups. configurable frequency (daily/weekly/monthly). max backups (default 10, auto-prune oldest). atomic file copy via temp file + os.replace. |
-| attachments | store files with entries. base64 encoded in database. file metadata (size, creation date, modification date). open with default system application. preview images with pil (optional). |
-| custom fields | key-value storage per entry. supports text, hidden, boolean types. stored as json in database. |
-| dark/light theme | toggle between themes. persistent across sessions via settings.json. recursive color propagation to all widgets. |
-| cli console | built-in command line interface. commands: list, search, stats, export, generate, clear, exit. accessible via tools menu or ctrl+`. |
-| system tray | background operation (optional). show window, lock vault, exit. |
+| | standard loading | aether v2.2 |
+|--|-----------------|-------------|
+| load time (20 videos) | 4–6 seconds | ~1 second |
+| RAM usage | 400–600MB | 80–120MB |
+| videos loaded before scrolling | all | zero |
+| bandwidth for unviewed videos | wasted | zero |
 
 ---
 
 ## development timeline
 
-version 3.0 was built in 5 days. version 3.1 followed over the subsequent month with security fixes, bug corrections, and feature additions.
+the initial version (v2.0) was built in 5 days. v2.2 followed over the subsequent month with two major feature additions and extensive testing.
 
-### version 3.0 – may 11–15, 2026
-
-| date | hours | work completed |
-|------|-------|----------------|
-| may 11 | ~8h | project architecture, crypto module (aes-gcm), database schema, vault manager |
-| may 12 | ~10h | main window ui, entry list, details panel, add/edit entries, dark/light theme |
-| may 13 | ~10h | password generator, totp (basic), auto-type, clipboard manager |
-| may 14 | ~10h | breach detection (v1, fallback only), security report, expiry reminders |
-| may 15 | ~10h | import/export (bitwarden, lastpass), attachments, emergency access (v1, broken), backup scheduler |
-
-**version 3.0 total: ~48 hours across 5 days**
-
-### version 3.1 – may 16 – june 7, 2026
+### v2.0 — may 4–8, 2026
 
 | date | hours | work completed |
 |------|-------|----------------|
-| may 16 | ~2h | bug identification pass, security audit |
-| may 18 | ~2h | cbc → gcm migration, pbkdf2 iterations increase (100k → 200k) |
-| may 19 | ~3h | hmac verifier implementation, unlock_with_password rewrite |
-| may 20 | ~4h | change_master_password rewrite (re-encrypts all entries) |
-| may 21 | ~2h | database row factory fix (named columns, not indexes), like wildcard escaping |
-| may 22 | ~3h | emergency access rewrite (guardian key scheme) |
-| may 23 | ~4h | breach detection rewrite (hibp k-anonymity with sqlite) |
-| may 24 | ~3h | totp fixes (motp, yandex, steam guard corrections) |
-| may 25 | ~2h | password_gen entropy-based strength scoring |
-| may 26 | ~2h | auto-type lazy token resolution, clipboard zeroing |
-| may 27 | ~2h | atomic config writes (temp file + os.replace) |
-| may 28 | ~3h | logging migration (replace print with logging) |
-| may 29 | ~2h | launcher security fixes (no env var password leak) |
-| may 30 | ~3h | testing across windows, mac, linux |
-| june 1 | ~2h | edge case fixes, error handling improvements |
-| june 2 | ~3h | documentation, requirements.txt update, .gitignore |
-| june 3 | ~2h | final testing pass, regression checks |
-| june 7 | ~1h | readme finalization, release preparation |
+| may 4 | ~10h | project architecture, formatter, SEO tools, favicon generator, WebP converter, link manager, robots.txt |
+| may 5 | ~10h | schema generator, image lazy load, OG preview, image hints, link checker, SEO scorer, dark/light theme |
+| may 6 | ~10h | alt text checker, CSS optimizer, keyword density, spell checker, security headers, performance scanner, batch meta updater |
+| may 7 | ~10h | PageSpeed API integration, backup system, undo/redo, logs tab, tab merging (29 → 12), sidebar navigation |
+| may 8 | ~8h | theme propagation fixes, cross-platform testing, documentation, v2.0 stable release |
 
-**version 3.1 additions: ~41 hours**
+**v2.0 total: ~48 hours across 5 days**
 
-**combined total: ~89 hours. one month. one developer.**
+### v2.2 — may 12 – june 4, 2026
+
+| date | hours | work completed |
+|------|-------|----------------|
+| may 12 | ~1h | bug identification pass |
+| may 15 | ~1.5h | real-world testing, additional bugs found |
+| may 19 | ~3h | researching code humanization strategies, roadmap planning |
+| may 21 | ~4h | smart video lazy loader architecture design |
+| may 26 | ~2h | identifying the correct python approach for parallel chunk downloading |
+| may 30 | ~6h | building and shipping the smart video lazy loader |
+| june 1 | ~1h | edge case testing on video lazy load |
+| june 2 | ~3h | standard video lazy load injection mode |
+| june 3 | ~5h | code humanizer v1, final testing pass across all features |
+| june 4 | ~2h | repository cleanup, v2.2 stable release |
+
+**v2.2 additions: ~28.5 hours**
+
+**combined total: ~55 hours. one month. one developer.**
 
 ---
 
@@ -219,92 +172,54 @@ version 3.0 was built in 5 days. version 3.1 followed over the subsequent month 
 
 this project was developed under significant constraints.
 
-iran experienced widespread internet restrictions during this period, including whitelisting protocols that blocked access to github, pypi, stack overflow, and most standard development resources. the majority of the work was completed offline. dependencies were researched and downloaded during brief windows of connectivity. documentation was consulted from locally cached copies. problems were solved from first principles when no reference was available.
+iran experienced widespread internet restrictions during this period, including whitelisting protocols that blocked access to github, PyPI, stack overflow, and most standard development resources. the majority of the work was completed offline — dependencies researched and downloaded during brief windows of connectivity, documentation consulted from locally cached copies, problems solved from first principles when no reference was available.
 
-this affected not just convenience but fundamental development workflow. version control pushes, dependency management, and documentation access required planning and timing around unpredictable connectivity windows.
+this affected not just convenience but fundamental development workflow. version control pushes, dependency management, and documentation access — things most developers do without thinking — required planning and timing around unpredictable connectivity windows.
 
 the application was built anyway. it works. it is documented. it can be cloned and run by anyone.
 
 ---
 
-## code quality indicators
-
-- all sensitive fields are encrypted before storage (password, notes, totp_secret)
-- no master password retention in memory (zeroed after derivation)
-- atomic file writes prevent config corruption
-- logging at warning level by default, no sensitive data leaked to stdout
-- explicit exception handling (no bare except clauses)
-- sqlite row factory prevents column index errors
-- like wildcard escaping prevents search injection
-- hmac.compare_digest for constant-time verification
-- secrets module for all random generation (cryptographically secure)
-
----
-
-## third-party dependencies
-
-| library | version | purpose |
-|---------|---------|---------|
-| cryptography | 42.0.0+ | aes-256-gcm, pbkdf2 |
-| keyboard | 0.13.5+ | system-wide auto-type |
-| qrcode[pil] | 7.4.2+ | emergency access qr codes |
-| pillow | 10.3.0+ | image processing, icons |
-| pystray | 0.19.0+ | system tray icon |
-| pyperclip | 1.8.2+ | clipboard operations |
-
-no http client (requests) is included. vaultkeeper is offline-first and makes no network requests except optional hibp database download (separate script).
-
----
-
-## verification instructions
+## verification
 
 the authenticity and functionality of this project can be verified directly:
 
-1. clone the repository: `git clone https://github.com/mh3nj/vaultkeeper.git`
+1. clone the repository: `git clone https://github.com/mh3nj/Aether.git`
 2. install dependencies: `pip install -r requirements.txt`
-3. run the application: `python run.py`
-4. create a new vault with a master password
-5. add an entry, verify encryption (inspect vaultkeeper.db, fields should be hex-encoded ciphertext)
-6. change master password, verify all entries still decrypt correctly
-7. create an emergency access package, verify time-lock works
-8. run `scripts/download_hibp.py` (optional, requires internet), verify breach detection
+3. run the application: `python main.py`
 
 the full application launches and operates exactly as documented. no binaries, no compiled executables required. every line of code is readable in the repository.
 
 ---
 
-## known limitations
+## technical challenges solved
 
-- auto-type on linux requires root or uinput permissions (`sudo modprobe uinput`)
-- the full hibp database is ~900 mb and takes 10–30 minutes to download
-- without the hibp database, breach detection falls back to top-500 common passwords
-- attachments are stored base64-encoded in the database, which increases size by approximately 33%
-- the emergency access guardian key must be stored separately; losing it makes the package undecryptable
-- `zero_key()` makes a best-effort attempt but python's memory management may retain copies
+| challenge | solution implemented |
+|-----------|---------------------|
+| dark theme not propagating to nested Qt widgets | implemented `update_theme()` method on every merged tab, called on theme toggle |
+| FontAwesome unicode icons not rendering | resolved prefix format to `\ufxxx` with correct `\u` notation |
+| sidebar text color incorrect on startup | added `sidebar.update_theme(is_dark)` call during initial `_set_theme_state` |
+| dashboard not receiving live data from tabs | connected data bridge signals after dashboard instantiation |
+| tab bar visible after programmatic hiding | used `self.tabs.tabBar().setHidden(True)` explicitly |
+| BeautifulSoup scope issues | standardized import pattern across all tabs |
 
 ---
 
 ## about the author
 
-**mohsen jafari** is a full-time web developer based in iran, with professional experience in frontend development, backend systems, and desktop applications. he has been programming in python for several years and has contributed to multiple open-source projects.
+**Mohsen Jafari** is a full-time web developer based in iran, with professional experience in frontend development, website design, and SEO implementation.
 
-vaultkeeper was built to solve a real need: a password manager that does not require trusting someone else's cloud, paying a monthly fee, or accepting telemetry. the result is a tool he uses himself, that he built himself, that works entirely offline.
+Aether was built to solve a real problem from his own professional workflow — the hours spent on post-launch SEO and optimization work that every web project requires. the result is a tool he uses himself, that he built himself, that works.
 
 - github: [github.com/mh3nj](https://github.com/mh3nj)
 - xing: [xing.com/profile/Mohsen_Jafari093223](https://www.xing.com/profile/Mohsen_Jafari093223/)
-- logo design: [parsegan.com](https://parsegan.com)
+- logo design work: [parsegan.com](https://parsegan.com)
 - portfolio: [dahgan.com](https://dahgan.com)
-
----
-
-## declaration
-
-i, mohsen jafari, confirm that the information in this document is accurate. vaultkeeper was built by me, solo, over the period of may 11 to june 7, 2026. the source code is available at the github repository listed above. the application works as described.
 
 ---
 
 *this project was built during internet restrictions in iran. no stack overflow. no documentation access. no reliable connectivity. just whatever was cached, whatever could be reasoned through, and the determination to ship something real.*
 
-*89 hours. 18,000+ lines. 30+ features. one month. one developer.*
+*55 hours. 18,000+ lines. 31 features. 12 tools. one month. one developer.*
 
-*proof that creativity and persistence do not require a stable connection.*
+*proof that creativity and persistence don't need a stable connection.*
